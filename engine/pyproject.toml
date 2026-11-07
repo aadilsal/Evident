@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "evident"
+version = "0.1.0"
+description = "Evidence-backed architecture maps for Next.js, Express and Prisma apps."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [{ name = "Aadil Salman Butt" }]
+keywords = ["architecture", "static-analysis", "nextjs", "express", "prisma", "tree-sitter"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Environment :: Console",
+  "Topic :: Software Development :: Documentation",
+]
+dependencies = []
+
+[project.scripts]
+evident = "evident.cli:run"
+
+[project.urls]
+Homepage = "https://github.com/aadilsal/Evident"
+
+[dependency-groups]
+dev = [
+  "ruff>=0.8",
+  "mypy>=1.13",
+  "pytest>=8.3",
+  "jsonschema>=4.23",
+  "pre-commit>=4.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/evident"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+extend-exclude = ["tests/fixtures"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF", "PTH", "N"]
+
+[tool.ruff.lint.per-file-ignores]
+# git is invoked with a fixed argv list, never through a shell
+"src/evident/repo.py" = ["S603", "S607"]
+"tests/**" = ["S101", "S603", "S607"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["jsonschema", "jsonschema.*", "referencing", "referencing.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

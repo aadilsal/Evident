@@ -36,3 +36,9 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Private planning docs (tracker, design notes, case study drafts)
+docs/internal/
+
+# Local agent settings
+.claude/settings.local.json

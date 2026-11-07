@@ -26,7 +26,7 @@ Evident turns a public GitHub repo (Next.js / Express / Prisma) into an evidence
 4. **Schema changes are contract changes.** Edit `schema/graph.schema.json`, bump `schemaVersion` (minor = additive, major = breaking), update `schema/examples/`, and update both engine and web in the same PR.
 5. **Never read or store env var values**, only names.
 6. **Don't regress the benchmark.** CI fails if precision or recall drops more than 2 points in any category. If a change trades one metric for another, say so in the PR.
-7. **Decisions go in ADRs.** If you change a decision recorded in `docs/adr/` or `docs/design-doc.md`, write a new ADR that supersedes it. Don't silently diverge.
+7. **Decisions go in ADRs.** If you change a decision recorded in `docs/adr/` or `docs/PRD.md`, write a new ADR that supersedes it. Don't silently diverge.
 
 ## Commands
 
@@ -61,4 +61,4 @@ cd engine && uv run evident-bench
 
 ## When unsure
 
-Check `docs/design-doc.md` and `docs/adr/` first. If they don't answer it, ask rather than guess, especially about scope (v1 vs v1.5 vs v2).
+Check `docs/PRD.md` and `docs/adr/` first (plus the gitignored `docs/internal/` notes, if present locally). If they don't answer it, ask rather than guess, especially about scope (v1 vs v1.5 vs v2).

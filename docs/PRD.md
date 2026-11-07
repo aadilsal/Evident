@@ -4,7 +4,7 @@
 | --- | --- |
 | Owner | Aadil Salman Butt |
 | Status | Draft, pre-development |
-| Source of truth | [design-doc.md](design-doc.md). If this PRD and the design doc disagree, the design doc wins; fix the PRD. |
+| Scope reference | This PRD plus the [ADRs](adr/). Update both when a decision changes. |
 | Last updated | 2026-11-07 |
 
 ## 1. Problem
@@ -110,7 +110,7 @@ An evidence-backed, interactive architecture map for JS/TS full-stack apps (Next
 
 ## 9. Risks
 
-See [design-doc.md § Risks](design-doc.md#risks-and-open-questions). The top two: dynamic route registration missed by static analysis (mitigation: confidence + benchmark measures misses), and scope creep (mitigation: v1 rows only).
+The top risks: dynamic route registration missed by static analysis (mitigation: confidence + benchmark measures misses), and scope creep (mitigation: v1 rows only).
 
 ## 10. Open questions
 

@@ -178,7 +178,6 @@ Full scope and rationale: [PRD](docs/PRD.md) · [Architecture](docs/architecture
 
 | Doc | What's in it |
 | --- | --- |
-| [Design doc](docs/design-doc.md) | Source of truth: positioning, scope, decisions |
 | [PRD](docs/PRD.md) | Users, requirements, success metrics, milestones |
 | [Architecture](docs/architecture.md) · [Essentials](docs/architecture-essentials.md) | Full system design · the one-page rules |
 | [Graph schema](schema/) | The engine ↔ UI contract |

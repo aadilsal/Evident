@@ -49,7 +49,7 @@ Adding a benchmark repo? Follow the [labelling guide](docs/labelling-guide.md) e
 
 ## Changing a decision
 
-Decisions live in [docs/adr/](docs/adr/). To change one, add a new ADR that supersedes it (copy `0000-template.md`) and link it from the old one. Update [docs/design-doc.md](docs/design-doc.md) if scope changes.
+Decisions live in [docs/adr/](docs/adr/). To change one, add a new ADR that supersedes it (copy `0000-template.md`) and link it from the old one. Update [docs/PRD.md](docs/PRD.md) if scope changes.
 
 ## Changing the graph schema
 

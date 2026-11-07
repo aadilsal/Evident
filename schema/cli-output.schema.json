@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/aadilsal/Evident/main/schema/cli-output.schema.json",
+  "title": "Evident CLI --json output",
+  "description": "Envelope printed by every `evident <command> --json`. Summary first, then a capped list of results. Evidence is compact `file:line` or `file:start-end` strings; full evidence lives in the graph (graph.schema.json).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "graphSchemaVersion", "tool", "command", "exitCode", "summary", "total", "truncated", "results"],
+  "properties": {
+    "schemaVersion": { "description": "Version of this output schema.", "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "graphSchemaVersion": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": { "name": { "const": "evident" }, "version": { "type": "string" } }
+    },
+    "command": { "enum": ["analyze", "trace", "impact", "find", "health", "show"] },
+    "exitCode": { "description": "0 ok, 1 findings or no match, 2 usage error, 3 analysis error.", "enum": [0, 1, 2, 3] },
+    "summary": { "description": "One line a human or agent can act on without reading results.", "type": "string", "minLength": 1 },
+    "repo": { "$ref": "graph.schema.json#/$defs/repo" },
+    "query": { "description": "The resolved query (target node IDs, filters, depth, limit).", "type": "object" },
+    "total": { "description": "Results before --limit was applied.", "type": "integer", "minimum": 0 },
+    "truncated": { "type": "boolean" },
+    "results": { "type": "array", "items": { "$ref": "#/$defs/result" } },
+    "stats": { "$ref": "#/$defs/stats" },
+    "error": { "type": "string" }
+  },
+  "$defs": {
+    "evidenceRef": { "type": "string", "pattern": "^.+:\\d+(-\\d+)?$" },
+    "result": {
+      "description": "One row. Which fields appear depends on the command.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "label": { "type": "string" },
+        "depth": { "description": "Hops from the query target.", "type": "integer", "minimum": 0 },
+        "via": { "description": "Edge type that reached this row.", "enum": ["handles", "guards", "calls", "imports", "reads", "writes", "relates", "uses"] },
+        "direction": { "description": "show: edge direction relative to the shown node.", "enum": ["in", "out"] },
+        "op": { "description": "Prisma operation for reads/writes.", "type": "string" },
+        "source": { "enum": ["extracted", "inferred"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "rule": { "type": "string" },
+        "severity": { "enum": ["info", "warning", "error"] },
+        "message": { "type": "string" },
+        "nodeIds": { "type": "array", "items": { "type": "string" } },
+        "routes": { "description": "find: routes that reach this reader/writer.", "type": "array", "items": { "type": "string" } },
+        "attrs": { "type": "object" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidenceRef" } }
+      }
+    },
+    "stats": {
+      "description": "analyze only.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "parsed", "reused", "nodes", "edges", "findings", "durationMs", "cache", "llm", "graphPath"],
+      "properties": {
+        "files": { "type": "integer", "minimum": 0 },
+        "parsed": { "type": "integer", "minimum": 0 },
+        "reused": { "type": "integer", "minimum": 0 },
+        "nodes": { "type": "integer", "minimum": 0 },
+        "edges": { "type": "integer", "minimum": 0 },
+        "findings": { "type": "integer", "minimum": 0 },
+        "byType": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+        "durationMs": { "type": "integer", "minimum": 0 },
+        "cache": { "enum": ["hit", "partial", "miss"] },
+        "llm": { "enum": ["used", "skipped", "unavailable"] },
+        "graphPath": { "description": "Relative to the current directory.", "type": "string" }
+      }
+    }
+  }
+}

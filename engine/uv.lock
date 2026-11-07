@@ -107,7 +107,7 @@ wheels = [
 ]
 
 [[package]]
-name = "evident"
+name = "evident-map"
 version = "0.1.0"
 source = { editable = "." }
 

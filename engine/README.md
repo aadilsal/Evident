@@ -1,9 +1,11 @@
-# evident (engine + CLI)
+# evident-map (engine + CLI)
+
+Installed as `evident-map`; imports as `evident` and provides the `evident` command.
 
 The analysis engine behind [Evident](https://github.com/aadilsal/Evident): a static, read-only extractor that turns a Next.js / Express / Prisma repo into an evidence-backed graph. The web app, the agent skill and the future MCP server all sit on top of this package.
 
 ```bash
-pip install -e engine        # from the repo root
+pip install evident-map        # or, from a clone: pip install -e engine
 evident analyze .            # build or refresh .evident/graph.json
 evident trace "POST /api/users"
 evident impact User.email

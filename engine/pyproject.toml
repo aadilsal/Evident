@@ -3,7 +3,7 @@ requires = ["hatchling>=1.25"]
 build-backend = "hatchling.build"
 
 [project]
-name = "evident"
+name = "evident-map"
 version = "0.1.0"
 description = "Evidence-backed architecture maps for Next.js, Express and Prisma apps."
 readme = "README.md"

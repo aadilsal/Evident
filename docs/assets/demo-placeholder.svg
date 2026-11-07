@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="420" viewBox="0 0 860 420" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect width="860" height="420" rx="14" fill="#0d1117"/>
+  <g stroke="#30363d" stroke-width="2" fill="#161b22">
+    <rect x="50" y="170" width="170" height="56" rx="8"/>
+    <rect x="270" y="170" width="150" height="56" rx="8"/>
+    <rect x="480" y="100" width="150" height="56" rx="8"/>
+    <rect x="480" y="240" width="150" height="56" rx="8"/>
+    <rect x="690" y="240" width="120" height="56" rx="8"/>
+  </g>
+  <g stroke="#58a6ff" stroke-width="2.5" fill="none">
+    <path d="M220 198 H270"/>
+    <path d="M420 198 C450 198 450 128 480 128"/>
+    <path d="M420 198 C450 198 450 268 480 268"/>
+    <path d="M630 268 H690"/>
+  </g>
+  <g fill="#e6edf3" font-size="15" text-anchor="middle">
+    <text x="135" y="203">POST /api/invoices</text>
+    <text x="345" y="203">createInvoice()</text>
+    <text x="555" y="133">Stripe</text>
+    <text x="555" y="273">Invoice model</text>
+    <text x="750" y="273">invoices</text>
+  </g>
+  <text x="430" y="370" fill="#8b949e" font-size="16" text-anchor="middle">Demo GIF coming soon</text>
+</svg>

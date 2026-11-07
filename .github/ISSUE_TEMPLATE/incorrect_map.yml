@@ -1,0 +1,37 @@
+name: Incorrect map
+description: A route, model, service or edge is missing, wrong or invented
+title: "map: "
+labels: [accuracy]
+body:
+  - type: input
+    id: repo
+    attributes:
+      label: Repository URL
+      placeholder: https://github.com/owner/repo
+    validations:
+      required: true
+  - type: input
+    id: sha
+    attributes:
+      label: Commit SHA
+      description: Shown in the map header, or `evident analyze --json` → repo.sha
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What's wrong?
+      options:
+        - Missing (exists in code, not on the map)
+        - Invented (on the map, not in code)
+        - Wrong (e.g. read shown as write, wrong path)
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details and evidence
+      description: The node or edge, and the file:line that proves what's actually true.
+      placeholder: "POST /api/teams writes Membership, see packages/lib/teams.ts:88"
+    validations:
+      required: true

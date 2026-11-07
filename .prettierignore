@@ -1,0 +1,9 @@
+# Prettier formats web/ code and repo-level JSON/YAML; Markdown is left as written.
+*.md
+engine/
+benchmark/.repos/
+node_modules/
+.next/
+.evident/
+pnpm-lock.yaml
+package-lock.json

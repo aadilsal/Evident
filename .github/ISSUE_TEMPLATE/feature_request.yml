@@ -1,0 +1,19 @@
+name: Feature request
+description: Suggest a feature or a framework pattern to support
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: For a new framework pattern, include a minimal code example.
+  - type: markdown
+    attributes:
+      value: "Scope is set in the roadmap (v1 / v1.5 / v2) in docs/PRD.md. Out-of-scope requests may be parked."

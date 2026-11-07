@@ -67,7 +67,7 @@ Five deterministic stages and one LLM stage. Each stage is a pure function from 
 
 | # | Stage | Input → output | Notes |
 | --- | --- | --- | --- |
-| 1 | **Fetch** | URL + sha → checkout in temp dir | `git clone --depth 1 --filter=blob:limit=1m --no-tags`, hooks disabled, no submodules, no LFS. Enforce size/file caps. See [threat-model.md](threat-model.md). |
+| 1 | **Fetch** | URL + sha → checkout in temp dir | `git clone --depth 1 --filter=blob:limit=1m --no-tags`, hooks disabled, no submodules, no LFS. Enforce size/file caps. See [security.md](security.md). |
 | 2 | **Parse** | files → syntax trees | tree-sitter TS/TSX/JS grammars plus a small `schema.prisma` parser. Skip `node_modules`, build output, minified files, files > 1 MB. |
 | 3 | **Extract** | trees → raw facts | Independent extractors: `next_routes`, `express_routes`, `prisma_schema`, `prisma_calls`, `services`, `env_vars`, `imports`. Each fact carries evidence. |
 | 4 | **Link** | facts → graph | Resolve imports (tsconfig paths, workspaces), bind route → handler, follow call edges, track the Prisma client instance through re-exports, assign deterministic node IDs. Unresolvable links become `inferred` with lower confidence. |

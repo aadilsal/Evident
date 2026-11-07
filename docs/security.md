@@ -1,4 +1,4 @@
-# Threat model
+# Security and threat model
 
 Evident clones and analyses repositories **it did not write and must not trust**, then republishes facts about them on a public site. This page lists what we protect, what can go wrong, and the rules that prevent it.
 

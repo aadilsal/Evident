@@ -110,7 +110,7 @@
       "required": ["method", "path", "framework", "kind"],
       "properties": {
         "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"] },
-        "path": { "description": "Normalised path, see docs/benchmark/labelling-guide.md.", "type": "string", "pattern": "^/" },
+        "path": { "description": "Normalised path, see docs/labelling-guide.md.", "type": "string", "pattern": "^/" },
         "framework": { "enum": ["next-app-router", "express"] },
         "kind": { "enum": ["api", "page", "layout", "serverAction"] },
         "handlerRef": { "$ref": "#/$defs/nodeId" },

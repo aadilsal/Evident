@@ -21,7 +21,7 @@ The LLM can never create, delete or modify nodes or edges. If the call fails, th
 ## Consequences
 
 - The hallucination rate for nodes and edges is zero by construction. The only LLM risk is a poor grouping, which is measured by a rubric in the benchmark.
-- File contents never reach the LLM, which removes most prompt-injection surface ([threat-model.md](../threat-model.md) T6) and keeps token cost small.
+- File contents never reach the LLM, which removes most prompt-injection surface ([security.md](../security.md) T6) and keeps token cost small.
 - **Cost:** the LLM can't recover facts static analysis missed. That's intentional: misses show up as recall in the benchmark instead of being papered over.
 
 ## Alternatives considered

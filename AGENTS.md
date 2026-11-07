@@ -20,7 +20,7 @@ Evident turns a public GitHub repo (Next.js / Express / Prisma) into an evidence
 
 ## Non-negotiable rules
 
-1. **Never execute analysed repo code.** No `npm install`, `npx`, builds, `eval`, `require()`/`import()` of cloned files, or git hooks. Parse with tree-sitter and read files as text only. See [docs/threat-model.md](docs/threat-model.md).
+1. **Never execute analysed repo code.** No `npm install`, `npx`, builds, `eval`, `require()`/`import()` of cloned files, or git hooks. Parse with tree-sitter and read files as text only. See [docs/security.md](docs/security.md).
 2. **Every node and edge needs evidence** (`file`, `startLine`, `endLine`, `sha`). If you can't point to a line, don't emit the element.
 3. **The LLM never creates nodes or edges.** It may only return groups and labels that reference existing node IDs; the validator drops anything else. Don't loosen the validator to make a test pass.
 4. **Schema changes are contract changes.** Edit `schema/graph.schema.json`, bump `schemaVersion` (minor = additive, major = breaking), update `schema/examples/`, and update both engine and web in the same PR.

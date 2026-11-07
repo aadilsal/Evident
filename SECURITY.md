@@ -24,4 +24,4 @@ Only the latest deployed version and the `main` branch receive fixes.
 
 ## How we design for this
 
-See the [threat model](docs/threat-model.md). The core rule: **Evident never executes the code it analyses.**
+See the [threat model](docs/security.md). The core rule: **Evident never executes the code it analyses.**

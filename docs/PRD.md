@@ -75,7 +75,7 @@ An evidence-backed, interactive architecture map for JS/TS full-stack apps (Next
 | Area | Requirement | Status |
 | --- | --- | --- |
 | Correctness | Every element validates against `schema/graph.schema.json`; LLM output references only existing IDs | Fixed |
-| Safety | No execution of analysed code; limits per [threat-model.md](threat-model.md) | Fixed |
+| Safety | No execution of analysed code; limits per [security.md](security.md) | Fixed |
 | Latency | Cached graph < 500 ms; fresh analysis of a ~500-file repo p50 < 60 s | Proposed, confirm after first benchmark |
 | Cost | LLM spend under a monthly cap; one grouping call per uncached commit | Cap TBD (open question) |
 | Availability | Gallery and landing page stay up if worker/API is down; uptime monitor alerts | Fixed |

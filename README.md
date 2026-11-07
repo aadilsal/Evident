@@ -94,7 +94,7 @@ A hand-labelled benchmark of **15–20 open-source repos**, each pinned to a com
 | Route → model read/write edges | ≥ 90% | ≥ 85% | *pending first run* |
 | External services | tracked | tracked | *pending first run* |
 
-The same repos are run through GitDiagram as a baseline, so the comparison is honest and reproducible. Method: [benchmark labelling guide](docs/benchmark/labelling-guide.md). Results: the public `/benchmarks` page *(at launch)*.
+The same repos are run through GitDiagram as a baseline, so the comparison is honest and reproducible. Method: [benchmark labelling guide](docs/labelling-guide.md). Results: the public `/benchmarks` page *(at launch)*.
 
 ## How it is different
 
@@ -136,7 +136,7 @@ Five of the six stages are deterministic. The LLM stage can only label node IDs 
 
 **Supported in v1:** Next.js App Router (route handlers, pages, layouts, server actions, `middleware.ts`), Express (`app.METHOD`, `Router()` mounts and prefixes, middleware chains), Prisma (models, relations, `prisma.<model>.<op>()` classified as read or write), SDK detection (Stripe, S3, Resend, Redis, OpenAI and more), `process.env.*`, and a module graph that understands `tsconfig` path aliases and monorepo workspaces.
 
-**Safe by design:** Evident never runs the code it analyses. There's no `npm install`, no build and no scripts. Clones are shallow and size-capped, every job has a time limit, temp directories are wiped after each job, and every IP is rate limited. See the [threat model](docs/threat-model.md).
+**Safe by design:** Evident never runs the code it analyses. There's no `npm install`, no build and no scripts. Clones are shallow and size-capped, every job has a time limit, temp directories are wiped after each job, and every IP is rate limited. See the [threat model](docs/security.md).
 
 ## Quick start
 
@@ -184,8 +184,8 @@ Full scope and rationale: [PRD](docs/PRD.md) · [Architecture](docs/architecture
 | [Graph schema](schema/) | The engine ↔ UI contract |
 | [DESIGN.md](DESIGN.md) | Visual design system: tokens, components, motion rules |
 | [ADRs](docs/adr/) | Why Python + tree-sitter, React Flow, ID-only LLM, self-hosting |
-| [Labelling guide](docs/benchmark/labelling-guide.md) | How ground truth is counted |
-| [Threat model](docs/threat-model.md) · [Security policy](SECURITY.md) | Analysing untrusted repos safely |
+| [Labelling guide](docs/labelling-guide.md) | How ground truth is counted |
+| [Threat model](docs/security.md) · [Security policy](SECURITY.md) | Analysing untrusted repos safely |
 
 ## Contributing
 

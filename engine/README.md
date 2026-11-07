@@ -18,7 +18,7 @@ Every command takes `--json` (the [CLI output schema](../schema/cli-output.schem
 
 **Exit codes:** `0` ok · `1` findings or no match · `2` usage error · `3` analysis error.
 
-**Safety:** never executes repo code, never follows symlinks, and writes only inside `.evident/`. See [docs/threat-model.md](../docs/threat-model.md).
+**Safety:** never executes repo code, never follows symlinks, and writes only inside `.evident/`. See [docs/security.md](../docs/security.md).
 
 ## Development
 

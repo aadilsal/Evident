@@ -45,7 +45,7 @@ Types: `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `build`, `ci`, `chore`
 
 If your change touches the engine, CI re-runs the benchmark. **A drop of more than 2 points in any category fails the build.** If a trade-off is intentional (e.g. +5 recall, −1 precision), explain it in the PR.
 
-Adding a benchmark repo? Follow the [labelling guide](docs/benchmark/labelling-guide.md) exactly. Unlabelled conventions make the numbers meaningless.
+Adding a benchmark repo? Follow the [labelling guide](docs/labelling-guide.md) exactly. Unlabelled conventions make the numbers meaningless.
 
 ## Changing a decision
 

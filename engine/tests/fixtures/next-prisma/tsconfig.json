@@ -1,7 +1,7 @@
 {
   // JSONC on purpose: comments and trailing commas must parse.
   "compilerOptions": {
-    "baseUrl": ".",
+    // No baseUrl (deprecated in TS 6): paths resolve relative to this file.
     "paths": { "@/*": ["./src/*"] },
   },
 }

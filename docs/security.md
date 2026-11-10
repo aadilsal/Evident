@@ -30,7 +30,7 @@ Evident clones and analyses repositories **it did not write and must not trust**
 | T5 | **Leftover data** between jobs | Each job gets a fresh `mkdtemp` dir, removed in a `finally` block, plus a periodic sweeper for orphaned dirs older than 10 min. Use tmpfs where RAM allows. |
 | T6 | **Prompt injection** from repo text (comments, names, README) steering the LLM | Send the LLM only node IDs, types, short labels and paths, never file contents. Validate the output strictly: unknown IDs are dropped, lengths capped, and the schema is enforced. LLM text is always shown as `inferred`. |
 | T7 | **XSS** via labels, paths, snippets or LLM summaries | Render everything as text; no `dangerouslySetInnerHTML`. Shiki output only from escaped source. Strict CSP. |
-| T8 | **Publishing secrets** found in repos | Env var **names** only; values are never read or stored. Snippets come from public repos, but a takedown path exists ([SECURITY.md](../SECURITY.md)) along with a per-repo delete. |
+| T8 | **Publishing secrets** found in repos | Env var **names** only; values are never read or stored. `.env.example` yields names only; `docker-compose` `environment:` blocks are never read. Snippets come from public repos, but a takedown path exists ([SECURITY.md](../SECURITY.md)) along with a per-repo delete. |
 | T9 | **Abuse / cost blow-up**: scripted submissions, LLM spend | Per-IP rate limit in Redis, global concurrent-job cap, cache by commit SHA, cheap model for grouping, monthly spend cap with hard stop, gallery precomputed. |
 | T10 | **Secret leakage** from our own infra | Keys only in the worker's env, never in graphs, logs or the frontend bundle. `.env` git-ignored, gitleaks in pre-commit, least-privilege fine-grained GitHub token (public read only). |
 | T11 | **Container escape / lateral movement** | Worker runs as non-root with a read-only root filesystem, `no-new-privileges` and all capabilities dropped, on its own network. Postgres and Redis are not exposed outside the Compose network. |
@@ -46,6 +46,10 @@ Evident clones and analyses repositories **it did not write and must not trust**
 6. Everything from a repo is rendered as text.
 7. Env var names, never values.
 8. Rate limits per IP and a hard LLM spend cap.
+
+## Benchmark clones
+
+`evident-bench` fetches each benchmark repo at its pinned SHA into the gitignored `benchmark/.repos/` with the same safe git settings as analysis (no hooks, no symlinks, https only, no LFS) and never installs or runs anything in it. Labellers read those clones as text only.
 
 ## Local CLI and Claude skill
 

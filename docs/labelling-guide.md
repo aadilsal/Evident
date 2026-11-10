@@ -20,7 +20,7 @@ How a route, model, service or edge is counted in the ground-truth YAML. If the 
 
 ## Adapters covered
 
-The rules below cover the **Next.js, Express and Prisma** adapters. Each other adapter ([ADR-0006](adr/0006-adapter-architecture.md): NestJS, Fastify, Drizzle, TypeORM, Mongoose, Django, FastAPI, Flask, Django ORM, SQLAlchemy) gets its own counting rules in this guide **in the same PR as the adapter**. Until it has them, that adapter's benchmark items aren't scored. Record which adapters a repo uses under `adapters:` in `benchmark/repos.yaml`.
+The rules below cover the JS/TS adapters: **Next.js, Express, NestJS, Fastify, Prisma, Drizzle, TypeORM and Mongoose**. The Python adapters ([ADR-0006](adr/0006-adapter-architecture.md): Django, FastAPI, Flask, Django ORM, SQLAlchemy) get their own counting rules here **in the same PR as the adapter**. Until an adapter has rules, its benchmark items aren't scored. Record which adapters a repo uses under `adapters:` in `benchmark/repos.yaml`, and tag each route with `framework:` and each model and edge with `orm:`, so metrics can be reported per adapter.
 
 ## Routes
 
@@ -33,7 +33,9 @@ A route is one **(method, normalised path)** pair that a client can call.
 | `app/dashboard/layout.tsx` | 1 route: `GET /dashboard` (kind `layout`). Layouts are separate from pages. |
 | `"use server"` exported action `createInvoice` | 1 route: `POST action:createInvoice` (kind `serverAction`), path `action:<file>#<export>` |
 | Route groups `(marketing)` and private folders `_components` | Group segment removed from the path; private folders are not routes |
-| Dynamic segments | `[id]` → `:id`, `[...slug]` → `:slug*`, `[[...slug]]` → `:slug*?` |
+| Dynamic segments | `[id]` → `:id`, `[...slug]` → `:slug*`, `[[...slug]]` → `:slug*?`. Names can contain hyphens (`[[...sign-in]]` → `:sign-in*?`). |
+| Several layouts resolve to the same path (`app/layout.tsx`, `app/(shop)/layout.tsx`) | 1 route |
+| `loading`, `error`, `not-found`, `template`, `robots`, `sitemap` files | Not routes |
 | Express `router.get('/:id', h)` mounted with `app.use('/api/users', router)` | `GET /api/users/:id` (full resolved path) |
 | Express `app.all('/x')` | 1 route with method `ALL` |
 | Express `router.route('/x').get(a).post(b)` | 2 routes |
@@ -43,11 +45,37 @@ A route is one **(method, normalised path)** pair that a client can call.
 
 Trailing slashes are removed (`/api/users/` → `/api/users`). The root page is `/`.
 
-**Match rule:** method equal, and normalised path equal after replacing every param name with `:_` (so `:id` and `:userId` match).
+**Match rule:** method equal, and normalised path equal after replacing every param name with `:_` (so `:id` and `:userId` match). A layout keeps its own key, so a page and a layout at the same path are two routes.
+
+### NestJS
+
+| Situation | Count as |
+| --- | --- |
+| `@Controller('users')` + `@Get(':id')` with `app.setGlobalPrefix('api')` | `GET /api/users/:id` |
+| `@Controller()` / `@Get()` with no path | The prefix + controller path alone |
+| `@Get(['a', 'b'])` | The first path; the rest are `optional: true` |
+| URI versioning with `VERSION_NEUTRAL` in `defaultVersion` | The unversioned path; `/v1/...` aliases are `optional: true` |
+| Controller methods without an HTTP-method decorator | Not routes |
+
+### Fastify
+
+| Situation | Count as |
+| --- | --- |
+| `app.get('/x', [opts], handler)` | 1 route |
+| `app.route({ method: ['GET', 'PUT'], url: '/x', handler })` | 1 route per method |
+| `app.register(plugin, { prefix: '/api' })` | Routes inside the plugin get the prefix, nested registrations stack |
+| A plugin that is never registered | Its local paths, `optional: true` |
 
 ## Models
 
-One entry per `model` block in any `schema.prisma` (including multi-file `prisma/schema/*.prisma`). Record the `@@map` table name if present. Enums, views and types are not models.
+One entry per model the app defines, by ORM:
+
+| ORM | One model per… | Name |
+| --- | --- | --- |
+| Prisma | `model` block in any `*.prisma` file (enums, views, types are not models); record `@@map` | Model name |
+| Drizzle | `pgTable` / `mysqlTable` / `sqliteTable` call | The exported **variable** (`export const users = pgTable('users', …)` → `users`) |
+| TypeORM | `@Entity()` class | Class name; table from `@Entity('name')` |
+| Mongoose | `model('Name', schema)` call | The string name |
 
 **Match rule:** model name, case-sensitive.
 
@@ -66,6 +94,18 @@ One entry per **provider** the app talks to, identified by an SDK import from fi
 | `@sendgrid/mail` | `sendgrid` |
 | `twilio` | `twilio` |
 | `@sentry/*` | `sentry` |
+| `@aws-sdk/client-ses` | `aws-ses` |
+| `@stripe/*` (e.g. `@stripe/stripe-js` in a web client) | `stripe` |
+| `groq-sdk` | `groq` |
+| `@google/generative-ai`, `@google/genai` | `google-gemini` |
+| `cloudinary` | `cloudinary` |
+| `@supabase/*` | `supabase` |
+| `convex`, `@convex-dev/*` | `convex` |
+| `@clerk/*` | `clerk` |
+| `@arcjet/*` | `arcjet` |
+| `@sfpy/node-core` | `safepay` |
+
+Hosted backends (Supabase, Convex) count as services even when they hold the app's data: the app reaches them over the network through a vendor SDK. A package declared in `package.json` but never imported is not a service. A dynamic `import('stripe')` counts.
 
 Not services: Prisma itself, the app's own database, UI and utility libraries, auth helpers that make no network call of their own. A plain `fetch('https://api.x.com')` with a literal host counts as `http:<host>` and is `optional: true`.
 
@@ -88,6 +128,16 @@ The edge that matters most: **does this route read or write this model?**
 | Calls inside `$transaction([...])` or `$transaction(async tx => tx.model.op())` | Count normally |
 | `$queryRaw`, `$executeRaw` | Not counted unless the table is a literal; then `optional: true` |
 | Repository class or wrapper (`userRepo.save()`) that ends in a Prisma call | Count it. This is what makes the benchmark hard. |
+| A server component (page/layout) that calls a server action or function directly | Count the callee's edges for that page. JSX children (`<Header />`) are not calls. |
+| Work enqueued on a job queue (`queue.add(...)`) | Not counted: the worker isn't statically reachable from the route |
+
+The same reachability rule applies to the other ORMs; only the call shapes differ:
+
+| ORM | `read` | `write` |
+| --- | --- | --- |
+| Drizzle | `select().from(t)`, joins on `t`, `db.query.t.findMany/findFirst` | `insert(t)`, `update(t)`, `delete(t)` |
+| TypeORM (repository from `getRepository(E)`, `@InjectRepository(E)` or a `Repository<E>` field) | `find*`, `count*`, `exist*`, `sum`/`average`/`minimum`/`maximum` | `save`, `insert`, `update`, `upsert`, `delete`, `remove`, `softDelete`, `softRemove`, `restore`, `increment`, `decrement`, `clear` |
+| Mongoose (model binding, or `@InjectModel` field typed `Model<E>`) | `find*`, `countDocuments`, `estimatedDocumentCount`, `exists`, `aggregate`, `distinct` | `create`, `insertMany`, `update*`, `delete*`, `replaceOne`, `bulkWrite`, `findOneAnd*`/`findByIdAnd*`, `new Model().save()` |
 
 A route with both a read and a write to the same model gets two edges. Multiple calls of the same op count once.
 
@@ -101,6 +151,7 @@ Per category (routes, models, services, route-model edges), and per adapter:
 - **Recall** = matched ground-truth items / all non-optional ground-truth items
 - **F1** = harmonic mean
 - **Hallucination rate** = predicted items with no ground-truth match (optional or not) / all predictions
+- **Engine-marked dynamic predictions** (`dynamic: true`, a computed path) are scored like optional items: they don't count against precision, but an unmatched one still counts in the hallucination rate.
 - **Grouping rubric** (LLM groups, 1–5 each): *coherent* (members belong together), *named well* (label matches members), *complete* (no obvious orphan nodes). Two runs, averaged.
 
 Report per repo and micro-averaged across repos. Also record analysis time and LLM cost per repo.

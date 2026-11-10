@@ -7,6 +7,7 @@
 **Point it at a repo. Get an interactive map of every route, database table and external service in your web app, and how they connect.
 Every box and every arrow links to the exact line of code that proves it.**
 
+[![CI](https://github.com/aadilsal/Evident/actions/workflows/ci.yml/badge.svg)](https://github.com/aadilsal/Evident/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Status](https://img.shields.io/badge/status-pre--alpha-orange)
 ![Stack](https://img.shields.io/badge/stacks-Next.js%20·%20Express%20·%20Prisma%20·%20Django%20·%20FastAPI%20·%20more-black)
@@ -82,18 +83,21 @@ Not a static Mermaid image. A zoomable map built with React Flow and ELK auto-la
 
 ## Status
 
-Pre-alpha, in **Phase 1 (Engine)**. This table is updated with every change.
+Pre-alpha. **Phase 1 (Engine) is complete and Gate A is met.** Next up: Phase 2, the Claude skill. This table is updated at the end of every phase.
 
 | Piece | State |
 | --- | --- |
-| Graph schema `1.0.0` + CLI output schema | ✅ Done |
-| `evident-map` package: `analyze`, `trace`, `impact`, `find`, `health`, `show`, `--json`, exit codes | ✅ Scaffolded and tested. Commands run end to end but return an empty map until adapters land |
-| Incremental `.evident/` cache, offline `--no-llm` mode, safe GitHub shallow clone | ✅ Done |
-| Health rules: unguarded write, unused model, undocumented env, import cycles | ✅ Logic done; waits on extracted facts. Unvalidated body pending |
-| Universal layer, stack detection, framework/ORM adapters | 🚧 Next |
-| Benchmark: repos pinned in [`benchmark/repos.yaml`](benchmark/repos.yaml) | 🚧 Labelling not started |
-| Claude skill, `export`, `open`, `share` | ⏳ Planned (week 4) |
-| API, worker, Groq grouping, web map UI, gallery, CI | ⏳ Planned |
+| Graph schema `1.1.0` + CLI output schema `1.1.0` | ✅ Done |
+| JS/TS adapters: Next.js, Express, NestJS, Fastify, Prisma, Drizzle, TypeORM, Mongoose | ✅ Done, with fixture tests |
+| Universal layer: module graph, SDK services, env vars, `docker-compose` containers, `tsconfig` aliases, workspaces | ✅ Done (JS/TS) |
+| Stack detection + fallback map for unsupported stacks | ✅ Done |
+| CLI: `analyze`, `trace`, `impact`, `find`, `health`, `show` with `--json` | ✅ Done |
+| Health rules: unguarded write, unvalidated body, import cycle, unused model, undocumented env | ✅ Done |
+| Benchmark: 5 repos labelled, `evident-bench`, CI gate (>2 pt drop fails) | ✅ Done |
+| CI: pre-commit, mypy + pytest on Linux and Windows, benchmark gate | ✅ Done |
+| Claude skill, `export`, `open`, `share` | ⏳ Phase 2 (week 4) |
+| API, worker, Groq grouping, Python adapters | ⏳ Phase 3 |
+| Web map UI, `/benchmarks` page, gallery | ⏳ Phase 4 |
 
 ## Accuracy, measured not promised
 
@@ -103,10 +107,12 @@ A hand-labelled benchmark of **15–20 repos**, each pinned to a commit and cove
 
 | Category | Target precision | Target recall | Current |
 | --- | :-: | :-: | :-: |
-| Routes | ≥ 90% | ≥ 85% | *pending first run* |
-| Models | ≥ 90% | ≥ 85% | *pending first run* |
-| Route → model read/write edges | ≥ 90% | ≥ 85% | *pending first run* |
-| External services | tracked | tracked | *pending first run* |
+| Routes | ≥ 90% | ≥ 85% | **100% / 100%** (366 routes) |
+| Models | ≥ 90% | ≥ 85% | **100% / 100%** (20 models) |
+| Route → model read/write edges | ≥ 90% | ≥ 85% | **100% / 100%** (161 edges) |
+| External services | tracked | tracked | **100% / 100%** (15 services) |
+
+*Current* = precision / recall at Gate A (2026-11-10) on the first 5 repos (Next.js, Express, NestJS and Prisma), hallucination rate 0.3%. The labels were written from source by an AI assistant and are awaiting the owner's review, and these repos are fairly conventional. Expect the numbers to drop as the set grows to 15–20 repos with public open-source apps. Fastify, Drizzle, TypeORM and Mongoose have fixture tests but no labelled repos yet. Run it yourself: `cd engine && uv run evident-bench --verbose`.
 
 The same repos are run through GitDiagram as a baseline, so the comparison is honest and reproducible. Method: [benchmark labelling guide](docs/labelling-guide.md). Results: the public `/benchmarks` page *(at launch)*.
 
@@ -131,9 +137,9 @@ Adapters are tree-sitter queries plus a small mapper ([ADR-0006](docs/adr/0006-a
 
 | Ecosystem | Frameworks | ORMs | State |
 | --- | --- | --- | --- |
-| JS / TS | Next.js (App Router, server actions, middleware), Express, NestJS, Fastify | Prisma, Drizzle, TypeORM, Mongoose | ⏳ v1 |
-| Python | Django, FastAPI, Flask | Django ORM, SQLAlchemy | ⏳ v1 |
-| Any language | Universal layer: imports, SDK services, env vars, `docker-compose` containers | | ⏳ v1 |
+| JS / TS | Next.js (App Router, server actions, middleware), Express, NestJS, Fastify | Prisma, Drizzle, TypeORM, Mongoose | ✅ v1 |
+| Python | Django, FastAPI, Flask | Django ORM, SQLAlchemy | ⏳ v1 (Phase 3) |
+| Any language | Universal layer: imports, SDK services, env vars, `docker-compose` containers | | ✅ JS/TS · ⏳ Python |
 | Java/Kotlin · PHP · Ruby · C# · Go | Spring Boot, Laravel, Rails, ASP.NET Core, Gin/Echo/Chi | JPA, Eloquent, ActiveRecord, EF Core, GORM | After launch |
 
 Plus `tsconfig` path aliases and npm/pnpm/yarn workspaces.
@@ -153,6 +159,8 @@ evident show model:User
 ```
 
 Every command takes `--json`, `--limit`, `--depth`, `--no-llm` and `--repo PATH|URL`. Exit codes: `0` ok · `1` findings or no match · `2` usage error · `3` analysis error. Coming in v1: `export`, `open` (local map UI, no Node needed) and `share` (opt-in, metadata only).
+
+`uv run evident-bench` scores the engine against the labelled benchmark repos (cloned read-only at their pinned commits).
 
 ## Use with Claude
 

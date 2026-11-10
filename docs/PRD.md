@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Owner | Aadil Salman Butt |
-| Status | Draft, Phase 1 (Engine) in progress |
+| Status | Phase 1 (Engine) complete, Gate A met 2026-11-10; Phase 2 (Skill) next |
 | Scope reference | This PRD plus the [ADRs](adr/). Scope follows the internal feature tracker; update all three when a decision changes. |
 | Last updated | 2026-11-10 |
 
@@ -136,7 +136,7 @@ All commands support `--json` (schema-valid envelope) and human output, `file:li
 
 | Phase | Weeks | Contents | Gate |
 | --- | --- | --- | --- |
-| 1. Engine | 1–3 | Universal layer, JS/TS adapters, linker, schema validator, CLI; label the first 5 benchmark repos | **Gate A:** baseline F1 measured on 5 repos |
+| 1. Engine | 1–3 | Universal layer, JS/TS adapters, linker, schema validator, CLI; label the first 5 benchmark repos | **Gate A:** baseline F1 measured on 5 repos ✅ *(100% P/R per category)* |
 | 2. Skill release | 4 | `skills/evident/`, skill-task evals | Skill usable on fixture repos; evals run |
 | 3. Service | 4–5 | FastAPI, arq worker, SSE, Postgres cache, validated Groq grouping, Python adapters, limits and sandboxing | — |
 | 4. Interface | 5–7 | Dual-mode map UI, five views, tracer, blast radius, exports, mobile | — |

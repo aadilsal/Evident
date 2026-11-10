@@ -92,6 +92,8 @@ Five deterministic stages and one LLM stage. Each stage is a pure function from 
 
 Stages publish progress counts (`files parsed`, `routes found`) to Redis for SSE.
 
+**How the engine is built (as of Phase 1).** Extract is two layers. `universal/js.py` summarises each file into cacheable JSON: imports, exports, CommonJS bindings, function scopes with their calls, locals, params and env reads, classes with decorators and typed fields, and request-body reads. Each adapter adds its own per-file facts (e.g. Express route calls via a `.scm` query). Link (`link.py`) resolves specifiers (relative, tsconfig paths, workspaces), symbols (through re-exports) and package taint (`const db = new PrismaClient()`). Adapters then mark handlers and middleware and register **call classifiers** for their ORM. `universal/build.py` builds the function graph as the call closure of every handler and middleware, applying the classifiers to every call. Function IDs are placeholders until roles are final (handler > middleware > function).
+
 ## 5. Graph data model
 
 Defined in [schema/graph.schema.json](../schema/graph.schema.json) (JSON Schema 2020-12). Summary:
@@ -146,13 +148,13 @@ The gallery is exported to static JSON in `web/public/gallery/` at build time, s
 ```
 .
 ├── engine/                 Python package evident-map: CLI, engine, api, worker, llm, bench
-│   ├── src/evident/        cli, analyze, cache, query, health, repo, universal/, adapters/<name>/
+│   ├── src/evident/        cli, analyze, cache, query, health, repo, link, pipeline, bench, universal/, adapters/<name>/
 │   └── tests/fixtures/     tiny per-adapter snippets with expected graphs
 ├── skills/evident/         Claude skill: SKILL.md, scripts/ensure_installed.sh
 ├── skill-tasks/            agent tasks run with vs without the skill
 ├── web/                    Next.js frontend
 ├── schema/                 graph.schema.json + examples (the contract)
-├── benchmark/              repos.yaml (pinned SHAs) + ground-truth/ hand-labelled YAML per repo
+├── benchmark/              repos.yaml (pinned SHAs), ground-truth/ (labelled YAML), results/baseline.json (CI gate)
 ├── deploy/                 docker-compose.yml, Caddyfile (added with infra)
 ├── docs/                   design doc, PRD, architecture, ADRs, threat model, guides
 └── .github/                CI, issue/PR templates

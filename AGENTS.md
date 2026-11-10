@@ -42,8 +42,8 @@ pre-commit run --all-files    # ruff, prettier, schema validation, secret scan
 cd engine && uv run mypy && uv run pytest
 cd web && npm run lint && npm run typecheck
 
-# benchmark (needs network to clone pinned repos)
-cd engine && uv run evident-bench
+# benchmark (needs network to clone pinned repos; fails on a >2 point drop)
+cd engine && uv run evident-bench --baseline ../benchmark/results/baseline.json
 ```
 
 ## Code style

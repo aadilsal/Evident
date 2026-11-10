@@ -38,7 +38,9 @@ Break one of these and the product's core claim breaks with it.
 | A new framework pattern (e.g. Express `Router.route()`) | that framework's adapter in `engine/src/evident/adapters/<name>/` (`.scm` queries + mapper) + a fixture test |
 | A new framework or ORM | a new adapter + registry entry, fixture repo, snapshot tests, benchmark cases, labelling-guide rules ([ADR-0006](adr/0006-adapter-architecture.md)) |
 | A language-agnostic fact (imports, env vars, containers) | the universal layer in `engine/src/evident/universal/` + a fixture |
-| A new SDK/service | the service catalogue (data, not code) + a fixture |
+| A new ORM's read/write calls | a classifier registered by that ORM adapter (`ctx.classifiers`), with its op table in the labelling guide |
+| A new SDK/service | `engine/src/evident/universal/services.json` (data, not code) + the slug in the labelling guide |
+| A benchmark repo | `benchmark/repos.yaml` (pinned SHA) + `benchmark/ground-truth/<owner>__<repo>.yaml`, then refresh `benchmark/results/baseline.json` |
 | A CLI command or flag | `engine/src/evident/cli.py`, keeping the `--json` envelope valid against `schema/cli-output.schema.json` |
 | Agent behaviour | `skills/evident/SKILL.md` |
 | A health check | `engine/src/evident/analyse/` with an evidence-bearing finding |

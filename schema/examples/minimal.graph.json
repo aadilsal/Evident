@@ -16,8 +16,21 @@
       "label": "POST /api/invoices",
       "source": "extracted",
       "confidence": 1,
-      "evidence": [{ "file": "app/api/invoices/route.ts", "startLine": 8, "endLine": 24, "sha": "0123456789abcdef0123456789abcdef01234567" }],
-      "attrs": { "method": "POST", "path": "/api/invoices", "framework": "next-app-router", "kind": "api", "handlerRef": "handler:app/api/invoices/route.ts#POST" }
+      "evidence": [
+        {
+          "file": "app/api/invoices/route.ts",
+          "startLine": 8,
+          "endLine": 24,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ],
+      "attrs": {
+        "method": "POST",
+        "path": "/api/invoices",
+        "framework": "next-app-router",
+        "kind": "api",
+        "handlerRef": "handler:app/api/invoices/route.ts#POST"
+      }
     },
     {
       "id": "handler:app/api/invoices/route.ts#POST",
@@ -25,7 +38,14 @@
       "label": "POST()",
       "source": "extracted",
       "confidence": 1,
-      "evidence": [{ "file": "app/api/invoices/route.ts", "startLine": 8, "endLine": 24, "sha": "0123456789abcdef0123456789abcdef01234567" }],
+      "evidence": [
+        {
+          "file": "app/api/invoices/route.ts",
+          "startLine": 8,
+          "endLine": 24,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ],
       "attrs": { "file": "app/api/invoices/route.ts", "exportName": "POST" }
     },
     {
@@ -34,7 +54,14 @@
       "label": "Invoice",
       "source": "extracted",
       "confidence": 1,
-      "evidence": [{ "file": "prisma/schema.prisma", "startLine": 12, "endLine": 20, "sha": "0123456789abcdef0123456789abcdef01234567" }],
+      "evidence": [
+        {
+          "file": "prisma/schema.prisma",
+          "startLine": 12,
+          "endLine": 20,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ],
       "attrs": {
         "tableName": "invoices",
         "fields": [
@@ -50,8 +77,18 @@
       "label": "Customer",
       "source": "extracted",
       "confidence": 1,
-      "evidence": [{ "file": "prisma/schema.prisma", "startLine": 22, "endLine": 27, "sha": "0123456789abcdef0123456789abcdef01234567" }],
-      "attrs": { "tableName": "Customer", "fields": [{ "name": "id", "type": "String", "isId": true }] }
+      "evidence": [
+        {
+          "file": "prisma/schema.prisma",
+          "startLine": 22,
+          "endLine": 27,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ],
+      "attrs": {
+        "tableName": "Customer",
+        "fields": [{ "name": "id", "type": "String", "isId": true }]
+      }
     },
     {
       "id": "service:stripe",
@@ -59,7 +96,14 @@
       "label": "Stripe",
       "source": "extracted",
       "confidence": 1,
-      "evidence": [{ "file": "lib/stripe.ts", "startLine": 1, "endLine": 1, "sha": "0123456789abcdef0123456789abcdef01234567" }],
+      "evidence": [
+        {
+          "file": "lib/stripe.ts",
+          "startLine": 1,
+          "endLine": 1,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ],
       "attrs": { "provider": "stripe", "packages": ["stripe"] }
     },
     {
@@ -68,7 +112,14 @@
       "label": "STRIPE_SECRET_KEY",
       "source": "extracted",
       "confidence": 1,
-      "evidence": [{ "file": "lib/stripe.ts", "startLine": 3, "endLine": 3, "sha": "0123456789abcdef0123456789abcdef01234567" }],
+      "evidence": [
+        {
+          "file": "lib/stripe.ts",
+          "startLine": 3,
+          "endLine": 3,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ],
       "attrs": { "name": "STRIPE_SECRET_KEY", "documented": false }
     }
   ],
@@ -80,7 +131,14 @@
       "to": "handler:app/api/invoices/route.ts#POST",
       "source": "extracted",
       "confidence": 1,
-      "evidence": [{ "file": "app/api/invoices/route.ts", "startLine": 8, "endLine": 8, "sha": "0123456789abcdef0123456789abcdef01234567" }]
+      "evidence": [
+        {
+          "file": "app/api/invoices/route.ts",
+          "startLine": 8,
+          "endLine": 8,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ]
     },
     {
       "id": "writes:handler:app/api/invoices/route.ts#POST->model:Invoice",
@@ -89,7 +147,14 @@
       "to": "model:Invoice",
       "source": "extracted",
       "confidence": 0.95,
-      "evidence": [{ "file": "app/api/invoices/route.ts", "startLine": 15, "endLine": 17, "sha": "0123456789abcdef0123456789abcdef01234567" }],
+      "evidence": [
+        {
+          "file": "app/api/invoices/route.ts",
+          "startLine": 15,
+          "endLine": 17,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ],
       "attrs": { "operation": "create" }
     },
     {
@@ -99,7 +164,14 @@
       "to": "model:Customer",
       "source": "extracted",
       "confidence": 1,
-      "evidence": [{ "file": "prisma/schema.prisma", "startLine": 16, "endLine": 16, "sha": "0123456789abcdef0123456789abcdef01234567" }],
+      "evidence": [
+        {
+          "file": "prisma/schema.prisma",
+          "startLine": 16,
+          "endLine": 16,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ],
       "attrs": { "relationField": "customer" }
     },
     {
@@ -109,7 +181,14 @@
       "to": "service:stripe",
       "source": "inferred",
       "confidence": 0.7,
-      "evidence": [{ "file": "app/api/invoices/route.ts", "startLine": 19, "endLine": 19, "sha": "0123456789abcdef0123456789abcdef01234567" }]
+      "evidence": [
+        {
+          "file": "app/api/invoices/route.ts",
+          "startLine": 19,
+          "endLine": 19,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ]
     },
     {
       "id": "reads:handler:app/api/invoices/route.ts#POST->envVar:STRIPE_SECRET_KEY",
@@ -118,7 +197,14 @@
       "to": "envVar:STRIPE_SECRET_KEY",
       "source": "inferred",
       "confidence": 0.7,
-      "evidence": [{ "file": "lib/stripe.ts", "startLine": 3, "endLine": 3, "sha": "0123456789abcdef0123456789abcdef01234567" }]
+      "evidence": [
+        {
+          "file": "lib/stripe.ts",
+          "startLine": 3,
+          "endLine": 3,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ]
     }
   ],
   "groups": [
@@ -126,7 +212,12 @@
       "id": "group:billing",
       "label": "Billing",
       "summary": "Creates invoices and charges customers through Stripe.",
-      "members": ["route:POST /api/invoices", "handler:app/api/invoices/route.ts#POST", "model:Invoice", "service:stripe"],
+      "members": [
+        "route:POST /api/invoices",
+        "handler:app/api/invoices/route.ts#POST",
+        "model:Invoice",
+        "service:stripe"
+      ],
       "source": "inferred",
       "confidence": 0.8
     }
@@ -138,7 +229,14 @@
       "severity": "warning",
       "message": "POST /api/invoices writes to Invoice with no auth middleware.",
       "nodeIds": ["route:POST /api/invoices", "model:Invoice"],
-      "evidence": [{ "file": "app/api/invoices/route.ts", "startLine": 15, "endLine": 17, "sha": "0123456789abcdef0123456789abcdef01234567" }]
+      "evidence": [
+        {
+          "file": "app/api/invoices/route.ts",
+          "startLine": 15,
+          "endLine": 17,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ]
     },
     {
       "id": "undocumented-env:STRIPE_SECRET_KEY",
@@ -146,7 +244,14 @@
       "severity": "info",
       "message": "STRIPE_SECRET_KEY is read but not listed in .env.example.",
       "nodeIds": ["envVar:STRIPE_SECRET_KEY"],
-      "evidence": [{ "file": "lib/stripe.ts", "startLine": 3, "endLine": 3, "sha": "0123456789abcdef0123456789abcdef01234567" }]
+      "evidence": [
+        {
+          "file": "lib/stripe.ts",
+          "startLine": 3,
+          "endLine": 3,
+          "sha": "0123456789abcdef0123456789abcdef01234567"
+        }
+      ]
     }
   ]
 }

@@ -46,7 +46,7 @@
     "nodeId": {
       "description": "Deterministic, stable across runs on the same commit. Prefix is the node type.",
       "type": "string",
-      "pattern": "^(route|handler|function|middleware|model|service|module|envVar):.+$"
+      "pattern": "^(route|handler|function|middleware|model|service|module|envVar|container):.+$"
     },
     "repoPath": {
       "description": "Repo-relative POSIX path. No leading slash, no backslashes, no '..' segments.",
@@ -64,14 +64,26 @@
         "host": { "enum": ["github.com", "local"] },
         "owner": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$" },
         "name": { "type": "string", "minLength": 1, "maxLength": 200 },
-        "sha": { "description": "HEAD commit, or for a folder without git, a hash of its file hashes.", "$ref": "#/$defs/sha" },
+        "sha": {
+          "description": "HEAD commit, or for a folder without git, a hash of its file hashes.",
+          "$ref": "#/$defs/sha"
+        },
         "ref": { "description": "Branch or tag the user asked for, if any.", "type": "string" },
-        "dirty": { "description": "Working tree had uncommitted changes; line numbers refer to the working tree.", "type": "boolean" },
-        "worktreeHash": { "description": "Hash of all analysed file hashes. Changes whenever any analysed file changes.", "$ref": "#/$defs/sha" },
+        "dirty": {
+          "description": "Working tree had uncommitted changes; line numbers refer to the working tree.",
+          "type": "boolean"
+        },
+        "worktreeHash": {
+          "description": "Hash of all analysed file hashes. Changes whenever any analysed file changes.",
+          "$ref": "#/$defs/sha"
+        },
         "analyzedAt": { "type": "string", "format": "date-time" }
       },
       "if": { "properties": { "host": { "const": "github.com" } } },
-      "then": { "required": ["owner"], "properties": { "name": { "pattern": "^[A-Za-z0-9._-]{1,100}$" } } }
+      "then": {
+        "required": ["owner"],
+        "properties": { "name": { "pattern": "^[A-Za-z0-9._-]{1,100}$" } }
+      }
     },
 
     "evidence": {
@@ -98,7 +110,19 @@
       "required": ["id", "type", "label", "source", "confidence", "evidence", "attrs"],
       "properties": {
         "id": { "$ref": "#/$defs/nodeId" },
-        "type": { "enum": ["route", "handler", "function", "middleware", "model", "service", "module", "envVar"] },
+        "type": {
+          "enum": [
+            "route",
+            "handler",
+            "function",
+            "middleware",
+            "model",
+            "service",
+            "module",
+            "envVar",
+            "container"
+          ]
+        },
         "label": { "type": "string", "minLength": 1 },
         "source": { "$ref": "#/$defs/source" },
         "confidence": { "$ref": "#/$defs/confidence" },
@@ -106,14 +130,87 @@
         "attrs": { "type": "object" }
       },
       "allOf": [
-        { "if": { "properties": { "type": { "const": "route" } } }, "then": { "properties": { "id": { "pattern": "^route:" }, "attrs": { "$ref": "#/$defs/routeAttrs" } } } },
-        { "if": { "properties": { "type": { "const": "handler" } } }, "then": { "properties": { "id": { "pattern": "^handler:" }, "attrs": { "$ref": "#/$defs/functionAttrs" } } } },
-        { "if": { "properties": { "type": { "const": "function" } } }, "then": { "properties": { "id": { "pattern": "^function:" }, "attrs": { "$ref": "#/$defs/functionAttrs" } } } },
-        { "if": { "properties": { "type": { "const": "middleware" } } }, "then": { "properties": { "id": { "pattern": "^middleware:" }, "attrs": { "$ref": "#/$defs/middlewareAttrs" } } } },
-        { "if": { "properties": { "type": { "const": "model" } } }, "then": { "properties": { "id": { "pattern": "^model:" }, "attrs": { "$ref": "#/$defs/modelAttrs" } } } },
-        { "if": { "properties": { "type": { "const": "service" } } }, "then": { "properties": { "id": { "pattern": "^service:" }, "attrs": { "$ref": "#/$defs/serviceAttrs" } } } },
-        { "if": { "properties": { "type": { "const": "module" } } }, "then": { "properties": { "id": { "pattern": "^module:" }, "attrs": { "$ref": "#/$defs/moduleAttrs" } } } },
-        { "if": { "properties": { "type": { "const": "envVar" } } }, "then": { "properties": { "id": { "pattern": "^envVar:" }, "attrs": { "$ref": "#/$defs/envVarAttrs" } } } }
+        {
+          "if": { "properties": { "type": { "const": "route" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^route:" },
+              "attrs": { "$ref": "#/$defs/routeAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "handler" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^handler:" },
+              "attrs": { "$ref": "#/$defs/functionAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "function" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^function:" },
+              "attrs": { "$ref": "#/$defs/functionAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "middleware" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^middleware:" },
+              "attrs": { "$ref": "#/$defs/middlewareAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "model" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^model:" },
+              "attrs": { "$ref": "#/$defs/modelAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "service" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^service:" },
+              "attrs": { "$ref": "#/$defs/serviceAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "module" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^module:" },
+              "attrs": { "$ref": "#/$defs/moduleAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "envVar" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^envVar:" },
+              "attrs": { "$ref": "#/$defs/envVarAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "container" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^container:" },
+              "attrs": { "$ref": "#/$defs/containerAttrs" }
+            }
+          }
+        }
       ]
     },
 
@@ -123,11 +220,18 @@
       "required": ["method", "path", "framework", "kind"],
       "properties": {
         "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"] },
-        "path": { "description": "Normalised path, see docs/labelling-guide.md. Server actions use action:<file>#<export> (since 1.1.0).", "type": "string", "pattern": "^(/|action:)" },
+        "path": {
+          "description": "Normalised path, see docs/labelling-guide.md. Server actions use action:<file>#<export> (since 1.1.0).",
+          "type": "string",
+          "pattern": "^(/|action:)"
+        },
         "framework": { "enum": ["next-app-router", "express", "nestjs", "fastify"] },
         "kind": { "enum": ["api", "page", "layout", "serverAction"] },
         "handlerRef": { "$ref": "#/$defs/nodeId" },
-        "dynamic": { "description": "Registered with a computed path; low confidence.", "type": "boolean" }
+        "dynamic": {
+          "description": "Registered with a computed path; low confidence.",
+          "type": "boolean"
+        }
       }
     },
     "functionAttrs": {
@@ -137,7 +241,19 @@
       "properties": {
         "file": { "$ref": "#/$defs/repoPath" },
         "exportName": { "type": ["string", "null"] },
-        "checksAuth": { "description": "Since 1.1.0. Handler calls or is wrapped by something auth-like (heuristic).", "type": "boolean" }
+        "checksAuth": {
+          "description": "Since 1.1.0. Handler calls or is wrapped by something auth-like (heuristic).",
+          "type": "boolean"
+        },
+        "bodyLine": {
+          "description": "Since 1.1.0. First line that reads the request body.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "validatesBody": {
+          "description": "Since 1.1.0. Calls a schema/validator (zod, joi, yup, class-validator, express-validator...).",
+          "type": "boolean"
+        }
       }
     },
     "middlewareAttrs": {
@@ -148,7 +264,15 @@
         "file": { "$ref": "#/$defs/repoPath" },
         "framework": { "enum": ["next-app-router", "express", "nestjs", "fastify"] },
         "name": { "type": ["string", "null"] },
-        "matchers": { "description": "Next.js middleware matcher patterns, as written.", "type": "array", "items": { "type": "string" } }
+        "matchers": {
+          "description": "Next.js middleware matcher patterns, as written.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "checksAuth": {
+          "description": "Since 1.1.0. Body calls or references something auth-like (heuristic).",
+          "type": "boolean"
+        }
       }
     },
     "modelAttrs": {
@@ -157,6 +281,10 @@
       "required": ["tableName", "fields"],
       "properties": {
         "tableName": { "description": "@@map value, or the model name.", "type": "string" },
+        "orm": {
+          "description": "Since 1.1.0. Adapter that found the model.",
+          "enum": ["prisma", "drizzle", "typeorm", "mongoose"]
+        },
         "fields": {
           "type": "array",
           "items": {
@@ -180,7 +308,11 @@
       "additionalProperties": false,
       "required": ["provider", "packages"],
       "properties": {
-        "provider": { "description": "Slug from the engine's service catalogue, e.g. stripe, aws-s3.", "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "provider": {
+          "description": "Slug from the engine's service catalogue, e.g. stripe, aws-s3.",
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
         "packages": { "type": "array", "minItems": 1, "items": { "type": "string" } }
       }
     },
@@ -191,6 +323,20 @@
       "properties": {
         "path": { "$ref": "#/$defs/repoPath" },
         "workspace": { "description": "Monorepo package name, if any.", "type": ["string", "null"] }
+      }
+    },
+    "containerAttrs": {
+      "description": "Since 1.1.0. A service in docker-compose. Environment values are never read.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "name"],
+      "properties": {
+        "file": { "$ref": "#/$defs/repoPath" },
+        "name": { "type": "string", "minLength": 1 },
+        "image": { "type": "string" },
+        "build": { "type": "string" },
+        "ports": { "type": "array", "items": { "type": "string" } },
+        "dependsOn": { "type": "array", "items": { "type": "string" } }
       }
     },
     "envVarAttrs": {
@@ -210,7 +356,9 @@
       "required": ["id", "type", "from", "to", "source", "confidence", "evidence"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
-        "type": { "enum": ["handles", "guards", "calls", "imports", "reads", "writes", "relates", "uses"] },
+        "type": {
+          "enum": ["handles", "guards", "calls", "imports", "reads", "writes", "relates", "uses"]
+        },
         "from": { "$ref": "#/$defs/nodeId" },
         "to": { "$ref": "#/$defs/nodeId" },
         "source": { "$ref": "#/$defs/source" },
@@ -220,20 +368,81 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "operation": { "description": "Prisma op name (findMany, create, ...) for reads/writes.", "type": "string" },
-            "relationField": { "description": "Prisma relation field for relates edges.", "type": "string" }
+            "operation": {
+              "description": "Prisma op name (findMany, create, ...) for reads/writes.",
+              "type": "string"
+            },
+            "relationField": {
+              "description": "Prisma relation field for relates edges.",
+              "type": "string"
+            }
           }
         }
       },
       "allOf": [
-        { "if": { "properties": { "type": { "const": "handles" } } }, "then": { "properties": { "from": { "pattern": "^route:" }, "to": { "pattern": "^(handler|function):" } } } },
-        { "if": { "properties": { "type": { "const": "guards" } } }, "then": { "properties": { "from": { "pattern": "^middleware:" }, "to": { "pattern": "^route:" } } } },
-        { "if": { "properties": { "type": { "const": "calls" } } }, "then": { "properties": { "from": { "pattern": "^(handler|function|middleware):" }, "to": { "pattern": "^(handler|function|middleware):" } } } },
-        { "if": { "properties": { "type": { "const": "imports" } } }, "then": { "properties": { "from": { "pattern": "^module:" }, "to": { "pattern": "^module:" } } } },
-        { "if": { "properties": { "type": { "const": "reads" } } }, "then": { "properties": { "from": { "pattern": "^(handler|function|middleware):" }, "to": { "pattern": "^(model|envVar):" } } } },
-        { "if": { "properties": { "type": { "const": "writes" } } }, "then": { "properties": { "from": { "pattern": "^(handler|function|middleware):" }, "to": { "pattern": "^model:" } } } },
-        { "if": { "properties": { "type": { "const": "relates" } } }, "then": { "properties": { "from": { "pattern": "^model:" }, "to": { "pattern": "^model:" } } } },
-        { "if": { "properties": { "type": { "const": "uses" } } }, "then": { "properties": { "from": { "pattern": "^(handler|function|middleware|module):" }, "to": { "pattern": "^service:" } } } }
+        {
+          "if": { "properties": { "type": { "const": "handles" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^route:" },
+              "to": { "pattern": "^(handler|function):" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "guards" } } },
+          "then": {
+            "properties": { "from": { "pattern": "^middleware:" }, "to": { "pattern": "^route:" } }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "calls" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^(handler|function|middleware):" },
+              "to": { "pattern": "^(handler|function|middleware):" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "imports" } } },
+          "then": {
+            "properties": { "from": { "pattern": "^module:" }, "to": { "pattern": "^module:" } }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "reads" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^(handler|function|middleware):" },
+              "to": { "pattern": "^(model|envVar):" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "writes" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^(handler|function|middleware):" },
+              "to": { "pattern": "^model:" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "relates" } } },
+          "then": {
+            "properties": { "from": { "pattern": "^model:" }, "to": { "pattern": "^model:" } }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "uses" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^(handler|function|middleware|module):" },
+              "to": { "pattern": "^service:" }
+            }
+          }
+        }
       ]
     },
 
@@ -246,7 +455,12 @@
         "id": { "type": "string", "pattern": "^group:[a-z0-9-]+$" },
         "label": { "type": "string", "minLength": 1, "maxLength": 60 },
         "summary": { "type": "string", "maxLength": 400 },
-        "members": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/nodeId" } },
+        "members": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nodeId" }
+        },
         "source": { "const": "inferred" },
         "confidence": { "$ref": "#/$defs/confidence" }
       }
@@ -259,7 +473,15 @@
       "required": ["id", "rule", "severity", "message", "nodeIds", "evidence"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
-        "rule": { "enum": ["unguarded-write", "unvalidated-body", "circular-import", "unused-model", "undocumented-env"] },
+        "rule": {
+          "enum": [
+            "unguarded-write",
+            "unvalidated-body",
+            "circular-import",
+            "unused-model",
+            "undocumented-env"
+          ]
+        },
         "severity": { "enum": ["info", "warning", "error"] },
         "message": { "type": "string", "minLength": 1 },
         "nodeIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nodeId" } },

@@ -1,0 +1,441 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo:
+  {
+    owner: aadilsal,
+    name: AjaiConsultancyAssignment,
+    sha: df83d726c11513d2076fdb2a764b2a7d6cdde9ef,
+  }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-10',
+    minutes: 50,
+  }
+routes:
+  - {
+      method: POST,
+      path: /api/auth/login,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/auth/auth.controller.ts:70',
+    }
+  - {
+      method: POST,
+      path: /api/v1/auth/login,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/auth/auth.controller.ts:70',
+      optional: true,
+    }
+  - {
+      method: POST,
+      path: /api/auth/register,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/auth/auth.controller.ts:86',
+    }
+  - {
+      method: POST,
+      path: /api/v1/auth/register,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/auth/auth.controller.ts:86',
+      optional: true,
+    }
+  - {
+      method: POST,
+      path: /api/auth/logout,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/auth/auth.controller.ts:102',
+    }
+  - {
+      method: POST,
+      path: /api/v1/auth/logout,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/auth/auth.controller.ts:102',
+      optional: true,
+    }
+  - {
+      method: GET,
+      path: /api/auth/me,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/auth/auth.controller.ts:111',
+    }
+  - {
+      method: GET,
+      path: /api/v1/auth/me,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/auth/auth.controller.ts:111',
+      optional: true,
+    }
+  - {
+      method: GET,
+      path: /api/documents,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:72',
+    }
+  - {
+      method: GET,
+      path: /api/v1/documents,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:72',
+      optional: true,
+    }
+  - {
+      method: POST,
+      path: /api/documents,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:80',
+    }
+  - {
+      method: POST,
+      path: /api/v1/documents,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:80',
+      optional: true,
+    }
+  - {
+      method: POST,
+      path: /api/documents/import,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:96',
+    }
+  - {
+      method: POST,
+      path: /api/v1/documents/import,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:96',
+      optional: true,
+    }
+  - {
+      method: GET,
+      path: '/api/documents/:id',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:124',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/documents/:id',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:124',
+      optional: true,
+    }
+  - {
+      method: PATCH,
+      path: '/api/documents/:id',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:132',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/documents/:id',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:132',
+      optional: true,
+    }
+  - {
+      method: DELETE,
+      path: '/api/documents/:id',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:148',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/documents/:id',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:148',
+      optional: true,
+    }
+  - {
+      method: GET,
+      path: '/api/documents/:id/shares',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:158',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/documents/:id/shares',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:158',
+      optional: true,
+    }
+  - {
+      method: POST,
+      path: '/api/documents/:id/shares',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:167',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/documents/:id/shares',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:167',
+      optional: true,
+    }
+  - {
+      method: DELETE,
+      path: '/api/documents/:id/shares/:userId',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:186',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/documents/:id/shares/:userId',
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/documents/documents.controller.ts:186',
+      optional: true,
+    }
+  - {
+      method: GET,
+      path: /api/health,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/health/health.controller.ts:27',
+    }
+  - {
+      method: GET,
+      path: /api/v1/health,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/health/health.controller.ts:27',
+      optional: true,
+    }
+  - {
+      method: GET,
+      path: /api/health/live,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/health/health.controller.ts:35',
+    }
+  - {
+      method: GET,
+      path: /api/v1/health/live,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/health/health.controller.ts:35',
+      optional: true,
+    }
+  - {
+      method: GET,
+      path: /api/health/ready,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/health/health.controller.ts:42',
+    }
+  - {
+      method: GET,
+      path: /api/v1/health/ready,
+      kind: api,
+      framework: nestjs,
+      evidence: 'apps/api/src/health/health.controller.ts:42',
+      optional: true,
+    }
+  - {
+      method: GET,
+      path: '/docs/:id',
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/web/src/app/(app)/docs/[id]/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'apps/web/src/app/layout.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/web/src/app/(app)/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /privacy,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/web/src/app/(marketing)/privacy/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /terms,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/web/src/app/(marketing)/terms/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /welcome,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/web/src/app/(marketing)/welcome/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /login,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/web/src/app/login/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /register,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/web/src/app/register/page.tsx:1',
+    }
+models:
+  - { name: User, orm: prisma, evidence: 'apps/api/prisma/schema.prisma:16' }
+  - { name: Document, orm: prisma, evidence: 'apps/api/prisma/schema.prisma:28' }
+  - { name: DocumentShare, orm: prisma, evidence: 'apps/api/prisma/schema.prisma:43' }
+services: []
+edges:
+  - {
+      route: POST /api/auth/login,
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/auth/auth.controller.ts:70',
+    }
+  - {
+      route: POST /api/auth/register,
+      model: User,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/api/src/auth/auth.controller.ts:86',
+    }
+  - {
+      route: GET /api/documents,
+      model: Document,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:72',
+    }
+  - {
+      route: GET /api/documents,
+      model: DocumentShare,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:72',
+    }
+  - {
+      route: POST /api/documents,
+      model: Document,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:80',
+    }
+  - {
+      route: POST /api/documents/import,
+      model: Document,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:96',
+    }
+  - {
+      route: 'GET /api/documents/:id',
+      model: Document,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:124',
+    }
+  - {
+      route: 'PATCH /api/documents/:id',
+      model: Document,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:132',
+    }
+  - {
+      route: 'PATCH /api/documents/:id',
+      model: Document,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:132',
+    }
+  - {
+      route: 'DELETE /api/documents/:id',
+      model: Document,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:148',
+    }
+  - {
+      route: 'DELETE /api/documents/:id',
+      model: Document,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:148',
+    }
+  - {
+      route: 'GET /api/documents/:id/shares',
+      model: Document,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:158',
+    }
+  - {
+      route: 'POST /api/documents/:id/shares',
+      model: Document,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:167',
+    }
+  - {
+      route: 'POST /api/documents/:id/shares',
+      model: DocumentShare,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:167',
+    }
+  - {
+      route: 'POST /api/documents/:id/shares',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:167',
+    }
+  - {
+      route: 'DELETE /api/documents/:id/shares/:userId',
+      model: Document,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:186',
+    }
+  - {
+      route: 'DELETE /api/documents/:id/shares/:userId',
+      model: DocumentShare,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/api/src/documents/documents.controller.ts:186',
+    }
+out_of_scope:
+  - e2e/ and apps/api/test (tests)
+  - health checks use $queryRaw (not a model)
+notes: |
+  Global prefix 'api' (setup.ts:19). URI versioning makes /api/v1/... aliases callable too: optional.
+  Three layouts at / ((app), (marketing), root) count once. template.tsx/loading.tsx are not routes.

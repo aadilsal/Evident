@@ -9,27 +9,27 @@ first_five: # Gate A (Engine phase)
     name: Munshi
     sha: 40ad91b6e58e2d20cc60f29ddc035688c8eb7ae6
     adapters: [nextjs, express, prisma]
-    status: candidate
+    status: labelled
   - owner: aadilsal
     name: MotorAi
     sha: c10fa5d77f0daa0d40a26ab681e795d5fc589a55
     adapters: [nextjs, prisma]
-    status: candidate
+    status: labelled
   - owner: aadilsal
     name: AjaiConsultancyAssignment
     sha: df83d726c11513d2076fdb2a764b2a7d6cdde9ef
     adapters: [nextjs, nestjs, prisma]
-    status: candidate
+    status: labelled
   - owner: aadilsal
     name: TournamentMatchMaker
     sha: 973998e38d0906dfe661505e78e77f46cdc4d42a
     adapters: [express]
-    status: candidate
+    status: labelled
   - owner: aadilsal
     name: MdcatExpert
     sha: 34c226da59c2da8989b7053cf4a41bbce4e578e3
     adapters: [nextjs]
-    status: candidate
+    status: labelled
 
 launch_set: # Gate B: 15-20 repos covering every v1 adapter
   - owner: aadilsal

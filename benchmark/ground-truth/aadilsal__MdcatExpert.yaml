@@ -1,0 +1,731 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo: { owner: aadilsal, name: MdcatExpert, sha: 34c226da59c2da8989b7053cf4a41bbce4e578e3 }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-10',
+    minutes: 45,
+  }
+routes:
+  - {
+      method: GET,
+      path: /admin/analytics,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/analytics/page.tsx:9',
+    }
+  - {
+      method: GET,
+      path: '/admin/blog/:id/edit',
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/blog/[id]/edit/page.tsx:12',
+    }
+  - {
+      method: GET,
+      path: /admin/blog/new,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/blog/new/page.tsx:8',
+    }
+  - {
+      method: GET,
+      path: /admin/blog,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/blog/page.tsx:18',
+    }
+  - {
+      method: GET,
+      path: /admin/discounts,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/discounts/page.tsx:9',
+    }
+  - {
+      method: GET,
+      path: /admin/payments,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/payments/page.tsx:33',
+    }
+  - {
+      method: GET,
+      path: '/admin/quizzes/:id',
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/quizzes/[id]/page.tsx:11',
+    }
+  - {
+      method: GET,
+      path: /admin/quizzes,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/quizzes/page.tsx:21',
+    }
+  - {
+      method: GET,
+      path: /admin/reports,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/reports/page.tsx:52',
+    }
+  - {
+      method: GET,
+      path: /admin/students,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/students/page.tsx:10',
+    }
+  - {
+      method: GET,
+      path: /admin/study-library,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/study-library/page.tsx:7',
+    }
+  - {
+      method: GET,
+      path: /admin/upload,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/upload/page.tsx:21',
+    }
+  - {
+      method: GET,
+      path: '/admin/upload/review/:batchId',
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/upload/review/[batchId]/page.tsx:35',
+    }
+  - {
+      method: GET,
+      path: /analytics,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/analytics/page.tsx:12',
+    }
+  - {
+      method: GET,
+      path: '/copilot/chat/:sessionId',
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/copilot/chat/[sessionId]/page.tsx:8',
+    }
+  - {
+      method: GET,
+      path: /copilot,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/copilot/page.tsx:7',
+    }
+  - {
+      method: GET,
+      path: /dashboard,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/dashboard/page.tsx:52',
+    }
+  - {
+      method: GET,
+      path: /flashcards,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/flashcards/page.tsx:53',
+    }
+  - {
+      method: GET,
+      path: /,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'src/app/(app)/layout.tsx:91',
+    }
+  - {
+      method: GET,
+      path: /profile,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/profile/page.tsx:11',
+    }
+  - {
+      method: GET,
+      path: '/quiz/:quizId',
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/quiz/[quizId]/page.tsx:31',
+    }
+  - {
+      method: GET,
+      path: /quizzes,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/quizzes/page.tsx:15',
+    }
+  - {
+      method: GET,
+      path: '/results/:attemptId',
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/results/[attemptId]/page.tsx:33',
+    }
+  - {
+      method: GET,
+      path: /signup-payment,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/signup-payment/page.tsx:263',
+    }
+  - {
+      method: GET,
+      path: /upgrade/complete,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/upgrade/complete/page.tsx:132',
+    }
+  - {
+      method: GET,
+      path: /upgrade,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'src/app/(app)/upgrade/layout.tsx:9',
+    }
+  - {
+      method: GET,
+      path: /upgrade,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(app)/upgrade/page.tsx:465',
+    }
+  - {
+      method: GET,
+      path: /forgot-password,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/forgot-password/layout.tsx:8',
+    }
+  - {
+      method: GET,
+      path: /forgot-password,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/forgot-password/page.tsx:11',
+    }
+  - {
+      method: GET,
+      path: /login,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/login/layout.tsx:8',
+    }
+  - {
+      method: GET,
+      path: /login,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/login/page.tsx:11',
+    }
+  - {
+      method: GET,
+      path: /reset-password,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/reset-password/layout.tsx:9',
+    }
+  - {
+      method: GET,
+      path: /reset-password,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/reset-password/page.tsx:249',
+    }
+  - {
+      method: GET,
+      path: /signup,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/signup/layout.tsx:8',
+    }
+  - {
+      method: GET,
+      path: /signup,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/signup/page.tsx:14',
+    }
+  - {
+      method: GET,
+      path: /verify,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/verify/page.tsx:173',
+    }
+  - {
+      method: GET,
+      path: '/blog/:slug',
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(info)/blog/[slug]/page.tsx:51',
+    }
+  - {
+      method: GET,
+      path: /blog,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(info)/blog/page.tsx:26',
+    }
+  - {
+      method: GET,
+      path: /contact,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'src/app/(info)/contact/layout.tsx:8',
+    }
+  - {
+      method: GET,
+      path: /contact,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(info)/contact/page.tsx:9',
+    }
+  - {
+      method: GET,
+      path: /help,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(info)/help/page.tsx:10',
+    }
+  - {
+      method: GET,
+      path: /privacy,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(info)/privacy/page.tsx:9',
+    }
+  - {
+      method: GET,
+      path: /refund-policy,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(info)/refund-policy/page.tsx:9',
+    }
+  - {
+      method: GET,
+      path: /terms,
+      kind: page,
+      framework: nextjs,
+      evidence: 'src/app/(info)/terms/page.tsx:9',
+    }
+  - {
+      method: DELETE,
+      path: '/api/admin/blog/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/blog/[id]/route.ts:81',
+    }
+  - {
+      method: GET,
+      path: '/api/admin/blog/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/blog/[id]/route.ts:9',
+    }
+  - {
+      method: PATCH,
+      path: '/api/admin/blog/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/blog/[id]/route.ts:38',
+    }
+  - {
+      method: POST,
+      path: /api/admin/blog/generate,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/blog/generate/route.ts:6',
+    }
+  - {
+      method: GET,
+      path: /api/admin/blog,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/blog/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: /api/admin/blog,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/blog/route.ts:24',
+    }
+  - {
+      method: POST,
+      path: /api/admin/discounts/create,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/discounts/create/route.ts:7',
+    }
+  - {
+      method: GET,
+      path: /api/admin/discounts,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/discounts/route.ts:7',
+    }
+  - {
+      method: POST,
+      path: /api/admin/discounts/toggle,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/discounts/toggle/route.ts:7',
+    }
+  - {
+      method: GET,
+      path: /api/admin/payments,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/payments/route.ts:9',
+    }
+  - {
+      method: PATCH,
+      path: '/api/admin/questions/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/questions/[id]/route.ts:9',
+    }
+  - {
+      method: PATCH,
+      path: '/api/admin/quizzes/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/quizzes/[id]/route.ts:8',
+    }
+  - {
+      method: GET,
+      path: '/api/admin/reports/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/reports/[id]/route.ts:8',
+    }
+  - {
+      method: PATCH,
+      path: '/api/admin/reports/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/reports/[id]/route.ts:67',
+    }
+  - {
+      method: GET,
+      path: /api/admin/reports,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/reports/route.ts:7',
+    }
+  - {
+      method: POST,
+      path: /api/admin/study-library/summary,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/study-library/summary/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: /api/admin/study-library/upload,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/admin/study-library/upload/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: /api/analytics/event,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/analytics/event/route.ts:7',
+    }
+  - {
+      method: POST,
+      path: /api/analytics/touch-login,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/analytics/touch-login/route.ts:6',
+    }
+  - {
+      method: GET,
+      path: /api/auth/me,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/auth/me/route.ts:6',
+    }
+  - {
+      method: POST,
+      path: /api/auth/redeem-promo,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/auth/redeem-promo/route.ts:7',
+    }
+  - {
+      method: POST,
+      path: /api/blob/upload,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/blob/upload/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: /api/checkout/create,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/checkout/create/route.ts:10',
+    }
+  - {
+      method: GET,
+      path: /api/checkout/status,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/checkout/status/route.ts:11',
+    }
+  - {
+      method: POST,
+      path: /api/copilot/chat,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/copilot/chat/route.ts:10',
+    }
+  - {
+      method: POST,
+      path: /api/copilot/ocr-page,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/copilot/ocr-page/route.ts:15',
+    }
+  - {
+      method: DELETE,
+      path: '/api/copilot/source/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/copilot/source/[id]/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: '/api/copilot/source/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/copilot/source/[id]/route.ts:31',
+    }
+  - {
+      method: POST,
+      path: /api/copilot/upload,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/copilot/upload/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: /api/dashboard/attempts,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/dashboard/attempts/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: /api/dashboard/subject-stats,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/dashboard/subject-stats/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: /api/payments/submit,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/payments/submit/route.ts:8',
+    }
+  - {
+      method: DELETE,
+      path: '/api/quizzes/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/quizzes/[id]/route.ts:111',
+    }
+  - {
+      method: GET,
+      path: '/api/quizzes/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/quizzes/[id]/route.ts:13',
+    }
+  - {
+      method: POST,
+      path: /api/quizzes/upload-pdf,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/quizzes/upload-pdf/route.ts:5',
+    }
+  - {
+      method: POST,
+      path: /api/quizzes/upload,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/quizzes/upload/route.ts:13',
+    }
+  - {
+      method: GET,
+      path: '/api/staging/:batchId',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/staging/[batchId]/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: '/api/staging/publish/:batchId',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/staging/publish/[batchId]/route.ts:11',
+    }
+  - {
+      method: DELETE,
+      path: '/api/staging/question/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/staging/question/[id]/route.ts:57',
+    }
+  - {
+      method: PATCH,
+      path: '/api/staging/question/:id',
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/staging/question/[id]/route.ts:9',
+    }
+  - {
+      method: POST,
+      path: /api/upload-image,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/upload-image/route.ts:8',
+    }
+  - {
+      method: POST,
+      path: /api/webhooks/safepay,
+      kind: api,
+      framework: nextjs,
+      evidence: 'src/app/api/webhooks/safepay/route.ts:20',
+    }
+  - { method: GET, path: /, kind: page, framework: nextjs, evidence: 'src/app/page.tsx:6' }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/admin/discounts/actions.ts#createPromoCodeAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/discounts/actions.ts:16',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/admin/discounts/actions.ts#togglePromoCodeActiveAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/discounts/actions.ts:33',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/admin/payments/actions.ts#approvePaymentAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/payments/actions.ts:11',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/admin/payments/actions.ts#rejectPaymentAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/payments/actions.ts:44',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/admin/students/actions.ts#updateUserRoleAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/students/actions.ts:9',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/admin/students/actions.ts#updateUserSubscriptionAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/admin/students/actions.ts:21',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/profile/actions.ts#updateProfile',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/profile/actions.ts:8',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/profile/actions.ts#updatePassword',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/profile/actions.ts:30',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/profile/actions.ts#setEmailNotifications',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/profile/actions.ts:44',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/quiz/actions.ts#submitQuizAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/quiz/actions.ts:18',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/quiz/report-actions.ts#reportQuestionAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/quiz/report-actions.ts:16',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(app)/results/actions.ts#generateAnswerInsight',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(app)/results/actions.ts:12',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(auth)/signup/actions.ts#sendWelcomeEmailAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/signup/actions.ts:6',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(auth)/signup/actions.ts#sendOtpEmailAction',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(auth)/signup/actions.ts:25',
+    }
+  - {
+      method: POST,
+      path: 'action:src/app/(info)/contact/actions.ts#sendContactEmail',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'src/app/(info)/contact/actions.ts:20',
+    }
+models: []
+services:
+  - { provider: resend, evidence: 'src/lib/resend.ts:1' }
+  - { provider: groq, evidence: 'src/app/api/admin/study-library/summary/route.ts:4' }
+  - { provider: safepay, evidence: 'src/lib/safepay.ts:1' }
+  - { provider: convex, evidence: 'src/app/(app)/admin/analytics/page.tsx:3' }
+edges: []
+out_of_scope:
+  - api/ (Python services, not part of the Next.js app)
+  - convex/ functions and schema (no Convex adapter in v1)
+  - '@supabase/* and @google/generative-ai are declared in package.json but never imported'
+notes: |
+  No ORM in scope: data lives in Convex. Routes and services only.
+  Layouts at / ((app), (auth), (info), root) count once.

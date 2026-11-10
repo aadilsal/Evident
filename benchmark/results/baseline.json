@@ -1,0 +1,469 @@
+{
+  "categories": {
+    "routes": {
+      "tp": 366,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinationRate": 0.0027
+    },
+    "models": {
+      "tp": 20,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinationRate": 0.0
+    },
+    "services": {
+      "tp": 15,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinationRate": 0.0
+    },
+    "edges": {
+      "tp": 161,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinationRate": 0.0
+    }
+  },
+  "byAdapter": {
+    "express": {
+      "routes": {
+        "tp": 184,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0054
+      }
+    },
+    "nestjs": {
+      "routes": {
+        "tp": 16,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    },
+    "nextjs": {
+      "routes": {
+        "tp": 166,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    },
+    "prisma": {
+      "models": {
+        "tp": 20,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      },
+      "edges": {
+        "tp": 161,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    }
+  },
+  "repos": [
+    {
+      "repo": "aadilsal/Munshi",
+      "sha": "40ad91b6e58e2d20cc60f29ddc035688c8eb7ae6",
+      "seconds": 4.69,
+      "categories": {
+        "routes": {
+          "tp": 55,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0179
+        },
+        "models": {
+          "tp": 11,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 71,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "express": {
+          "routes": {
+            "tp": 38,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0256
+          }
+        },
+        "nextjs": {
+          "routes": {
+            "tp": 17,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        },
+        "prisma": {
+          "models": {
+            "tp": 11,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          },
+          "edges": {
+            "tp": 71,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "aadilsal/MotorAi",
+      "sha": "c10fa5d77f0daa0d40a26ab681e795d5fc589a55",
+      "seconds": 5.07,
+      "categories": {
+        "routes": {
+          "tp": 39,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 73,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "nextjs": {
+          "routes": {
+            "tp": 39,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        },
+        "prisma": {
+          "models": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          },
+          "edges": {
+            "tp": 73,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "aadilsal/AjaiConsultancyAssignment",
+      "sha": "df83d726c11513d2076fdb2a764b2a7d6cdde9ef",
+      "seconds": 5.08,
+      "categories": {
+        "routes": {
+          "tp": 24,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 17,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "nestjs": {
+          "routes": {
+            "tp": 16,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        },
+        "nextjs": {
+          "routes": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        },
+        "prisma": {
+          "models": {
+            "tp": 3,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          },
+          "edges": {
+            "tp": 17,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "aadilsal/TournamentMatchMaker",
+      "sha": "973998e38d0906dfe661505e78e77f46cdc4d42a",
+      "seconds": 8.77,
+      "categories": {
+        "routes": {
+          "tp": 146,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "express": {
+          "routes": {
+            "tp": 146,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "aadilsal/MdcatExpert",
+      "sha": "34c226da59c2da8989b7053cf4a41bbce4e578e3",
+      "seconds": 8.04,
+      "categories": {
+        "routes": {
+          "tp": 102,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "nextjs": {
+          "routes": {
+            "tp": 102,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    }
+  ]
+}

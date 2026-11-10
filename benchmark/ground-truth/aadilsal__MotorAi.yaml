@@ -1,0 +1,776 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo: { owner: aadilsal, name: MotorAi, sha: c10fa5d77f0daa0d40a26ab681e795d5fc589a55 }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-10',
+    minutes: 70,
+  }
+routes:
+  - {
+      method: GET,
+      path: /admin/cars/create,
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(admin)/admin/cars/create/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: /admin/cars,
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(admin)/admin/cars/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: /admin,
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(admin)/admin/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: /admin/settings,
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(admin)/admin/settings/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: /admin/test-drives,
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(admin)/admin/test-drives/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: '/sign-in/:sign-in*?',
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(auth)/sign-in/[[...sign-in]]/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: '/sign-up/:sign-up*?',
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(auth)/sign-up/[[...sign-up]]/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: '/cars/:id',
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(main)/cars/[id]/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: /cars,
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(main)/cars/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: /reservations,
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(main)/reservations/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: /saved-cars,
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(main)/saved-cars/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: '/test-drive/:id',
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/(main)/test-drive/[id]/page.jsx:1',
+    }
+  - { method: GET, path: /, kind: page, framework: nextjs, evidence: 'app/page.jsx:1' }
+  - {
+      method: GET,
+      path: /waitlist,
+      kind: page,
+      framework: nextjs,
+      evidence: 'app/waitlist/page.jsx:1',
+    }
+  - {
+      method: GET,
+      path: /admin,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'app/(admin)/admin/layout.js:1',
+    }
+  - { method: GET, path: /, kind: layout, framework: nextjs, evidence: 'app/layout.js:1' }
+  - {
+      method: POST,
+      path: 'action:actions/admin.js#getAdmin',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/admin.js:8',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/admin.js#getAdminTestDrives',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/admin.js:23',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/admin.js#updateTestDriveStatus',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/admin.js:107',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/admin.js#getDashboardData',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/admin.js:159',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/car-listing.js#getCarFilters',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/car-listing.js:8',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/car-listing.js#getCars',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/car-listing.js:65',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/car-listing.js#toggleSavedCar',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/car-listing.js:167',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/car-listing.js#getCarById',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/car-listing.js#getSavedCars',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/car-listing.js:323',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/cars.js#processCarImageWithAI',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/cars.js:20',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/cars.js#addCar',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/cars.js:116',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/cars.js#getCars',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/cars.js:196',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/cars.js#deleteCar',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/cars.js:234',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/cars.js#updateCarStatus',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/cars.js:294',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/home.js#getFeaturedCars',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/home.js:15',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/home.js#processImageSearch',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/home.js:32',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/settings.js#getDealershipInfo',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/settings.js:6',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/settings.js#saveWorkingHours',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/settings.js:99',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/settings.js#getUsers',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/settings.js:147',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/settings.js#updateUserRole',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/settings.js:177',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/test-drive.js#bookTestDrive',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/test-drive.js:11',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/test-drive.js#getUserTestDrives',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/test-drive.js:79',
+    }
+  - {
+      method: POST,
+      path: 'action:actions/test-drive.js#cancelTestDrive',
+      kind: serverAction,
+      framework: nextjs,
+      evidence: 'actions/test-drive.js:124',
+    }
+models:
+  - { name: User, orm: prisma, evidence: 'prisma/schema.prisma:18' }
+  - { name: Car, orm: prisma, evidence: 'prisma/schema.prisma:37' }
+  - { name: DealershipInfo, orm: prisma, evidence: 'prisma/schema.prisma:73' }
+  - { name: WorkingHour, orm: prisma, evidence: 'prisma/schema.prisma:84' }
+  - { name: UserSavedCar, orm: prisma, evidence: 'prisma/schema.prisma:112' }
+  - { name: TestDriveBooking, orm: prisma, evidence: 'prisma/schema.prisma:125' }
+services:
+  - { provider: clerk, evidence: 'lib/checkUser.js:1' }
+  - { provider: google-gemini, evidence: 'actions/cars.js:5' }
+  - { provider: arcjet, evidence: 'lib/arcjet.js:1' }
+  - { provider: supabase, evidence: 'lib/supabase.js:1' }
+edges:
+  - {
+      route: 'POST action:actions/admin.js#getAdmin',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:8',
+    }
+  - {
+      route: 'POST action:actions/admin.js#getAdminTestDrives',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:23',
+    }
+  - {
+      route: 'POST action:actions/admin.js#getAdminTestDrives',
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:23',
+    }
+  - {
+      route: 'POST action:actions/admin.js#updateTestDriveStatus',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:107',
+    }
+  - {
+      route: 'POST action:actions/admin.js#updateTestDriveStatus',
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:107',
+    }
+  - {
+      route: 'POST action:actions/admin.js#updateTestDriveStatus',
+      model: TestDriveBooking,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/admin.js:107',
+    }
+  - {
+      route: 'POST action:actions/admin.js#getDashboardData',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:159',
+    }
+  - {
+      route: 'POST action:actions/admin.js#getDashboardData',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:159',
+    }
+  - {
+      route: 'POST action:actions/admin.js#getDashboardData',
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:159',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getCarFilters',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:8',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getCars',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:65',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getCars',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:65',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getCars',
+      model: UserSavedCar,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:65',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#toggleSavedCar',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:167',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#toggleSavedCar',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:167',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#toggleSavedCar',
+      model: UserSavedCar,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:167',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#toggleSavedCar',
+      model: UserSavedCar,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:167',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getCarById',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getCarById',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getCarById',
+      model: UserSavedCar,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getCarById',
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getCarById',
+      model: DealershipInfo,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getSavedCars',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:323',
+    }
+  - {
+      route: 'POST action:actions/car-listing.js#getSavedCars',
+      model: UserSavedCar,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:323',
+    }
+  - {
+      route: 'POST action:actions/cars.js#addCar',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/cars.js:116',
+    }
+  - {
+      route: 'POST action:actions/cars.js#addCar',
+      model: Car,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/cars.js:116',
+    }
+  - {
+      route: 'POST action:actions/cars.js#getCars',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/cars.js:196',
+    }
+  - {
+      route: 'POST action:actions/cars.js#getCars',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/cars.js:196',
+    }
+  - {
+      route: 'POST action:actions/cars.js#deleteCar',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/cars.js:234',
+    }
+  - {
+      route: 'POST action:actions/cars.js#deleteCar',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/cars.js:234',
+    }
+  - {
+      route: 'POST action:actions/cars.js#deleteCar',
+      model: Car,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/cars.js:234',
+    }
+  - {
+      route: 'POST action:actions/cars.js#updateCarStatus',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/cars.js:294',
+    }
+  - {
+      route: 'POST action:actions/cars.js#updateCarStatus',
+      model: Car,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/cars.js:294',
+    }
+  - {
+      route: 'POST action:actions/home.js#getFeaturedCars',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/home.js:15',
+    }
+  - {
+      route: 'POST action:actions/settings.js#getDealershipInfo',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/settings.js:6',
+    }
+  - {
+      route: 'POST action:actions/settings.js#getDealershipInfo',
+      model: DealershipInfo,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/settings.js:6',
+    }
+  - {
+      route: 'POST action:actions/settings.js#getDealershipInfo',
+      model: DealershipInfo,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/settings.js:6',
+    }
+  - {
+      route: 'POST action:actions/settings.js#getDealershipInfo',
+      model: WorkingHour,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/settings.js:6',
+    }
+  - {
+      route: 'POST action:actions/settings.js#saveWorkingHours',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/settings.js:99',
+    }
+  - {
+      route: 'POST action:actions/settings.js#saveWorkingHours',
+      model: DealershipInfo,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/settings.js:99',
+    }
+  - {
+      route: 'POST action:actions/settings.js#saveWorkingHours',
+      model: WorkingHour,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/settings.js:99',
+    }
+  - {
+      route: 'POST action:actions/settings.js#getUsers',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/settings.js:147',
+    }
+  - {
+      route: 'POST action:actions/settings.js#updateUserRole',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/settings.js:177',
+    }
+  - {
+      route: 'POST action:actions/settings.js#updateUserRole',
+      model: User,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/settings.js:177',
+    }
+  - {
+      route: 'POST action:actions/test-drive.js#bookTestDrive',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:11',
+    }
+  - {
+      route: 'POST action:actions/test-drive.js#bookTestDrive',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:11',
+    }
+  - {
+      route: 'POST action:actions/test-drive.js#bookTestDrive',
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:11',
+    }
+  - {
+      route: 'POST action:actions/test-drive.js#bookTestDrive',
+      model: TestDriveBooking,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:11',
+    }
+  - {
+      route: 'POST action:actions/test-drive.js#getUserTestDrives',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:79',
+    }
+  - {
+      route: 'POST action:actions/test-drive.js#getUserTestDrives',
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:79',
+    }
+  - {
+      route: 'POST action:actions/test-drive.js#cancelTestDrive',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:124',
+    }
+  - {
+      route: 'POST action:actions/test-drive.js#cancelTestDrive',
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:124',
+    }
+  - {
+      route: 'POST action:actions/test-drive.js#cancelTestDrive',
+      model: TestDriveBooking,
+      op: write,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:124',
+    }
+  - {
+      route: GET /admin (layout),
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:8',
+    }
+  - { route: GET /admin, model: User, op: read, orm: prisma, evidence: 'actions/admin.js:159' }
+  - { route: GET /admin, model: Car, op: read, orm: prisma, evidence: 'actions/admin.js:159' }
+  - {
+      route: GET /admin,
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/admin.js:159',
+    }
+  - {
+      route: 'GET /cars/:id',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'GET /cars/:id',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'GET /cars/:id',
+      model: UserSavedCar,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'GET /cars/:id',
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'GET /cars/:id',
+      model: DealershipInfo,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - { route: GET /cars, model: Car, op: read, orm: prisma, evidence: 'actions/car-listing.js:8' }
+  - {
+      route: GET /reservations,
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:79',
+    }
+  - {
+      route: GET /reservations,
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/test-drive.js:79',
+    }
+  - {
+      route: GET /saved-cars,
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:323',
+    }
+  - {
+      route: GET /saved-cars,
+      model: UserSavedCar,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:323',
+    }
+  - {
+      route: 'GET /test-drive/:id',
+      model: User,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'GET /test-drive/:id',
+      model: Car,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'GET /test-drive/:id',
+      model: UserSavedCar,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'GET /test-drive/:id',
+      model: TestDriveBooking,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - {
+      route: 'GET /test-drive/:id',
+      model: DealershipInfo,
+      op: read,
+      orm: prisma,
+      evidence: 'actions/car-listing.js:234',
+    }
+  - { route: GET /, model: Car, op: read, orm: prisma, evidence: 'actions/home.js:15' }
+out_of_scope:
+  - app/not-found.jsx (not a page/layout/route file)
+  - include/select relation reads (optional, not labelled)
+notes: |
+  Three layouts resolve to GET / (app/layout.js, (auth)/layout.jsx, (main)/layout.js): counted once.
+  components/header.jsx calls checkUser() but is rendered as JSX from app/layout.js: not a call, not counted.

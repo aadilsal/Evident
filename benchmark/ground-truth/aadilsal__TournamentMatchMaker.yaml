@@ -1,0 +1,1045 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo: { owner: aadilsal, name: TournamentMatchMaker, sha: 973998e38d0906dfe661505e78e77f46cdc4d42a }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-10',
+    minutes: 60,
+  }
+routes:
+  - {
+      method: GET,
+      path: /health,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/app.ts:54',
+    }
+  - {
+      method: POST,
+      path: /webhooks/stripe,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/integrations/stripe.webhook.ts:14',
+    }
+  - {
+      method: GET,
+      path: /api/v1/integrations/meta/link-code,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/integrations/meta.routes.ts:28',
+    }
+  - {
+      method: POST,
+      path: /api/v1/integrations/meta/identity/verify-link-code,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/integrations/meta.routes.ts:41',
+    }
+  - {
+      method: GET,
+      path: /api/v1/integrations/meta/matches/current,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/integrations/meta.routes.ts:56',
+    }
+  - {
+      method: GET,
+      path: /api/v1/integrations/meta/tournaments/live,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/integrations/meta.routes.ts:71',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/integrations/meta/matches/:id/scores',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/integrations/meta.routes.ts:79',
+    }
+  - {
+      method: POST,
+      path: /api/v1/integrations/meta/solo-target,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/integrations/meta.routes.ts:94',
+    }
+  - {
+      method: GET,
+      path: /api/v1/geo/location,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/geo/geo.routes.ts:26',
+    }
+  - {
+      method: GET,
+      path: /api/v1/geo/reverse,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/geo/geo.routes.ts:35',
+    }
+  - {
+      method: GET,
+      path: /api/v1/geo/coords,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/geo/geo.routes.ts:45',
+    }
+  - {
+      method: GET,
+      path: /api/v1/geo/countries,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/geo/geo.routes.ts:55',
+    }
+  - {
+      method: GET,
+      path: /api/v1/geo/cities,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/geo/geo.routes.ts:64',
+    }
+  - {
+      method: GET,
+      path: /api/v1/auth/check-availability,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/auth/auth.routes.ts:23',
+    }
+  - {
+      method: POST,
+      path: /api/v1/auth/register,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/auth/auth.routes.ts:39',
+    }
+  - {
+      method: POST,
+      path: /api/v1/auth/login,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/auth/auth.routes.ts:53',
+    }
+  - {
+      method: POST,
+      path: /api/v1/auth/forgot-password,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/auth/auth.routes.ts:67',
+    }
+  - {
+      method: POST,
+      path: /api/v1/auth/reset-password,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/auth/auth.routes.ts:75',
+    }
+  - {
+      method: POST,
+      path: /api/v1/auth/refresh,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/auth/auth.routes.ts:84',
+    }
+  - {
+      method: POST,
+      path: /api/v1/auth/logout,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/auth/auth.routes.ts:108',
+    }
+  - {
+      method: GET,
+      path: /api/v1/players/me,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/players/players.routes.ts:14',
+    }
+  - {
+      method: GET,
+      path: /api/v1/players/me/buyback-options,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/players/players.routes.ts:23',
+    }
+  - {
+      method: PATCH,
+      path: /api/v1/players/me,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/players/players.routes.ts:32',
+    }
+  - {
+      method: PATCH,
+      path: /api/v1/players/me/avatar,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/players/players.routes.ts:41',
+    }
+  - {
+      method: GET,
+      path: /api/v1/players/me/avatar,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/players/players.routes.ts:50',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/players/:username',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/players/players.routes.ts:65',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/players/:username/matches',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/players/players.routes.ts:74',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/players/:username/avatar',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/players/players.routes.ts:83',
+    }
+  - {
+      method: GET,
+      path: /api/v1/venues,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/venues/venues.routes.ts:16',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/venues/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/venues/venues.routes.ts:25',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/venues/:id/slots',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/slots/slots.routes.ts:14',
+    }
+  - {
+      method: GET,
+      path: /api/v1/bookings/me,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/bookings/bookings.routes.ts:15',
+    }
+  - {
+      method: POST,
+      path: /api/v1/bookings,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/bookings/bookings.routes.ts:24',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/bookings/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/bookings/bookings.routes.ts:33',
+    }
+  - {
+      method: GET,
+      path: /api/v1/tournaments,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:22',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/tournaments/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:31',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/tournaments/:id/registration',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:40',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/tournaments/:id/participant',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:49',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/tournaments/:id/slot-options',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:59',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/tournaments/:id/my-slot',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:78',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/tournaments/:id/rounds',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:87',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/tournaments/:id/participants',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:96',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/tournaments/:id/matches',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:105',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/tournaments/:id/bracket',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:114',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/tournaments/:id/register',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:125',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/tournaments/:id/enter',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:139',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/tournaments/:id/buyback/checkout',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:153',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/tournaments/:id/register',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/tournaments/tournaments.routes.ts:171',
+    }
+  - {
+      method: POST,
+      path: /api/v1/matchmaking/queue,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/matchmaking/matchmaking.routes.ts:15',
+    }
+  - {
+      method: DELETE,
+      path: /api/v1/matchmaking/queue,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/matchmaking/matchmaking.routes.ts:24',
+    }
+  - {
+      method: GET,
+      path: /api/v1/matchmaking/status,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/matchmaking/matchmaking.routes.ts:33',
+    }
+  - {
+      method: GET,
+      path: /api/v1/matches/me,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/matches/matches.routes.ts:15',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/matches/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/matches/matches.routes.ts:24',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/matches/:id/confirm',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/matches/matches.routes.ts:33',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/matches/:id/decline',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/matches/matches.routes.ts:42',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/matches/:id/score',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/matches/matches.routes.ts:56',
+    }
+  - {
+      method: GET,
+      path: /api/v1/notifications,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/notifications/notifications.routes.ts:14',
+    }
+  - {
+      method: PATCH,
+      path: /api/v1/notifications/read-all,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/notifications/notifications.routes.ts:26',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/notifications/:id/read',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/notifications/notifications.routes.ts:35',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/dashboard,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:121',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/audit-logs,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:129',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/users,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:139',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/users,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:148',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/users/lookup,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:158',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/users/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:166',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/users/:id/sync-tier',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:180',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/users/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:188',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/users/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:196',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/users/:id/reset-password',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:205',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/users/:id/sessions',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:219',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/venues,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:229',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/venues,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:239',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/venues/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:248',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/venues/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:257',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/venues/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:266',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/venues/:id/slots',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:275',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/venues/:id/slots',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:284',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/venues/:id/slots/generate',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:293',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/venues/:id/admins',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:302',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/venues/:id/admins',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:310',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/venues/:venueId/admins/:userId',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:319',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/slots,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:329',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/slots/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:342',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/slots/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:350',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/slots/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:358',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/slots/:id/unlock',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:367',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/slots/:id/recount',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:375',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/bookings,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:384',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/bookings,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:398',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/bookings/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:407',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/bookings/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:415',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/bookings/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:423',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/tournaments,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:433',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/tournaments,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:443',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/tournaments/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:452',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/tournaments/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:461',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/tournaments/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:470',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/tournaments/:id/publish',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:479',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/tournaments/:id/close-registration',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:487',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/tournaments/:id/start',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:495',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/tournaments/:id/complete',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:503',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/tournaments/:id/close-round',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:511',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/tournaments/:id/rounds',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:520',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/tournaments/:id/rounds',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:528',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/tournaments/:id/registrations',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:537',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/tournaments/:id/registrations',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:548',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/tournaments/:tournamentId/registrations/:userId',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:557',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/tournaments/:id/participants',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:570',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/tournaments/:id/participants/sync-stats',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:578',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/tournaments/:id/matches',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:586',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/tournaments/:id/bracket',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:594',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/tournaments/:id/buybacks',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:602',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/tournaments/:id/admins',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:610',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/tournaments/:id/admins',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:618',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/tournaments/:tournamentId/admins/:userId',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:627',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/rounds/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:641',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/participants/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:649',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/participants/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:657',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/participants/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:665',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/matches,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:675',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/matches,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:684',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/matches/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:693',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/matches/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:701',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/matches/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:709',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/matches/:id/confirm',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:718',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/matches/:id/expire',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:726',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/admin/matches/:id/result',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:734',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/buybacks,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:743',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/buybacks,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:752',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/admin/buybacks/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:761',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/buybacks/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:769',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/buybacks/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:777',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/notifications,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:788',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/notifications,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:797',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/notifications/broadcast,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:805',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/admin/notifications/:id/read',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:813',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/notifications/:id',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:822',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/queue,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:832',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/queue/trigger-pair,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:840',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/admin/queue/players/:userId',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:848',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/queue/players/:userId',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:857',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/system/health,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:867',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/system/expire-matches,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:875',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/admin/buybacks/:id/refund',
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:883',
+    }
+  - {
+      method: GET,
+      path: /api/v1/admin/integrations,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:892',
+    }
+  - {
+      method: POST,
+      path: /api/v1/admin/integrations/email/test,
+      kind: api,
+      framework: express,
+      evidence: 'apps/api/src/modules/admin/admin.routes.ts:900',
+    }
+models: []
+services:
+  - { provider: redis, evidence: 'apps/api/src/lib/redis.ts:1' }
+  - { provider: stripe, evidence: 'apps/api/src/lib/stripe.ts:31' }
+  - { provider: aws-ses, evidence: 'packages/shared/src/server/email.ts:1' }
+edges: []
+out_of_scope:
+  - apps/web (Vite SPA, no server routes)
+  - raw SQL via pg (no ORM in scope)
+  - '**/__tests__/**'
+notes: |
+  Routers are built in factory functions (createXRouter) and mounted in createApp.
+  metaApiRouter is mounted at '/' inside the meta router, so it shares the meta prefix.
+  stripe is loaded with a dynamic import('stripe') in apps/api/src/lib/stripe.ts:31; @stripe/stripe-js is the web client.

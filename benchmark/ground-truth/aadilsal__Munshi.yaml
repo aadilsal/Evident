@@ -1,0 +1,926 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo: { owner: aadilsal, name: Munshi, sha: 40ad91b6e58e2d20cc60f29ddc035688c8eb7ae6 }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-10',
+    minutes: 110,
+  }
+routes:
+  - {
+      method: GET,
+      path: /health,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/server.ts:44',
+    }
+  - {
+      method: GET,
+      path: /api/analytics/summary,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:14',
+    }
+  - {
+      method: POST,
+      path: /api/analytics/ask,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:25',
+    }
+  - {
+      method: POST,
+      path: /api/auth/signup,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:77',
+    }
+  - {
+      method: POST,
+      path: /api/auth/signup/verify,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:113',
+    }
+  - {
+      method: POST,
+      path: /api/auth/request-otp,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:168',
+    }
+  - {
+      method: POST,
+      path: /api/auth/verify-otp,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:191',
+    }
+  - {
+      method: GET,
+      path: /api/billing,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/billing/billing.routes.ts:14',
+    }
+  - {
+      method: POST,
+      path: /api/billing/change-plan,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/billing/billing.routes.ts:27',
+    }
+  - {
+      method: GET,
+      path: /api/products,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:31',
+    }
+  - {
+      method: POST,
+      path: /api/products/uploads/presign,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:45',
+    }
+  - {
+      method: POST,
+      path: /api/products/drafts,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:62',
+    }
+  - {
+      method: PATCH,
+      path: '/api/products/:productId',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:83',
+    }
+  - {
+      method: POST,
+      path: '/api/products/:productId/variants',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:104',
+    }
+  - {
+      method: PATCH,
+      path: '/api/products/:productId/variants/:variantId',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:124',
+    }
+  - {
+      method: DELETE,
+      path: '/api/products/:productId/variants/:variantId',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:138',
+    }
+  - {
+      method: POST,
+      path: '/api/products/:productId/publish',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:147',
+    }
+  - {
+      method: GET,
+      path: /api/channels,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/channels/channels.routes.ts:18',
+    }
+  - {
+      method: GET,
+      path: /api/channels/whatsapp/config,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/channels/channels.routes.ts:29',
+    }
+  - {
+      method: POST,
+      path: /api/channels/whatsapp/connect,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/channels/channels.routes.ts:48',
+    }
+  - {
+      method: GET,
+      path: /api/channels/instagram/connect-url,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/channels/channels.routes.ts:67',
+    }
+  - {
+      method: POST,
+      path: '/api/channels/:type/disconnect',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/channels/channels.routes.ts:78',
+    }
+  - {
+      method: GET,
+      path: /oauth/instagram/callback,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/channels/oauth-callback.routes.ts:14',
+    }
+  - {
+      method: GET,
+      path: /api/conversations,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/conversations/conversations.routes.ts:12',
+    }
+  - {
+      method: GET,
+      path: '/api/conversations/:conversationId/messages',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/conversations/conversations.routes.ts:23',
+    }
+  - {
+      method: POST,
+      path: '/api/conversations/:conversationId/handoff',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/conversations/conversations.routes.ts:35',
+    }
+  - {
+      method: POST,
+      path: '/api/conversations/:conversationId/resume-bot',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/conversations/conversations.routes.ts:47',
+    }
+  - {
+      method: GET,
+      path: /api/orders,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:14',
+    }
+  - {
+      method: GET,
+      path: /api/orders/low-stock,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:23',
+    }
+  - {
+      method: POST,
+      path: /api/orders,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:40',
+    }
+  - {
+      method: POST,
+      path: '/api/orders/:orderId/dispatch',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:58',
+    }
+  - {
+      method: POST,
+      path: '/api/orders/:orderId/cancel',
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:66',
+    }
+  - {
+      method: POST,
+      path: /api/payment-proofs,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/reconciliation/reconciliation.routes.ts:15',
+    }
+  - {
+      method: GET,
+      path: /api/payment-proofs/needs-review,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/modules/reconciliation/reconciliation.routes.ts:26',
+    }
+  - {
+      method: GET,
+      path: /webhooks/whatsapp,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:19',
+    }
+  - {
+      method: POST,
+      path: /webhooks/whatsapp,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:51',
+    }
+  - {
+      method: GET,
+      path: /webhooks/instagram,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/webhooks/instagram.ts:15',
+    }
+  - {
+      method: POST,
+      path: /webhooks/instagram,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/webhooks/instagram.ts:36',
+    }
+  - {
+      method: PUT,
+      path: /media/*,
+      kind: api,
+      framework: express,
+      evidence: 'apps/backend/src/server.ts:50',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: GET,
+      path: /contact,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/contact/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /dashboard/billing,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/dashboard/billing/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /dashboard/channels,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/dashboard/channels/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /dashboard/conversations,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/dashboard/conversations/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /dashboard,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/dashboard/layout.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /dashboard/orders,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/dashboard/orders/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /dashboard,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/dashboard/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /dashboard/products,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/dashboard/products/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/layout.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /login,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/login/layout.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /login,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/login/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /onboarding,
+      kind: layout,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/onboarding/layout.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /onboarding,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/onboarding/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /privacy,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/privacy/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /terms,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/terms/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /thank-you,
+      kind: page,
+      framework: nextjs,
+      evidence: 'apps/dashboard/app/thank-you/page.tsx:1',
+    }
+models:
+  - { name: Plan, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:68' }
+  - { name: Seller, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:77' }
+  - { name: Channel, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:97' }
+  - { name: Product, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:130' }
+  - { name: ProductVariant, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:147' }
+  - { name: Customer, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:161' }
+  - { name: Conversation, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:178' }
+  - { name: Message, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:197' }
+  - { name: Order, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:210' }
+  - { name: OrderItem, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:235' }
+  - { name: PaymentProof, orm: prisma, evidence: 'apps/backend/prisma/schema.prisma:252' }
+services:
+  - { provider: anthropic, evidence: 'apps/backend/src/lib/anthropic.ts:1' }
+  - { provider: aws-s3, evidence: 'apps/backend/src/lib/storage.ts:4' }
+  - { provider: twilio, evidence: 'apps/backend/src/lib/otp.ts:2' }
+  - { provider: redis, evidence: 'apps/backend/src/queue/queue.ts:2' }
+edges:
+  - {
+      route: GET /api/analytics/summary,
+      model: Order,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:14',
+    }
+  - {
+      route: GET /api/analytics/summary,
+      model: OrderItem,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:14',
+    }
+  - {
+      route: GET /api/analytics/summary,
+      model: Customer,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:14',
+    }
+  - {
+      route: GET /api/analytics/summary,
+      model: Conversation,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:14',
+    }
+  - {
+      route: GET /api/analytics/summary,
+      model: ProductVariant,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:14',
+    }
+  - {
+      route: POST /api/analytics/ask,
+      model: Order,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:25',
+    }
+  - {
+      route: POST /api/analytics/ask,
+      model: OrderItem,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:25',
+    }
+  - {
+      route: POST /api/analytics/ask,
+      model: Customer,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:25',
+    }
+  - {
+      route: POST /api/analytics/ask,
+      model: Conversation,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:25',
+    }
+  - {
+      route: POST /api/analytics/ask,
+      model: ProductVariant,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/analytics/analytics.routes.ts:25',
+    }
+  - {
+      route: POST /api/auth/signup,
+      model: Seller,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:77',
+    }
+  - {
+      route: POST /api/auth/signup,
+      model: Plan,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:77',
+    }
+  - {
+      route: POST /api/auth/signup/verify,
+      model: Seller,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:113',
+    }
+  - {
+      route: POST /api/auth/signup/verify,
+      model: Seller,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:113',
+    }
+  - {
+      route: POST /api/auth/signup/verify,
+      model: Plan,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:113',
+    }
+  - {
+      route: POST /api/auth/request-otp,
+      model: Seller,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:168',
+    }
+  - {
+      route: POST /api/auth/verify-otp,
+      model: Seller,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/auth/auth.routes.ts:191',
+    }
+  - {
+      route: GET /api/billing,
+      model: Seller,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/billing/billing.routes.ts:14',
+    }
+  - {
+      route: GET /api/billing,
+      model: Order,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/billing/billing.routes.ts:14',
+    }
+  - {
+      route: POST /api/billing/change-plan,
+      model: Plan,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/billing/billing.routes.ts:27',
+    }
+  - {
+      route: POST /api/billing/change-plan,
+      model: Seller,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/billing/billing.routes.ts:27',
+    }
+  - {
+      route: GET /api/products,
+      model: Product,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:31',
+    }
+  - {
+      route: POST /api/products/drafts,
+      model: Seller,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:62',
+    }
+  - {
+      route: POST /api/products/drafts,
+      model: Product,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:62',
+    }
+  - {
+      route: 'PATCH /api/products/:productId',
+      model: Product,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:83',
+    }
+  - {
+      route: 'PATCH /api/products/:productId',
+      model: Product,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:83',
+    }
+  - {
+      route: 'POST /api/products/:productId/variants',
+      model: Product,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:104',
+    }
+  - {
+      route: 'POST /api/products/:productId/variants',
+      model: ProductVariant,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:104',
+    }
+  - {
+      route: 'PATCH /api/products/:productId/variants/:variantId',
+      model: ProductVariant,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:124',
+    }
+  - {
+      route: 'PATCH /api/products/:productId/variants/:variantId',
+      model: ProductVariant,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:124',
+    }
+  - {
+      route: 'DELETE /api/products/:productId/variants/:variantId',
+      model: ProductVariant,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:138',
+    }
+  - {
+      route: 'DELETE /api/products/:productId/variants/:variantId',
+      model: ProductVariant,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:138',
+    }
+  - {
+      route: 'POST /api/products/:productId/publish',
+      model: Product,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:147',
+    }
+  - {
+      route: 'POST /api/products/:productId/publish',
+      model: Channel,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/catalog/catalog.routes.ts:147',
+    }
+  - {
+      route: GET /api/channels,
+      model: Channel,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/channels/channels.routes.ts:18',
+    }
+  - {
+      route: POST /api/channels/whatsapp/connect,
+      model: Channel,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/channels/channels.routes.ts:48',
+    }
+  - {
+      route: 'POST /api/channels/:type/disconnect',
+      model: Channel,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/channels/channels.routes.ts:78',
+    }
+  - {
+      route: GET /oauth/instagram/callback,
+      model: Channel,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/channels/oauth-callback.routes.ts:14',
+    }
+  - {
+      route: GET /api/conversations,
+      model: Conversation,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/conversations/conversations.routes.ts:12',
+    }
+  - {
+      route: 'GET /api/conversations/:conversationId/messages',
+      model: Message,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/conversations/conversations.routes.ts:23',
+    }
+  - {
+      route: 'POST /api/conversations/:conversationId/handoff',
+      model: Conversation,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/conversations/conversations.routes.ts:35',
+    }
+  - {
+      route: 'POST /api/conversations/:conversationId/resume-bot',
+      model: Conversation,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/conversations/conversations.routes.ts:47',
+    }
+  - {
+      route: GET /api/orders,
+      model: Order,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:14',
+    }
+  - {
+      route: GET /api/orders/low-stock,
+      model: ProductVariant,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:23',
+    }
+  - {
+      route: POST /api/orders,
+      model: Customer,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:40',
+    }
+  - {
+      route: POST /api/orders,
+      model: Customer,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:40',
+    }
+  - {
+      route: POST /api/orders,
+      model: Order,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:40',
+    }
+  - {
+      route: POST /api/orders,
+      model: Order,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:40',
+    }
+  - {
+      route: POST /api/orders,
+      model: OrderItem,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:40',
+    }
+  - {
+      route: POST /api/orders,
+      model: ProductVariant,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:40',
+    }
+  - {
+      route: POST /api/orders,
+      model: ProductVariant,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:40',
+    }
+  - {
+      route: POST /api/orders,
+      model: Seller,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:40',
+    }
+  - {
+      route: 'POST /api/orders/:orderId/dispatch',
+      model: Order,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:58',
+    }
+  - {
+      route: 'POST /api/orders/:orderId/cancel',
+      model: Order,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:66',
+    }
+  - {
+      route: 'POST /api/orders/:orderId/cancel',
+      model: Order,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:66',
+    }
+  - {
+      route: 'POST /api/orders/:orderId/cancel',
+      model: ProductVariant,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/orders/orders.routes.ts:66',
+    }
+  - {
+      route: POST /api/payment-proofs,
+      model: PaymentProof,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/reconciliation/reconciliation.routes.ts:15',
+    }
+  - {
+      route: GET /api/payment-proofs/needs-review,
+      model: PaymentProof,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/modules/reconciliation/reconciliation.routes.ts:26',
+    }
+  - {
+      route: POST /webhooks/whatsapp,
+      model: Channel,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:51',
+    }
+  - {
+      route: POST /webhooks/whatsapp,
+      model: Customer,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:51',
+    }
+  - {
+      route: POST /webhooks/whatsapp,
+      model: Customer,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:51',
+    }
+  - {
+      route: POST /webhooks/whatsapp,
+      model: Order,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:51',
+    }
+  - {
+      route: POST /webhooks/whatsapp,
+      model: Conversation,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:51',
+    }
+  - {
+      route: POST /webhooks/whatsapp,
+      model: Conversation,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:51',
+    }
+  - {
+      route: POST /webhooks/whatsapp,
+      model: Message,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:51',
+    }
+  - {
+      route: POST /webhooks/whatsapp,
+      model: PaymentProof,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/whatsapp.ts:51',
+    }
+  - {
+      route: POST /webhooks/instagram,
+      model: Channel,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/instagram.ts:36',
+    }
+  - {
+      route: POST /webhooks/instagram,
+      model: Customer,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/instagram.ts:36',
+    }
+  - {
+      route: POST /webhooks/instagram,
+      model: Conversation,
+      op: read,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/instagram.ts:36',
+    }
+  - {
+      route: POST /webhooks/instagram,
+      model: Conversation,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/instagram.ts:36',
+    }
+  - {
+      route: POST /webhooks/instagram,
+      model: Message,
+      op: write,
+      orm: prisma,
+      evidence: 'apps/backend/src/webhooks/instagram.ts:36',
+    }
+out_of_scope:
+  - queue workers (BullMQ jobs are enqueued with queue.add, not called)
+  - apps/backend/eval and prisma/seed.ts (scripts)
+  - 'Meta Graph API fetch calls (http: services are optional)'
+notes: |
+  PUT /media/* is registered only when local storage is active and its prefix is an imported constant: optional, dynamic.
+  POST /api/orders: createManualOrder writes OrderItem through a nested `items: { create }` (orders.service.ts:120).
+  Dashboard pages call the backend over HTTP only, so they have no model edges.

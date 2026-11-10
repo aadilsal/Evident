@@ -3,17 +3,24 @@
 | | |
 | --- | --- |
 | Owner | Aadil Salman Butt |
-| Status | Draft, pre-development |
-| Scope reference | This PRD plus the [ADRs](adr/). Update both when a decision changes. |
-| Last updated | 2026-11-07 |
+| Status | Draft, Phase 1 (Engine) in progress |
+| Scope reference | This PRD plus the [ADRs](adr/). Scope follows the internal feature tracker; update all three when a decision changes. |
+| Last updated | 2026-11-10 |
 
 ## 1. Problem
 
-Developers who land in an unfamiliar codebase, whether onboarding, evaluating an open-source project or reviewing a PR, spend hours answering *what talks to what*. Existing AI diagram tools (GitDiagram, DeepWiki, CodeBoarding) produce folder- or module-level Mermaid diagrams, largely inferred by an LLM, with no way to verify a box or an arrow. Users report hallucinated components. A diagram that can't be checked can't be trusted.
+Developers who land in an unfamiliar codebase, whether onboarding, evaluating an open-source project or reviewing a PR, spend hours answering *what talks to what*. Coding agents have the same problem and fill the gaps by guessing. Existing AI diagram tools (GitDiagram, DeepWiki, CodeBoarding) produce folder- or module-level Mermaid diagrams, largely inferred by an LLM, with no way to verify a box or an arrow. Users report hallucinated components. A diagram that can't be checked can't be trusted.
 
 ## 2. Product
 
-An evidence-backed, interactive architecture map for JS/TS full-stack apps (Next.js, Express, Prisma). Paste a public GitHub URL and get routes, handlers, middleware, database tables, external services and env vars, plus the edges between them. Every element links to the file and line range that proves it. Static analysis produces the facts; an LLM only groups and labels them.
+An evidence-backed architecture map for web apps. Point it at a repo (a public GitHub URL, or a local folder through the CLI) and get routes, handlers, middleware, models/tables, external services, env vars and containers, plus the edges between them. Every element links to the file and line range that proves it. Static analysis produces the facts; an LLM only groups and labels them.
+
+It's **CLI-first** ([ADR-0005](adr/0005-cli-first-three-front-ends.md)). One pip package (`evident-map`) powers three front-ends:
+- the `evident` CLI
+- a Claude skill for coding agents
+- the hosted web app (and later an MCP server)
+
+Extraction runs through **per-framework adapters on a universal layer** ([ADR-0006](adr/0006-adapter-architecture.md)).
 
 ## 3. Users
 
@@ -22,53 +29,77 @@ An evidence-backed, interactive architecture map for JS/TS full-stack apps (Next
 | **New joiner** | Understand a codebase in their first week | Finds where a feature's data is written in under 5 minutes |
 | **OSS evaluator** | Decide whether to adopt or contribute | Sees the system's shape and risks before cloning |
 | **Reviewer** | Judge a PR's architectural impact | Sees blast radius of a changed model or file |
+| **Coding agent (via the Claude skill)** | Change code without breaking callers it can't see | Runs `impact` before editing a model; cites `file:line` for every claimed dependency |
+| **Developer on a private repo** | Same map, without uploading code | `evident analyze .` works offline; nothing leaves the machine unless they run `share` |
 | **Recruiter / hiring manager** *(portfolio audience)* | Judge the author's engineering | Opens a gallery map in 10 seconds, sees the benchmark score |
 
 ## 4. Goals and non-goals
 
 **Goals (v1)**
-1. Extract routes, models, DB read/write edges and external services with **≥ 90% precision and ≥ 85% recall** on the benchmark.
-2. Every node and edge carries line-level evidence; the UI never shows an element without a receipt.
+1. Extract routes, models, DB read/write edges and external services with **≥ 90% precision and ≥ 85% recall** on the benchmark, reported per category **and per adapter**.
+2. Every node and edge carries line-level evidence; no surface (CLI, skill, UI) shows an element without a receipt.
 3. Demo works in 10 seconds with no waiting (featured gallery).
 4. Publish accuracy openly (`/benchmarks`), with a GitDiagram baseline.
+5. A Claude skill that measurably improves agent tasks (with vs without the skill).
+6. Unsupported stacks degrade gracefully to the universal map, never a blank screen.
 
 **Non-goals (v1)**
-- Private repos, authentication, user accounts
-- Frameworks beyond Next.js App Router / Express / Prisma (no NestJS, Remix, Drizzle, Pages Router)
-- Languages beyond JS/TS
+- Hosted analysis of private repos, authentication, user accounts (local CLI covers private code; hosted private repos are a v2 Pro tier)
+- Post-launch ecosystems before launch: Spring Boot, Laravel, Rails, ASP.NET Core, Go
+- Next.js Pages Router, Remix
 - Executing, installing or building any analysed code
 - Free-form AI chat (Ask the map is v1.5 and grounded)
 
 ## 5. Functional requirements (v1)
 
 ### 5.1 Analyse a repo
-- **FR-1** User pastes `github.com/owner/repo` (optionally `/tree/<ref>`); the system resolves it to a commit SHA.
-- **FR-2** If a graph exists for `owner/repo@sha + engineVersion`, return it immediately from cache.
-- **FR-3** Otherwise enqueue one job per commit; duplicate submissions attach to the running job.
-- **FR-4** Stream progress over SSE by stage: fetch → parse → extract → link → analyse → group, with live counts.
-- **FR-5** Reject with a clear message: non-GitHub hosts, private or missing repos, repos over size limits (default 200 MB / 10k files), unsupported stacks (no Next.js/Express/Prisma detected).
+- **FR-1** Accept a local path (CLI) or `github.com/owner/repo` (optionally `/tree/<ref>`); resolve to a commit SHA, or a worktree hash for a folder without git.
+- **FR-2** If a graph exists for `repo@sha + engineVersion`, return it from cache. Locally, the `.evident/` cache re-runs only changed files (target 1–2 s).
+- **FR-3** Hosted: enqueue one job per commit; duplicate submissions attach to the running job.
+- **FR-4** Hosted: stream progress over SSE by stage: fetch → parse → extract → link → analyse → group, with live counts.
+- **FR-5** Reject with a clear message: non-GitHub hosts, private or missing repos, repos over size limits (default 200 MB / 10k files). An unsupported stack is **not** rejected; see FR-12.
 
-### 5.2 Extraction
-- **FR-6** Next.js App Router: `app/**/route.{ts,js}` exported methods, pages, layouts, `"use server"` actions, `middleware.ts` + `config.matcher`.
-- **FR-7** Express: `app|router.METHOD(path, ...handlers)`, `app.use(prefix, router)` mounts with prefix resolution, middleware chains.
-- **FR-8** Prisma: models, fields, relations, `@@map` from `schema.prisma`; `prisma.<model>.<op>()` calls classified read/write, including through re-exported client instances.
-- **FR-9** External services from SDK imports via a maintained catalogue (Stripe, AWS S3, Resend, Redis, OpenAI, …).
-- **FR-10** `process.env.X` reads (names only), and whether each is documented in `.env.example`.
-- **FR-11** Module graph with `tsconfig` `paths`/`baseUrl` aliases and npm/pnpm/yarn workspaces.
+### 5.2 Engine
+- **FR-6** Stack detection from manifests (`package.json`, `pyproject.toml`/`requirements.txt`, `pom.xml`/Gradle, `go.mod`, `composer.json`, `Gemfile`, `.csproj`); every matching adapter runs, including several at once in monorepos.
+- **FR-7** Universal layer (any language tree-sitter parses): module/import graph, external services from manifests + SDK imports (maintained catalogue), env var reads (names only) and whether each is documented in `.env.example`, containers from `docker-compose.yml`.
+- **FR-8** Module resolution for `tsconfig` `paths`/`baseUrl` aliases and npm/pnpm/yarn workspaces.
+- **FR-9** Framework adapters (v1): **Next.js** App Router (route handlers, pages, layouts, `"use server"` actions, `middleware.ts` + `config.matcher`), **Express** (`app|router.METHOD`, `app.use(prefix, router)` mounts with prefix resolution, middleware chains), **NestJS**, **Fastify**, **Django**, **FastAPI**, **Flask**.
+- **FR-10** ORM adapters (v1): **Prisma** (models, fields, relations, `@@map`; `prisma.<model>.<op>()` classified read/write, including through re-exported client instances), **Drizzle**, **TypeORM**, **Mongoose**, **Django ORM**, **SQLAlchemy**.
+- **FR-11** Each adapter is tree-sitter `.scm` queries plus a small Python mapper, registered in an adapter registry, with a fixture repo, snapshot tests and benchmark cases.
+- **FR-12** Graceful fallback: unsupported framework → universal map plus "Routes and models aren't supported for <framework> yet. Here's the module and service map we found."
+- **FR-13** Fully offline local mode and `--no-llm` mode. The engine never executes repo code and writes only to `.evident/`.
 
-### 5.3 Views
-- **FR-12** System overview: LLM-grouped clusters of nodes, collapsible.
-- **FR-13** Route map: all routes by path, filterable by method/framework/kind.
-- **FR-14** Data model (ERD) from Prisma models and relations.
-- **FR-15** Request tracer: select a route and highlight route → middleware → handler → functions → models/services, with code per hop.
-- **FR-16** Health findings: `unguarded-write`, `unvalidated-body`, `circular-import`, `unused-model`, `undocumented-env`, each with evidence and linked nodes.
-- **FR-17** Blast radius: select a model, file or env var and highlight all transitive dependents.
-- **FR-18** Evidence panel on every node/edge: file, line range, highlighted snippet, `extracted`/`inferred` badge, confidence, GitHub permalink at the SHA.
-- **FR-19** Commit-pinned permalinks encode selected node, filters and active trace.
+### 5.3 CLI
+All commands support `--json` (schema-valid envelope) and human output, `file:line` evidence, exit codes `0` ok / `1` findings or no match / `2` usage / `3` analysis error, `--limit`/`--depth`, and summary-first output.
 
-### 5.4 Gallery and benchmarks
-- **FR-20** Featured gallery of pre-analysed popular repos served as static JSON (works when the worker is down).
-- **FR-21** `/benchmarks` page: precision/recall/F1 per category, hallucination rate, GitDiagram baseline, history chart.
+- **FR-14** `analyze <path-or-url>`, `trace "<METHOD> <path>"`, `impact <node>`, `find --reads/--writes <Model>`, `health`, `show <node-id>`.
+- **FR-15** `export --format …` (PNG/SVG, architecture report Markdown/PDF, graph JSON), stamped with repo, SHA and date, matching the current view and filters.
+- **FR-16** `open`: the local map UI in the browser, served from a static export bundled in the package (no Node needed).
+- **FR-17** `share`: opt-in upload of graph **metadata only** (no source code), returning an expiring link.
+
+### 5.4 Claude skill (`skills/evident/`)
+- **FR-18** `SKILL.md` with a `description` that says when to use it; `scripts/ensure_installed.sh` installs the CLI if missing.
+- **FR-19** Runs `analyze --no-llm` once per session and leads with a short summary (routes, models, services, top findings with `file:line`); offers `evident open` once per session.
+- **FR-20** Runs `impact` **before** editing models or shared code; uses `trace` to explain flows and `health` on new or changed routes.
+- **FR-21** Always cites evidence, never claims a dependency the tool didn't return, and flags inferred or low-confidence edges. Can write `docs/architecture.md` via `export --format md`. Never runs `share` unless the user asks.
+
+### 5.5 Views (web app and local viewer)
+- **FR-22** System overview: LLM-grouped clusters of nodes, collapsible.
+- **FR-23** Route map: all routes by path, filterable by method/framework/kind.
+- **FR-24** Data model (ERD) from ORM models and relations.
+- **FR-25** Request tracer: select a route and highlight route → middleware → handler → functions → models/services, with code per hop.
+- **FR-26** Health findings: `unguarded-write`, `unvalidated-body`, `circular-import`, `unused-model`, `undocumented-env`, each with evidence and linked nodes.
+- **FR-27** Blast radius: select a model, file or env var and highlight all transitive dependents.
+- **FR-28** Evidence panel on every node/edge: file, line range, highlighted snippet, `extracted`/`inferred` badge, confidence, GitHub permalink at the SHA.
+- **FR-29** Commit-pinned permalinks encode selected node, filters and active trace.
+- **FR-30** "Report a wrong edge": one-click flag that becomes a benchmark case.
+- **FR-31** Mobile layout (at minimum a summary plus route and model lists) and an unsupported-stack screen.
+- **FR-32** The map UI is its own frontend package with a data-source switch: API mode or local-file mode.
+
+### 5.6 Gallery, benchmarks and stacks
+- **FR-33** Featured gallery of pre-analysed repos served as static JSON (works when the worker is down).
+- **FR-34** `/benchmarks` page: precision/recall/F1 per category and per adapter, hallucination rate, GitDiagram baseline, history chart.
+- **FR-35** "Supported stacks" page with per-adapter scores.
 
 ## 6. Non-functional requirements
 
@@ -76,16 +107,19 @@ An evidence-backed, interactive architecture map for JS/TS full-stack apps (Next
 | --- | --- | --- |
 | Correctness | Every element validates against `schema/graph.schema.json`; LLM output references only existing IDs | Fixed |
 | Safety | No execution of analysed code; limits per [security.md](security.md) | Fixed |
-| Latency | Cached graph < 500 ms; fresh analysis of a ~500-file repo p50 < 60 s | Proposed, confirm after first benchmark |
-| Cost | LLM spend under a monthly cap; one grouping call per uncached commit | Cap TBD (open question) |
+| Latency | Cached graph < 500 ms; incremental local re-run 1–2 s; fresh analysis of a ~500-file repo p50 < 60 s | Proposed, confirm after first benchmark |
+| Cost | Groq free tier ([ADR-0007](adr/0007-groq-for-llm-grouping.md)); one grouping call per uncached commit; auto-fallback to `--no-llm` | Fixed |
 | Availability | Gallery and landing page stay up if worker/API is down; uptime monitor alerts | Fixed |
+| Portability | CI on Linux **and Windows** | Fixed |
+| Privacy | CLI telemetry opt-in only; privacy-friendly site analytics; `share` sends metadata only | Fixed |
 | Accessibility | WCAG 2.2 AA; keyboard-navigable graph; colour never the only signal (see [DESIGN.md](../DESIGN.md)) | Fixed |
 | Reproducibility | Same commit + engine version → identical graph (except LLM groups, which are cached) | Fixed |
 
 ## 7. Success metrics
 
-- **Launch gate:** ≥ 90% precision, ≥ 85% recall on routes, models, DB edges across ≥ 15 repos.
+- **Launch gate:** ≥ 90% precision, ≥ 85% recall on routes, models, DB edges across 15–20 repos covering every v1 adapter.
 - Hallucination rate (predicted nodes with no ground-truth match) reported and below 5%. *(Proposed.)*
+- Skill evals: 10–15 agent tasks in `skill-tasks/`, run with and without the skill; the skill must win.
 - Gallery map time-to-interactive < 3 s.
 - Benchmark runs on every PR; no metric regresses > 2 points.
 
@@ -93,29 +127,34 @@ An evidence-backed, interactive architecture map for JS/TS full-stack apps (Next
 
 | Tier | Contents | Starts when |
 | --- | --- | --- |
-| **v1** | Pillars + request tracer, health checks, gallery, live progress, blast radius, permalinks | Now |
-| **v1.5** | Ask the map, commit time machine/diff, exports + README embed, onboarding tour | v1 is live with video and case study |
-| **v2** | PR architecture bot, local CLI + MCP server | After v1.5 |
+| **v1** | Pillars, engine + v1 adapters, CLI, Claude skill, request tracer, health checks, blast radius, gallery, live progress, permalinks, v1 exports, report a wrong edge | Now |
+| **v1.5** | Ask the map, commit time machine/diff, README embed, onboarding tour, Mermaid/C4/CSV/OpenAPI/SARIF exports | v1 is live with video and case study |
+| **v2** | PR architecture bot, MCP server, private repos / Pro tier | After v1.5 |
+| **Rolling** | Spring Boot → Laravel → Rails → ASP.NET Core → Go adapters, one every 1–2 weeks | After launch |
 
 ### Milestones
 
-*The design doc's milestone diagram (4 phases, 2 gates) is an embed that didn't export; this is a reconstruction from its text. Confirm it.*
-
-1. **Phase 1: Engine.** Extractors, linker, schema validator, CLI output; label the first 5 benchmark repos.
-   **Gate A: accuracy.** Benchmark meets targets on the first 5 repos before any UI work.
-2. **Phase 2: Service.** FastAPI, arq worker, SSE progress, Postgres cache, LLM grouping and validator, limits and sandboxing.
-3. **Phase 3: Map UI.** Five views, evidence panel, tracer, blast radius, permalinks, gallery.
-4. **Phase 4: Launch.** 15–20 benchmark repos, `/benchmarks` page, VM deploy, demo GIF/video, case study.
-   **Gate B: launch.** All targets met on the full set; runbook tested (deploy, rollback, restore).
+| Phase | Weeks | Contents | Gate |
+| --- | --- | --- | --- |
+| 1. Engine | 1–3 | Universal layer, JS/TS adapters, linker, schema validator, CLI; label the first 5 benchmark repos | **Gate A:** baseline F1 measured on 5 repos |
+| 2. Skill release | 4 | `skills/evident/`, skill-task evals | Skill usable on fixture repos; evals run |
+| 3. Service | 4–5 | FastAPI, arq worker, SSE, Postgres cache, validated Groq grouping, Python adapters, limits and sandboxing | — |
+| 4. Interface | 5–7 | Dual-mode map UI, five views, tracer, blast radius, exports, mobile | — |
+| 5. Launch | 8–10 | 15–20 benchmark repos, `/benchmarks`, VM deploy, demo video, case study | **Gate B:** all targets met; runbook tested (deploy, rollback, restore) |
 
 ## 9. Risks
 
-The top risks: dynamic route registration missed by static analysis (mitigation: confidence + benchmark measures misses), and scope creep (mitigation: v1 rows only).
+| Risk | Mitigation |
+| --- | --- |
+| Dynamic route registration missed by static analysis | Confidence scores, `inferred` edges, benchmark measures misses |
+| Thirteen v1 adapters stretch the 10-week plan | Adapter template + registry; per-adapter metrics show which ones are ready; an adapter without fixtures and benchmark cases doesn't ship |
+| Groq free-tier limits change or throttle | Provider-agnostic interface, cache by SHA, automatic `--no-llm` fallback |
+| Scope creep beyond the tracker | Ship v1 rows only; v1.5/v2 wait for the launch gate |
 
 ## 10. Open questions
 
-- [ ] VM specs and location (cloud or home)?
-- [ ] LLM provider for grouping and monthly spend cap?
-- [ ] Product name and domain (working name: **Evident**)?
-- [ ] Which 5 repos to label first?
+- [ ] VM specs and location (cloud or home)? *(Owner will provide.)*
+- [x] LLM provider: **Groq, free tier** ([ADR-0007](adr/0007-groq-for-llm-grouping.md))
+- [x] Product name: **Evident**; PyPI package **`evident-map`** (`evident` is taken). Domain still open.
+- [x] First benchmark repos: owner's own repos, pinned in [`benchmark/repos.yaml`](../benchmark/repos.yaml)
 - [ ] Latency and hallucination-rate targets above: accept or change?

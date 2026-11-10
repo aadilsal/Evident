@@ -1,6 +1,6 @@
 # 0001. Use Python + tree-sitter for the analysis engine
 
-- **Status:** Accepted
+- **Status:** Accepted. Language scope extended beyond JS/TS by [0006](0006-adapter-architecture.md).
 - **Date:** 2026-11-07
 
 ## Context

@@ -1,0 +1,14 @@
+# Copy to <owner>__<repo>.yaml. Rules: docs/labelling-guide.md. Label without running Evident.
+repo: { owner: OWNER, name: REPO, sha: 0000000000000000000000000000000000000000 }
+labelled: { by: aadilsal, date: YYYY-MM-DD, minutes: 0 }
+# - { method: GET, path: /api/x/:id, kind: api, evidence: app/api/x/[id]/route.ts:12 }
+routes: []
+# - { name: User, table: users, evidence: prisma/schema.prisma:10 }
+models: []
+# - { provider: stripe, evidence: src/lib/stripe.ts:1 }
+services: []
+# - { route: GET /api/x/:id, model: User, op: read, evidence: src/lib/x.ts:44 }
+edges: []
+out_of_scope: []
+notes: |
+  -

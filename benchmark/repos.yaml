@@ -1,0 +1,66 @@
+# Benchmark repos, pinned to full commit SHAs. Never label a branch.
+# Labelling rules: docs/labelling-guide.md. Ground truth: ground-truth/<owner>__<repo>.yaml.
+# adapters = what the manifests suggest; confirm while labelling.
+# status: candidate -> labelling -> labelled
+# Untrusted input: clone and read only, never install or run.
+
+first_five: # Gate A (Engine phase)
+  - owner: aadilsal
+    name: Munshi
+    sha: 40ad91b6e58e2d20cc60f29ddc035688c8eb7ae6
+    adapters: [nextjs, express, prisma]
+    status: candidate
+  - owner: aadilsal
+    name: MotorAi
+    sha: c10fa5d77f0daa0d40a26ab681e795d5fc589a55
+    adapters: [nextjs, prisma]
+    status: candidate
+  - owner: aadilsal
+    name: AjaiConsultancyAssignment
+    sha: df83d726c11513d2076fdb2a764b2a7d6cdde9ef
+    adapters: [nextjs, nestjs, prisma]
+    status: candidate
+  - owner: aadilsal
+    name: TournamentMatchMaker
+    sha: 973998e38d0906dfe661505e78e77f46cdc4d42a
+    adapters: [express]
+    status: candidate
+  - owner: aadilsal
+    name: MdcatExpert
+    sha: 34c226da59c2da8989b7053cf4a41bbce4e578e3
+    adapters: [nextjs]
+    status: candidate
+
+launch_set: # Gate B: 15-20 repos covering every v1 adapter
+  - owner: aadilsal
+    name: FinBotics
+    sha: 8301c8221760667d2c9e965da28ab7826a5003d8
+    adapters: [express, mongoose]
+    status: candidate
+  - owner: aadilsal
+    name: Insight-OS
+    sha: 38ded8337547f5705d58943f481e17457ff3b841
+    adapters: [nextjs, fastapi, sqlalchemy]
+    status: candidate
+  - owner: aadilsal
+    name: SpotterTruckLogging
+    sha: 3cded29a1e127af7b772160ca1de12cb31d700f0
+    adapters: [django, django-orm]
+    status: candidate
+  - owner: aadilsal
+    name: TourAgency
+    sha: 68e26ef5036968f8bbd1423d806aec19ddfb60b6
+    adapters: [nextjs]
+    status: candidate
+  - owner: aadilsal
+    name: Next.js-Supabase-SaaS-Boilerplate-with-Stripe-Auth
+    sha: 210956103f1f007fcb65c467692982ed1b1df8e1
+    adapters: [nextjs]
+    status: candidate
+  - owner: aadilsal
+    name: JobFinder
+    sha: 13d8d0d6358f49e22307c2f055f5460838d6253f
+    adapters: [fastapi]
+    status: candidate
+# Gaps: no owned repo yet uses fastify, drizzle, typeorm or flask.
+# Add public OSS repos for those before launch.

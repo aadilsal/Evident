@@ -18,6 +18,10 @@ How a route, model, service or edge is counted in the ground-truth YAML. If the 
 - **`optional: true`:** mark items that a reasonable static analyser can't be expected to find (computed paths, runtime plugin registration). Optional items **don't count against recall** if missed and **don't count against precision** if found.
 - **Every item needs `evidence: file:line`**, the line where the thing is declared or called, so disputes can be settled quickly.
 
+## Adapters covered
+
+The rules below cover the **Next.js, Express and Prisma** adapters. Each other adapter ([ADR-0006](adr/0006-adapter-architecture.md): NestJS, Fastify, Drizzle, TypeORM, Mongoose, Django, FastAPI, Flask, Django ORM, SQLAlchemy) gets its own counting rules in this guide **in the same PR as the adapter**. Until it has them, that adapter's benchmark items aren't scored. Record which adapters a repo uses under `adapters:` in `benchmark/repos.yaml`.
+
 ## Routes
 
 A route is one **(method, normalised path)** pair that a client can call.
@@ -91,7 +95,7 @@ A route with both a read and a write to the same model gets two edges. Multiple 
 
 ## Metrics
 
-Per category (routes, models, services, route-model edges):
+Per category (routes, models, services, route-model edges), and per adapter:
 
 - **Precision** = matched predictions / all non-optional predictions
 - **Recall** = matched ground-truth items / all non-optional ground-truth items

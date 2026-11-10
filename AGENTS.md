@@ -4,16 +4,17 @@ Instructions for AI coding agents (Claude Code, Codex, Cursor, Copilot) working 
 
 ## What this project is
 
-Evident turns a public GitHub repo (Next.js / Express / Prisma) into an evidence-backed architecture graph. A Python engine extracts facts with tree-sitter, an LLM only groups and labels them, and a Next.js frontend renders the graph with React Flow. Read [docs/architecture-essentials.md](docs/architecture-essentials.md) before changing anything.
+Evident turns a repo (a public GitHub URL or a local folder) into an evidence-backed architecture graph. A CLI-first Python package (`evident-map`) extracts facts with tree-sitter through a universal layer plus per-framework adapters (JS/TS and Python in v1). An LLM (Groq) only groups and labels them. The package powers three front-ends: the `evident` CLI, a Claude skill, and a Next.js web app that renders the graph with React Flow. Read [docs/architecture-essentials.md](docs/architecture-essentials.md) before changing anything.
 
 ## Repo map
 
 | Path | What lives there |
 | --- | --- |
-| `engine/` | Python package: FastAPI API, arq worker, extractors, linker, health checks, LLM grouping, benchmark runner |
+| `engine/` | Python package `evident-map`: CLI, cache, queries, health checks, universal layer, adapters, linker; later API, worker, LLM grouping, benchmark runner |
+| `skills/evident/` | Claude skill that drives the CLI *(week 4)* |
 | `web/` | Next.js + TypeScript frontend (map UI, gallery, benchmarks page) |
 | `schema/graph.schema.json` | **The contract** between engine and web. Versioned. |
-| `benchmark/ground-truth/` | Hand-labelled YAML per benchmark repo |
+| `benchmark/` | `repos.yaml` (pinned SHAs) + `ground-truth/` hand-labelled YAML per repo |
 | `DESIGN.md` | Visual design system (tokens + rules). Read before writing any UI. |
 | `docs/` | Design doc (source of truth), PRD, architecture, ADRs, threat model, labelling guide, runbook |
 | `deploy/` | Docker Compose, Caddyfile *(added with infra work)* |
@@ -61,4 +62,4 @@ cd engine && uv run evident-bench
 
 ## When unsure
 
-Check `docs/PRD.md` and `docs/adr/` first (plus the gitignored `docs/internal/` notes, if present locally). If they don't answer it, ask rather than guess, especially about scope (v1 vs v1.5 vs v2).
+Check the feature tracker in the gitignored `docs/internal/evident-features.md` first (it's the scope authority when present locally), then `docs/PRD.md` and `docs/adr/`. If they don't answer it, ask rather than guess, especially about scope (v1 vs v1.5 vs v2).

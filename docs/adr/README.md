@@ -8,5 +8,8 @@ One short note per significant decision: the context, the choice, and what it co
 | [0002](0002-react-flow-over-mermaid.md) | React Flow + ELK instead of Mermaid for the map | Accepted |
 | [0003](0003-llm-labels-existing-node-ids.md) | The LLM only groups and labels existing node IDs | Accepted |
 | [0004](0004-self-host-on-a-vm.md) | Self-host everything on one VM with Docker Compose | Accepted |
+| [0005](0005-cli-first-three-front-ends.md) | CLI-first engine powering CLI, Claude skill and web (MCP later) | Accepted |
+| [0006](0006-adapter-architecture.md) | Per-framework adapters on a universal layer; widens v1 scope | Accepted |
+| [0007](0007-groq-for-llm-grouping.md) | Groq (free tier) for grouping, provider-agnostic, auto-fallback | Accepted |
 
 New ADR: copy [0000-template.md](0000-template.md) to `NNNN-short-title.md`.

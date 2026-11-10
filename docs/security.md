@@ -7,7 +7,7 @@ Evident clones and analyses repositories **it did not write and must not trust**
 | Asset | Why it matters |
 | --- | --- |
 | The VM and its network | Compromise exposes everything, including the home network if self-hosted |
-| LLM API key, GitHub token | Direct cost and abuse |
+| LLM API key (`GROQ_API_KEY`), GitHub token | Direct cost and abuse |
 | Service availability | A dead recruiter link is the main business risk |
 | Integrity of published maps | The product's whole claim is "every edge is proven" |
 | LLM spend | Unbounded cost on a public demo |
@@ -46,6 +46,22 @@ Evident clones and analyses repositories **it did not write and must not trust**
 6. Everything from a repo is rendered as text.
 7. Env var names, never values.
 8. Rate limits per IP and a hard LLM spend cap.
+
+## Local CLI and Claude skill
+
+The same engine runs on a developer's machine ([ADR-0005](adr/0005-cli-first-three-front-ends.md)). The rules hold there too:
+
+- **Read-only.** The engine never executes repo code and writes only inside `<repo>/.evident/`, which ignores itself (it contains its own `.gitignore`). It never follows symlinks. Git calls use a fixed argv with hooks, fsmonitor and symlinks disabled and https-only protocols.
+- **Offline by default for the skill.** The skill runs `analyze --no-llm`, so nothing leaves the machine. With an LLM, only node IDs, types, labels and paths are sent (T6), never file contents.
+- **Telemetry** is opt-in only.
+
+## Share-data rules (`evident share`)
+
+1. Opt-in per run. Never automatic, and the skill never runs it unless the user asks.
+2. Uploads **graph metadata only**: node and edge IDs, types, labels, paths, line ranges, findings. **No source code or snippets.** The hosted viewer shows "snippet unavailable" for shared local graphs.
+3. Env var names only, never values (T8).
+4. Links expire, and can be deleted early.
+5. Uploads are validated against the graph schema and size-capped like any other untrusted input (T3, T7).
 
 ## Out of scope (v1)
 

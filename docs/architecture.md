@@ -4,6 +4,20 @@ The full system design. For the one-page version, read [architecture-essentials.
 
 ## 1. System context
 
+The engine is a standalone pip package (`evident-map`) with a CLI. Everything below is the **hosted** deployment. The same library also runs locally through the CLI and the Claude skill, offline, writing only to `.evident/` ([ADR-0005](adr/0005-cli-first-three-front-ends.md)):
+
+```mermaid
+flowchart LR
+    dev([Developer]) --> cli[evident CLI]
+    agent([Coding agent]) --> skill[Claude skill<br/>skills/evident] --> cli
+    cli --> lib[evident library]
+    lib --> cache[(.evident/<br/>manifest + graph.json)]
+    cli -->|evident open| viewer[Bundled static map UI<br/>local-file mode]
+    cli -.->|evident share, opt-in<br/>metadata only| api
+```
+
+Hosted:
+
 ```mermaid
 flowchart LR
     user([Developer / visitor]) -->|HTTPS| caddy[Caddy<br/>TLS, reverse proxy]
@@ -24,7 +38,9 @@ All services run as one Docker Compose stack on a single VM ([ADR-0004](adr/0004
 
 | Component | Responsibility | Tech |
 | --- | --- | --- |
-| **web** | Landing page, map UI (five views), evidence panel, gallery, `/benchmarks` | Next.js, TypeScript, React Flow, elkjs, anime.js, Tailwind (tokens from [DESIGN.md](../DESIGN.md)) |
+| **engine / CLI** | `evident-map` package: stack detection, universal layer, adapters, linker, health checks, queries, `.evident/` cache, CLI | Python 3.12, tree-sitter, argparse |
+| **skill** | Claude skill that drives the CLI for coding agents | `skills/evident/SKILL.md` + scripts |
+| **web** | Landing page, map UI (five views), evidence panel, gallery, `/benchmarks`, supported-stacks page; same UI bundled into the pip package for `evident open` | Next.js, TypeScript, React Flow, elkjs, anime.js, Tailwind (tokens from [DESIGN.md](../DESIGN.md)) |
 | **api** | Validate submissions, cache lookup, enqueue, SSE progress, serve graphs | FastAPI, Pydantic |
 | **worker** | Run the six-stage pipeline in a sandboxed temp dir | Python 3.12, arq, tree-sitter |
 | **redis** | Job queue, job progress pub/sub, per-IP rate limits | Redis 7 |
@@ -68,11 +84,11 @@ Five deterministic stages and one LLM stage. Each stage is a pure function from 
 | # | Stage | Input → output | Notes |
 | --- | --- | --- | --- |
 | 1 | **Fetch** | URL + sha → checkout in temp dir | `git clone --depth 1 --filter=blob:limit=1m --no-tags`, hooks disabled, no submodules, no LFS. Enforce size/file caps. See [security.md](security.md). |
-| 2 | **Parse** | files → syntax trees | tree-sitter TS/TSX/JS grammars plus a small `schema.prisma` parser. Skip `node_modules`, build output, minified files, files > 1 MB. |
-| 3 | **Extract** | trees → raw facts | Independent extractors: `next_routes`, `express_routes`, `prisma_schema`, `prisma_calls`, `services`, `env_vars`, `imports`. Each fact carries evidence. |
+| 2 | **Parse** | files → syntax trees | tree-sitter grammars per detected language (TS/TSX/JS, Python, …) plus a small `schema.prisma` parser. Skip `node_modules`, build output, minified files, files > 1 MB. |
+| 3 | **Extract** | trees → raw facts | Stack detection from manifests picks adapters ([ADR-0006](adr/0006-adapter-architecture.md)). The **universal layer** (imports, services, env vars, `docker-compose` containers) always runs; **adapters** (tree-sitter `.scm` queries + a Python mapper, e.g. `nextjs`, `express`, `nestjs`, `fastify`, `prisma`, `drizzle`, `typeorm`, `mongoose`, `django`, `fastapi`, `flask`, `django-orm`, `sqlalchemy`) add routes, middleware and models. No matching adapter → universal map + an "unsupported framework" message. Each fact carries evidence. |
 | 4 | **Link** | facts → graph | Resolve imports (tsconfig paths, workspaces), bind route → handler, follow call edges, track the Prisma client instance through re-exports, assign deterministic node IDs. Unresolvable links become `inferred` with lower confidence. |
 | 5 | **Analyse** | graph → findings | Deterministic health rules: `unguarded-write`, `unvalidated-body`, `circular-import`, `unused-model`, `undocumented-env`. |
-| 6 | **Group** | graph → groups | One LLM call with a compact node list (IDs, types, labels, paths; **no file contents**). The response is parsed and validated, and every member ID must exist. Invalid entries are dropped; if the call fails, a deterministic fallback groups by top-level directory. Then the full graph is validated against the JSON Schema and saved. |
+| 6 | **Group** | graph → groups | Skipped with `--no-llm`. One LLM call (Groq free tier, [ADR-0007](adr/0007-groq-for-llm-grouping.md)) with a compact node list (IDs, types, labels, paths; **no file contents**). The response is parsed and validated, and every member ID must exist. Invalid entries are dropped; if the call fails, is rate-limited or over quota, a deterministic fallback groups by top-level directory and the result reports `llm: unavailable`. Then the full graph is validated against the JSON Schema and saved. |
 
 Stages publish progress counts (`files parsed`, `routes found`) to Redis for SSE.
 
@@ -80,7 +96,7 @@ Stages publish progress counts (`files parsed`, `routes found`) to Redis for SSE
 
 Defined in [schema/graph.schema.json](../schema/graph.schema.json) (JSON Schema 2020-12). Summary:
 
-- **Nodes:** `route`, `handler`, `function`, `middleware`, `model`, `service`, `module`, `envVar`
+- **Nodes:** `route`, `handler`, `function`, `middleware`, `model`, `service`, `module`, `envVar`; `container` (from `docker-compose.yml`) is planned for schema `1.1.0`, and `framework` enums grow as adapters land
 - **Edges:** `handles` (route → handler), `guards` (middleware → route), `calls`, `imports`, `reads` (fn → model | envVar), `writes` (fn → model), `relates` (model → model), `uses` (fn | module → service)
 - **Every node and edge:** `evidence[]` (≥ 1 item: `file`, `startLine`, `endLine`, `sha`), `source` (`extracted` | `inferred`), `confidence` (0–1)
 - **groups[]:** LLM output, always `inferred`, members are existing node IDs
@@ -118,6 +134,7 @@ The gallery is exported to static JSON in `web/public/gallery/` at build time, s
 
 ## 8. Frontend
 
+- **Data source switch:** API mode (hosted) or local-file mode (`evident open` serves `.evident/graph.json` with the static export bundled in the pip package; no Node needed).
 - **Data flow:** fetch graph JSON → validate `schemaVersion` major → build indexes (by ID, adjacency in/out) → derive views (overview, routes, ERD, trace, findings) as pure selectors.
 - **Layout:** elkjs `layered` algorithm with orthogonal routing, run in a Web Worker and cached per view.
 - **Trace and blast radius** are graph traversals over the adjacency index (BFS forward for traces, reverse for blast radius) with no server round-trip.
@@ -128,12 +145,14 @@ The gallery is exported to static JSON in `web/public/gallery/` at build time, s
 
 ```
 .
-├── engine/                 Python: api, worker, extractors, linker, analysers, llm, bench
-│   ├── src/evident/
-│   └── tests/fixtures/     tiny TS/JS/Prisma snippets with expected graphs
+├── engine/                 Python package evident-map: CLI, engine, api, worker, llm, bench
+│   ├── src/evident/        cli, analyze, cache, query, health, repo, universal/, adapters/<name>/
+│   └── tests/fixtures/     tiny per-adapter snippets with expected graphs
+├── skills/evident/         Claude skill: SKILL.md, scripts/ensure_installed.sh
+├── skill-tasks/            agent tasks run with vs without the skill
 ├── web/                    Next.js frontend
 ├── schema/                 graph.schema.json + examples (the contract)
-├── benchmark/ground-truth/ hand-labelled YAML per repo
+├── benchmark/              repos.yaml (pinned SHAs) + ground-truth/ hand-labelled YAML per repo
 ├── deploy/                 docker-compose.yml, Caddyfile (added with infra)
 ├── docs/                   design doc, PRD, architecture, ADRs, threat model, guides
 └── .github/                CI, issue/PR templates

@@ -97,6 +97,8 @@ def _analyze_cmd(args: argparse.Namespace, graph: Graph | None) -> CommandResult
         f"Analysed {st['files']} files ({st['parsed']} parsed, {st['reused']} cached): "
         f"{counts}, {st['findings']} findings in {st['durationMs']} ms."
     )
+    if g.stack and g.stack.get("message"):
+        summary += "\n  note: " + str(g.stack["message"])
     return CommandResult("analyze", EXIT_OK, summary, repo=g.repo, stats=st)
 
 

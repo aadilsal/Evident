@@ -1,0 +1,5 @@
+{
+  "name": "fixture-nest-only",
+  "private": true,
+  "dependencies": { "@nestjs/core": "^10.0.0", "stripe": "^17.0.0" }
+}

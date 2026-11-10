@@ -1,0 +1,37 @@
+{
+  "_comment": "Service catalogue: npm package (or prefix ending in /) -> provider. Slugs match docs/labelling-guide.md.",
+  "packages": {
+    "stripe": "stripe",
+    "@aws-sdk/client-s3": "aws-s3",
+    "@aws-sdk/lib-storage": "aws-s3",
+    "@aws-sdk/s3-request-presigner": "aws-s3",
+    "aws-sdk": "aws-s3",
+    "resend": "resend",
+    "ioredis": "redis",
+    "redis": "redis",
+    "@upstash/redis": "redis",
+    "openai": "openai",
+    "@anthropic-ai/sdk": "anthropic",
+    "@sendgrid/mail": "sendgrid",
+    "twilio": "twilio",
+    "@sentry/": "sentry",
+    "groq-sdk": "groq",
+    "@google/generative-ai": "google-gemini",
+    "@google/genai": "google-gemini",
+    "cloudinary": "cloudinary"
+  },
+  "labels": {
+    "stripe": "Stripe",
+    "aws-s3": "AWS S3",
+    "resend": "Resend",
+    "redis": "Redis",
+    "openai": "OpenAI",
+    "anthropic": "Anthropic",
+    "sendgrid": "SendGrid",
+    "twilio": "Twilio",
+    "sentry": "Sentry",
+    "groq": "Groq",
+    "google-gemini": "Google Gemini",
+    "cloudinary": "Cloudinary"
+  }
+}

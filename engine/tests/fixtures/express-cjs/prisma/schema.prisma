@@ -1,0 +1,4 @@
+model Item {
+  id   String @id
+  name String
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -43,3 +44,13 @@ def fixture_repo(tmp_path: Path) -> Path:
     dest = tmp_path / "express-prisma"
     shutil.copytree(FIXTURES / "express-prisma", dest)
     return dest
+
+
+@pytest.fixture
+def copy_fixture(tmp_path: Path) -> Callable[[str], Path]:
+    def copy(name: str) -> Path:
+        dest = tmp_path / name
+        shutil.copytree(FIXTURES / name, dest)
+        return dest
+
+    return copy

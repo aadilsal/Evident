@@ -15,7 +15,8 @@ from typing import Any, Literal
 from evident import cache
 from evident.extract import FileFacts, extract_file, is_parsed
 from evident.health import run_health
-from evident.models import AnalysisError, Edge, Graph, Node, RepoInfo
+from evident.models import AnalysisError, Graph, RepoInfo
+from evident.pipeline import link
 from evident.repo import (
     MAX_FILE_BYTES,
     MAX_FILES,
@@ -67,6 +68,7 @@ class AnalyzeResult:
             "cache": self.cache_state,
             "llm": self.llm,
             "graphPath": graph_path.replace("\\", "/"),
+            **({"stack": self.graph.stack} if self.graph.stack is not None else {}),
         }
 
 
@@ -200,7 +202,7 @@ def _analyze_dir(
         entries[rel].facts = extract_file(rel, text, sha)
 
     repo = RepoInfo(host, repo_name, sha, _now(), owner, ref, dirty, worktree_hash)
-    graph = link([e.facts.restamped(sha) for e in entries.values()], repo)
+    graph = link({rel: e.facts for rel, e in entries.items()}, repo)
     graph.findings = run_health(graph)
     # shortcut: LLM grouping isn't built yet; with an LLM requested we report it as unavailable.
     llm: Literal["used", "skipped", "unavailable"] = "unavailable" if use_llm else "skipped"
@@ -210,26 +212,4 @@ def _analyze_dir(
     cache.save(cache_dir, entries, graph)
     return AnalyzeResult(
         graph, cache_dir, len(entries), len(fresh), len(entries) - len(fresh), state, llm, 0
-    )
-
-
-def link(facts: list[FileFacts], repo: RepoInfo) -> Graph:
-    """Merge per-file facts into one graph; first occurrence of an id wins, evidence is merged.
-
-    shortcut: no cross-file resolution yet (imports, route -> handler); lands with extractors.
-    """
-    nodes: dict[str, Node] = {}
-    edges: dict[str, Edge] = {}
-    for f in facts:
-        for n in f.nodes:
-            if n.id in nodes:
-                nodes[n.id].evidence = sorted(
-                    {*nodes[n.id].evidence, *n.evidence}, key=lambda e: e.ref
-                )
-            else:
-                nodes[n.id] = n
-        for e in f.edges:
-            edges.setdefault(e.id, e)
-    return Graph(
-        repo, sorted(nodes.values(), key=lambda n: n.id), sorted(edges.values(), key=lambda e: e.id)
     )

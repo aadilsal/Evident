@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 
+from evident.link import AUTH_RE
 from evident.models import Finding, Graph
 from evident.query import TRACE_EDGES, GraphIndex, walk
 
@@ -19,7 +20,7 @@ def run_health(graph: Graph) -> list[Finding]:
 def _unguarded_writes(idx: GraphIndex) -> list[Finding]:
     out = []
     for route in idx.of_type("route"):
-        if any(e.type == "guards" for e in idx.incoming[route.id]):
+        if _is_guarded(idx, route.id):
             continue
         hops = walk(idx, [route.id], forward=True, depth=8, edge_types=TRACE_EDGES)
         writes = [h.edge for h in hops if h.edge is not None and h.edge.type == "writes"]
@@ -36,6 +37,20 @@ def _unguarded_writes(idx: GraphIndex) -> list[Finding]:
                 )
             )
     return out
+
+
+def _is_guarded(idx: GraphIndex, route_id: str) -> bool:
+    """An auth-like middleware guards the route, or its handler checks auth itself."""
+    for e in idx.incoming[route_id]:
+        mw = idx.nodes.get(e.src)
+        name = f"{mw.label} {mw.attrs.get('name') or ''}" if mw is not None else ""
+        if e.type == "guards" and AUTH_RE.search(name):
+            return True
+    for e in idx.outgoing[route_id]:
+        handler = idx.nodes.get(e.dst)
+        if e.type == "handles" and handler is not None and handler.attrs.get("checksAuth"):
+            return True
+    return False
 
 
 def _unused_models(idx: GraphIndex) -> list[Finding]:

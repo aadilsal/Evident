@@ -54,7 +54,7 @@ def test_every_command_emits_schema_valid_json(
     assert not errors, errors
     assert out["command"] == argv[0]
     assert out["exitCode"] == code
-    assert code in (0, 1)  # stub extractors: queries find nothing yet, which is exit 1
+    assert code == (1 if argv == ["health"] else 0)  # health exits 1 when it has findings
     assert out["repo"]["host"] == "local"
 
 

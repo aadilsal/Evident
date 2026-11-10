@@ -18,12 +18,25 @@
       "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"
     },
     "repo": { "$ref": "#/$defs/repo" },
+    "stack": { "$ref": "#/$defs/stack" },
     "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
     "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
     "groups": { "type": "array", "items": { "$ref": "#/$defs/group" } },
     "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
   },
   "$defs": {
+    "stack": {
+      "description": "Since 1.1.0. Frameworks named in manifests, adapters that produced facts, and the graceful-fallback message for detected-but-unsupported stacks.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detected", "adapters"],
+      "properties": {
+        "detected": { "type": "array", "items": { "type": "string" } },
+        "adapters": { "type": "array", "items": { "type": "string" } },
+        "unsupported": { "type": "array", "items": { "type": "string" } },
+        "message": { "type": "string" }
+      }
+    },
     "sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
     "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
     "source": {
@@ -110,8 +123,8 @@
       "required": ["method", "path", "framework", "kind"],
       "properties": {
         "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"] },
-        "path": { "description": "Normalised path, see docs/labelling-guide.md.", "type": "string", "pattern": "^/" },
-        "framework": { "enum": ["next-app-router", "express"] },
+        "path": { "description": "Normalised path, see docs/labelling-guide.md. Server actions use action:<file>#<export> (since 1.1.0).", "type": "string", "pattern": "^(/|action:)" },
+        "framework": { "enum": ["next-app-router", "express", "nestjs", "fastify"] },
         "kind": { "enum": ["api", "page", "layout", "serverAction"] },
         "handlerRef": { "$ref": "#/$defs/nodeId" },
         "dynamic": { "description": "Registered with a computed path; low confidence.", "type": "boolean" }
@@ -123,7 +136,8 @@
       "required": ["file"],
       "properties": {
         "file": { "$ref": "#/$defs/repoPath" },
-        "exportName": { "type": ["string", "null"] }
+        "exportName": { "type": ["string", "null"] },
+        "checksAuth": { "description": "Since 1.1.0. Handler calls or is wrapped by something auth-like (heuristic).", "type": "boolean" }
       }
     },
     "middlewareAttrs": {
@@ -132,7 +146,7 @@
       "required": ["file", "framework"],
       "properties": {
         "file": { "$ref": "#/$defs/repoPath" },
-        "framework": { "enum": ["next-app-router", "express"] },
+        "framework": { "enum": ["next-app-router", "express", "nestjs", "fastify"] },
         "name": { "type": ["string", "null"] },
         "matchers": { "description": "Next.js middleware matcher patterns, as written.", "type": "array", "items": { "type": "string" } }
       }

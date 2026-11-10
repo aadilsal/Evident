@@ -229,17 +229,23 @@ class Graph:
     findings: list[Finding] = field(default_factory=list)
     engine_version: str = ENGINE_VERSION
     schema_version: str = GRAPH_SCHEMA_VERSION
+    stack: JSON | None = None
 
     def to_dict(self) -> JSON:
-        return {
+        d: JSON = {
             "schemaVersion": self.schema_version,
             "engineVersion": self.engine_version,
             "repo": self.repo.to_dict(),
-            "nodes": [n.to_dict() for n in self.nodes],
-            "edges": [e.to_dict() for e in self.edges],
-            "groups": [g.to_dict() for g in self.groups],
-            "findings": [f.to_dict() for f in self.findings],
         }
+        if self.stack is not None:
+            d["stack"] = self.stack
+        d.update(
+            nodes=[n.to_dict() for n in self.nodes],
+            edges=[e.to_dict() for e in self.edges],
+            groups=[g.to_dict() for g in self.groups],
+            findings=[f.to_dict() for f in self.findings],
+        )
+        return d
 
     @classmethod
     def from_dict(cls, d: JSON) -> Graph:
@@ -251,6 +257,7 @@ class Graph:
             [Finding.from_dict(f) for f in d.get("findings", [])],
             d["engineVersion"],
             d["schemaVersion"],
+            d.get("stack"),
         )
 
     def check_integrity(self) -> list[str]:

@@ -1,0 +1,5 @@
+{
+  "name": "fixture-express-cjs",
+  "private": true,
+  "dependencies": { "@prisma/client": "^5.22.0", "express": "^4.21.0" }
+}

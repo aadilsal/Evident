@@ -18,7 +18,16 @@
     "groq-sdk": "groq",
     "@google/generative-ai": "google-gemini",
     "@google/genai": "google-gemini",
-    "cloudinary": "cloudinary"
+    "cloudinary": "cloudinary",
+    "@supabase/": "supabase",
+    "@clerk/": "clerk",
+    "@arcjet/": "arcjet",
+    "convex": "convex",
+    "@convex-dev/": "convex",
+    "@sfpy/node-core": "safepay",
+    "@stripe/": "stripe",
+    "@aws-sdk/client-ses": "aws-ses",
+    "@aws-sdk/client-sesv2": "aws-ses"
   },
   "labels": {
     "stripe": "Stripe",
@@ -32,6 +41,12 @@
     "sentry": "Sentry",
     "groq": "Groq",
     "google-gemini": "Google Gemini",
-    "cloudinary": "Cloudinary"
+    "cloudinary": "Cloudinary",
+    "supabase": "Supabase",
+    "clerk": "Clerk",
+    "arcjet": "Arcjet",
+    "convex": "Convex",
+    "safepay": "Safepay",
+    "aws-ses": "AWS SES"
   }
 }

@@ -105,7 +105,10 @@ def test_health_findings(fixture_repo: Path, graph_validator: Draft202012Validat
         "undocumented-env:STRIPE_SECRET_KEY",
         "unguarded-write:route:POST /api/users->model:User",
         "unused-model:AuditLog",
+        "unvalidated-body:route:POST /api/users",
     ]
+    body = next(f for f in run_health(g) if f.rule == "unvalidated-body")
+    assert [e.ref for e in body.evidence] == [f"{USERS}:18"]
 
 
 def test_commonjs_routes_wrappers_and_use_order(

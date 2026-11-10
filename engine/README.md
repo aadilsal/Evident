@@ -2,7 +2,7 @@
 
 Installed as `evident-map`; imports as `evident` and provides the `evident` command.
 
-The analysis engine behind [Evident](https://github.com/aadilsal/Evident): a static, read-only extractor that turns a Next.js / Express / Prisma repo into an evidence-backed graph. The web app, the agent skill and the future MCP server all sit on top of this package.
+The analysis engine behind [Evident](https://github.com/aadilsal/Evident): a static, read-only extractor that turns a JS/TS web app (Next.js, Express, NestJS, Fastify with Prisma, Drizzle, TypeORM or Mongoose) into an evidence-backed graph. The web app, the agent skill and the future MCP server all sit on top of this package.
 
 ```bash
 pip install evident-map        # or, from a clone: pip install -e engine
@@ -25,5 +25,8 @@ Every command takes `--json` (the [CLI output schema](../schema/cli-output.schem
 ```bash
 cd engine
 uv sync
-uv run pytest && uv run mypy && uv run ruff check . && uv run ruff format --check .
+uv run python -m pytest && uv run python -m mypy && uv run ruff check . && uv run ruff format --check .
+uv run evident-bench --verbose     # score against benchmark/ground-truth (clones pinned repos read-only)
 ```
+
+On Windows, call tools as `python -m pytest` / `python -m mypy`; some uv script shims fail to resolve paths on non-system drives.

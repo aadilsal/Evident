@@ -123,7 +123,19 @@ def check_size(repo: GitHubRepo) -> None:
 
 
 def shallow_clone(repo: GitHubRepo, dest: Path) -> None:
+    if repo.ref and re.fullmatch(r"[0-9a-f]{40}", repo.ref):
+        # A pinned commit: fetch exactly that object, so benchmarks score the labelled code.
+        dest.mkdir(parents=True)
+        _git(["init", "-q"], cwd=dest)
+        _git(["remote", "add", "origin", repo.clone_url], cwd=dest)
+        _git(
+            ["fetch", "-q", "--depth", "1", "--no-tags", "origin", repo.ref],
+            cwd=dest,
+            timeout=CLONE_TIMEOUT_S,
+        )
+        _git(["checkout", "-q", "--detach", "FETCH_HEAD"], cwd=dest)
+        return
     args = ["clone", "--depth", "1", "--no-tags", "--single-branch"]
-    if repo.ref and not re.fullmatch(r"[0-9a-f]{40}", repo.ref):
+    if repo.ref:
         args += ["--branch", repo.ref]
     _git([*args, "--", repo.clone_url, str(dest)], timeout=CLONE_TIMEOUT_S)

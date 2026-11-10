@@ -24,6 +24,7 @@ MW = "middleware:src/middleware.ts#middleware"
         ("app/(shop)/cart/page.jsx", ("/cart", "page", "")),
         ("app/blog/[...slug]/page.tsx", ("/blog/:slug*", "page", "")),
         ("app/docs/[[...slug]]/page.tsx", ("/docs/:slug*?", "page", "")),
+        ("app/sign-in/[[...sign-in]]/page.tsx", ("/sign-in/:sign-in*?", "page", "")),
         ("app/@modal/login/page.tsx", ("/login", "page", "")),
         ("app/_lib/page.tsx", None),
         ("app/(.)photo/page.tsx", None),
@@ -95,3 +96,4 @@ def test_middleware_matcher_guards_dashboard_only(
         f"guards:{MW}->route:GET /dashboard/:id",
     }
     assert node(g, MW)["attrs"]["matchers"] == ["/dashboard/:path*"]  # type: ignore[index]
+    assert node(g, MW)["attrs"]["checksAuth"] is True  # type: ignore[index]

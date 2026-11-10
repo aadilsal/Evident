@@ -12,7 +12,7 @@ from typing import Any
 
 import tree_sitter as ts
 
-from evident.adapters import express, nextjs, prisma
+from evident.adapters import drizzle, express, fastify, mongoose, nestjs, nextjs, prisma, typeorm
 from evident.link import LinkContext, Project
 from evident.universal.js import FnKeys
 
@@ -31,18 +31,18 @@ class Adapter:
 
 # Order matters: ORMs first, so call classification knows the models.
 ADAPTERS: tuple[Adapter, ...] = (
-    Adapter("prisma", "Prisma", "orm", "js", prisma.link),
+    Adapter("prisma", "Prisma", "orm", "js", prisma.link, prisma.extract),
+    Adapter("drizzle", "Drizzle", "orm", "js", drizzle.link, drizzle.extract),
+    Adapter("typeorm", "TypeORM", "orm", "js", typeorm.link, typeorm.extract),
+    Adapter("mongoose", "Mongoose", "orm", "js", mongoose.link, mongoose.extract),
     Adapter("express", "Express", "framework", "js", express.link, express.extract),
+    Adapter("fastify", "Fastify", "framework", "js", fastify.link),
+    Adapter("nestjs", "NestJS", "framework", "js", nestjs.link, nestjs.extract),
     Adapter("nextjs", "Next.js", "framework", "js", nextjs.link),
 )
 
 # Detected from manifests, mapped by a future adapter. Until then: universal map + a message.
 NOT_YET: dict[str, str] = {
-    "@nestjs/core": "NestJS",
-    "fastify": "Fastify",
-    "drizzle-orm": "Drizzle",
-    "typeorm": "TypeORM",
-    "mongoose": "Mongoose",
     "koa": "Koa",
     "hono": "Hono",
     "@remix-run/node": "Remix",
@@ -60,6 +60,11 @@ SUPPORTED_DEPS: dict[str, str] = {
     "express": "Express",
     "prisma": "Prisma",
     "@prisma/client": "Prisma",
+    "@nestjs/core": "NestJS",
+    "fastify": "Fastify",
+    "drizzle-orm": "Drizzle",
+    "typeorm": "TypeORM",
+    "mongoose": "Mongoose",
 }
 
 
@@ -68,9 +73,11 @@ def detect_stack(project: Project, active: list[str]) -> JSON:
     js_deps = {d for pkg in project.packages.values() for d in pkg.get("deps", [])}
     py_deps = {d for raw in project.raw.values() for d in raw.get("pyDeps", [])}
     detected = sorted({v for k, v in SUPPORTED_DEPS.items() if k in js_deps})
+    other = {f for raw in project.raw.values() for f in raw.get("otherFrameworks", [])}
     unsupported = sorted(
         {v for k, v in NOT_YET.items() if k in js_deps}
         | {v for k, v in NOT_YET_PY.items() if k in py_deps}
+        | other
     )
     labels = {a.name: a.label for a in ADAPTERS}
     ran = [labels[a] for a in active]

@@ -30,11 +30,11 @@ def _segment(seg: str) -> str | None:
         return ""  # parallel route slot
     if seg.startswith("("):
         return None  # intercepting route: a second view of a route counted elsewhere
-    if m := re.fullmatch(r"\[\[\.\.\.(\w+)\]\]", seg):
+    if m := re.fullmatch(r"\[\[\.\.\.([^\]/]+)\]\]", seg):
         return f":{m.group(1)}*?"
-    if m := re.fullmatch(r"\[\.\.\.(\w+)\]", seg):
+    if m := re.fullmatch(r"\[\.\.\.([^\]/]+)\]", seg):
         return f":{m.group(1)}*"
-    if m := re.fullmatch(r"\[(\w+)\]", seg):
+    if m := re.fullmatch(r"\[([^\]/]+)\]", seg):
         return f":{m.group(1)}"
     return seg
 

@@ -20,6 +20,7 @@ from evident.universal.js import MODULE, FnKeys
 
 JSON = dict[str, Any]
 METHODS = frozenset({"get", "post", "put", "patch", "delete", "del", "all", "head", "options"})
+CAPTURED = METHODS | {"use", "route", "register", "addHook"}  # route/register/addHook: Fastify
 UNMOUNTED_CONFIDENCE = 0.5
 DYNAMIC_CONFIDENCE = 0.4
 
@@ -31,7 +32,7 @@ def extract(rel_path: str, tree: ts.Tree, fn_keys: FnKeys) -> JSON | None:
     calls = []
     for _, caps in captures(q, tree.root_node):
         call, recv, args = caps["call"][0], caps["recv"][0], caps["args"][0]
-        if text(caps["method"][0]) not in METHODS | {"use"}:
+        if text(caps["method"][0]) not in CAPTURED:
             continue
         entry: JSON = {
             "m": text(caps["method"][0]),
@@ -76,7 +77,7 @@ RKey = tuple[str, str, str]  # (file, scope, binding): module-level or in a fact
 
 
 @dataclass
-class _Route:
+class Route:
     file: str
     method: str
     path: JSON
@@ -89,7 +90,7 @@ class _Route:
 @dataclass
 class _Router:
     kind: str
-    routes: list[_Route] = field(default_factory=list)
+    routes: list[Route] = field(default_factory=list)
     uses: list[tuple[str | None, list[tuple[str, JSON, int]], int]] = field(default_factory=list)
     mounts: list[tuple[str | None, RKey, list[tuple[str, JSON, int]], int]] = field(
         default_factory=list
@@ -258,7 +259,7 @@ def link(ctx: LinkContext) -> None:
     for file, raw in project.raw.items():
         for c in raw.get("express", {}).get("calls", []):
             recv = c["recv"]
-            if len(recv) != 1:
+            if len(recv) != 1 or c["m"] not in METHODS | {"use"}:
                 continue
             target = _lookup(project, file, c.get("s", MODULE), recv[0], routers)
             if target is None:
@@ -290,7 +291,7 @@ def link(ctx: LinkContext) -> None:
             if not handlers:
                 continue
             r.routes.append(
-                _Route(
+                Route(
                     file,
                     c["m"],
                     path,
@@ -319,7 +320,7 @@ def link(ctx: LinkContext) -> None:
                 if at < route.line and _applies(prefix, local):
                     mws.extend(use_mws)
             mws.extend(route.mws)
-            _emit(ctx, route, base, local, mws, inferred)
+            emit_route(ctx, route, base, local, mws, inferred)
         for prefix, child, mount_mws, at in r.mounts:
             if child in seen:
                 continue
@@ -338,21 +339,22 @@ def link(ctx: LinkContext) -> None:
             walk(sym, "", [], frozenset({sym}), True)
 
 
-def _emit(
+def emit_route(
     ctx: LinkContext,
-    route: _Route,
+    route: Route,
     base: str,
     local: str | None,
     mws: list[tuple[str, JSON, int]],
     inferred: bool,
+    framework: str = "express",
 ) -> None:
-    method = "DELETE" if route.method in ("delete", "del") else route.method.upper()
+    method = "DELETE" if route.method.lower() in ("delete", "del") else route.method.upper()
     dynamic = local is None
     path = _join(base, "/*" if dynamic else local or "")
     route_id = f"route:{method} {path}"
     confidence = DYNAMIC_CONFIDENCE if dynamic else UNMOUNTED_CONFIDENCE if inferred else 1.0
     source = "inferred" if dynamic or inferred else "extracted"
-    attrs: JSON = {"method": method, "path": path, "framework": "express", "kind": "api"}
+    attrs: JSON = {"method": method, "path": path, "framework": framework, "kind": "api"}
     if dynamic:
         attrs["dynamic"] = True
     key = fn_target(ctx.project, route.file, route.handler) if route.handler else None
@@ -370,6 +372,6 @@ def _emit(
     if key is not None:
         ctx.edge("handles", route_id, attrs["handlerRef"], [ctx.ev(route.file, route.line)])
     for file, desc, at in mws:
-        mid = middleware_id(ctx, file, desc, at, "express")
+        mid = middleware_id(ctx, file, desc, at, framework)
         if mid is not None:
             ctx.edge("guards", mid, route_id, [ctx.ev(file, at)])

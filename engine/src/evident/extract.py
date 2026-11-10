@@ -17,6 +17,16 @@ PARSED_NAMES = (
     "pnpm-workspace.yaml",
     "requirements.txt",
     "pyproject.toml",
+    "docker-compose.yml",
+    "docker-compose.yaml",
+    "compose.yml",
+    "compose.yaml",
+    "pom.xml",
+    "build.gradle",
+    "build.gradle.kts",
+    "go.mod",
+    "composer.json",
+    "Gemfile",
 )
 ENV_DOCS = (".env.example", ".env.sample", ".env.template")
 
@@ -56,7 +66,7 @@ def is_parsed(rel_path: str) -> bool:
     name = rel_path.rsplit("/", 1)[-1]
     if name.endswith(".d.ts"):
         return False
-    return name.endswith(PARSED_SUFFIXES) or name in PARSED_NAMES
+    return name.endswith((*PARSED_SUFFIXES, ".csproj")) or name in PARSED_NAMES
 
 
 def extract_file(rel_path: str, text: str, sha: str) -> FileFacts:
@@ -82,6 +92,10 @@ def extract_file(rel_path: str, text: str, sha: str) -> FileFacts:
             raw["envDoc"] = manifests.env_names(text)
         elif name == "pnpm-workspace.yaml":
             raw["pnpmWorkspaces"] = manifests.pnpm_workspace(text)
+        elif name in manifests.COMPOSE_NAMES:
+            raw["compose"] = manifests.compose_services(text)
+        elif name in manifests.OTHER_MANIFESTS or name.endswith(".csproj"):
+            raw["otherFrameworks"] = manifests.other_frameworks(name, text)
         elif name in ("requirements.txt", "pyproject.toml"):
             raw["pyDeps"] = manifests.python_deps(name, text)
         else:

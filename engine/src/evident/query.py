@@ -89,7 +89,7 @@ def hop_item(idx: GraphIndex, hop: Hop) -> ResultItem:
 
 def _normalise_path(path: str) -> str:
     path = path.rstrip("/") or "/"
-    return re.sub(r":[A-Za-z0-9_]+\*?\??", ":_", path)
+    return re.sub(r"(?<=/):[A-Za-z0-9_-]+\*?\??", ":_", path)
 
 
 def parse_route_query(query: str) -> tuple[str, str]:

@@ -58,6 +58,9 @@ class _Summary:
         if key in self.scopes:
             key = f"{key}@L{line(node)}"
         self.scopes[key] = {"line": line(node), "end": end_line(node), "calls": [], "refs": {}}
+        params = _param_names(node)
+        if params:
+            self.scopes[key]["params"] = params
         self.fn_keys[_span(node)] = key
         return key
 
@@ -155,8 +158,16 @@ class _Summary:
                     self._record_call(scope, c, node, new=True)
             elif t == "member_expression":
                 obj = node.child_by_field_name("object")
-                if chain(obj) == ["process", "env"]:
+                obj_chain = chain(obj)
+                if obj_chain == ["process", "env"]:
                     self._env(scope, text(node.child_by_field_name("property")), node)
+                elif (
+                    obj_chain is not None
+                    and len(obj_chain) == 1
+                    and text(node.child_by_field_name("property")) == "body"
+                    and self._is_request(scope, obj_chain[0])
+                ):
+                    self.scopes[scope].setdefault("body", line(node))
             elif t == "subscript_expression":
                 obj = node.child_by_field_name("object")
                 if chain(obj) == ["process", "env"]:
@@ -220,7 +231,16 @@ class _Summary:
                     {"spec": spec, "line": line(node), "names": [], "kind": "require"}
                 )
             return
+        if len(c) == 2 and c[1] in ("json", "formData") and self._is_request(scope, c[0]):
+            self.scopes[scope].setdefault("body", line(node))
         self._record_call(scope, c, node)
+
+    def _is_request(self, scope: str, name: str) -> bool:
+        """`req`/`request`, or the first parameter of the handler scope."""
+        if name in ("req", "request"):
+            return True
+        params = self.scopes.get(scope, {}).get("params", [])
+        return bool(params) and params[0] == name
 
     def _env(self, scope: str, name: str | None, node: ts.Node) -> None:
         if name and ENV_NAME.match(name):
@@ -386,8 +406,56 @@ class _Summary:
 
     def _class(self, node: ts.Node) -> None:
         name = text(node.child_by_field_name("name"))
-        if name:
-            self.classes[name] = {"line": line(node), "end": end_line(node)}
+        if not name:
+            return
+        info: JSON = {"line": line(node), "end": end_line(node)}
+        decos = [d for d in node.children if d.type == "decorator"]
+        if node.parent is not None and node.parent.type == "export_statement":
+            decos = [d for d in node.parent.children if d.type == "decorator"] + decos
+        if decos:
+            info["decorators"] = [_decorator(d) for d in decos]
+        heritage = next((c for c in node.named_children if c.type == "class_heritage"), None)
+        if heritage is not None:
+            ext = next((c for c in heritage.named_children if c.type == "extends_clause"), heritage)
+            value = ext.child_by_field_name("value") or (
+                ext.named_children[0] if ext.named_children else None
+            )
+            if value is not None:
+                info["extends"] = text(value)
+        body = node.child_by_field_name("body")
+        fields: JSON = {}
+        methods: JSON = {}
+        pending: list[JSON] = []
+        for member in body.named_children if body is not None else []:
+            if member.type == "decorator":
+                pending.append(_decorator(member))
+                continue
+            if member.type == "method_definition":
+                mname = text(member.child_by_field_name("name"))
+                if mname == "constructor":
+                    fields.update(_ctor_fields(member))
+                else:
+                    entry: JSON = {"line": line(member), "end": end_line(member)}
+                    if pending:
+                        entry["decorators"] = pending
+                    methods[mname] = entry
+            elif member.type in ("public_field_definition", "field_definition"):
+                fname = text(member.child_by_field_name("name"))
+                own = [_decorator(d) for d in member.children if d.type == "decorator"]
+                field: JSON = {"line": line(member)}
+                ftype = member.child_by_field_name("type")
+                if ftype is not None:
+                    field["type"] = text(ftype).lstrip(":").strip()
+                if own or pending:
+                    field["decorators"] = pending + own
+                if fname:
+                    fields[fname] = field
+            pending = []
+        if fields:
+            info["fields"] = fields
+        if methods:
+            info["methods"] = methods
+        self.classes[name] = info
 
     def _cjs_export(self, expr: ts.Node) -> None:
         left = chain(expr.child_by_field_name("left"))
@@ -439,6 +507,98 @@ class _Summary:
         if self.directive:
             out["directive"] = self.directive
         return out
+
+
+def _param_names(fn: ts.Node) -> list[str]:
+    single = fn.child_by_field_name("parameter")
+    if single is not None and single.type == "identifier":
+        return [text(single)]
+    params = fn.child_by_field_name("parameters")
+    out = []
+    for p in params.named_children if params is not None else []:
+        if p.type in ("required_parameter", "optional_parameter"):
+            p = p.child_by_field_name("pattern") or p
+        if p.type == "assignment_pattern":
+            p = p.child_by_field_name("left") or p
+        out.append(text(p) if p.type == "identifier" else "")
+    return out
+
+
+def _deco_arg(node: ts.Node) -> JSON:
+    n = unwrap(node)
+    value = string_value(n)
+    if value is not None:
+        return {"k": "str", "value": value}
+    if n.type == "identifier":
+        return {"k": "id", "name": text(n)}
+    if n.type == "arrow_function":
+        body = n.child_by_field_name("body")
+        if body is not None and unwrap(body).type == "identifier":
+            return {"k": "id", "name": text(unwrap(body))}
+        return {"k": "fn"}
+    if n.type == "member_expression":
+        c = chain(n)
+        return {"k": "member", "chain": c} if c else {"k": "other"}
+    if n.type == "object":
+        props: JSON = {}
+        for pair in n.named_children:
+            if pair.type == "pair":
+                key = text(pair.child_by_field_name("key")).strip("'\"")
+                val = pair.child_by_field_name("value")
+                if val is not None:
+                    props[key] = _deco_arg(val)
+        return {"k": "obj", "props": props}
+    if n.type == "array":
+        return {"k": "array", "items": [_deco_arg(c) for c in n.named_children]}
+    if n.type in ("call_expression", "new_expression"):
+        fn = n.child_by_field_name("function") or n.child_by_field_name("constructor")
+        args = n.child_by_field_name("arguments")
+        return {
+            "k": "call",
+            "chain": chain(fn),
+            "args": [_deco_arg(a) for a in args.named_children] if args is not None else [],
+        }
+    return {"k": "other"}
+
+
+def _decorator(node: ts.Node) -> JSON:
+    """`@Get(':id')` -> {"name": "Get", "args": [...], "line": n}."""
+    expr = next((c for c in node.named_children), None)
+    out: JSON = {"name": "", "args": [], "line": line(node)}
+    if expr is None:
+        return out
+    if expr.type == "call_expression":
+        c = chain(expr.child_by_field_name("function"))
+        args = expr.child_by_field_name("arguments")
+        out["name"] = ".".join(c) if c else ""
+        out["args"] = [_deco_arg(a) for a in args.named_children] if args is not None else []
+    else:
+        c = chain(expr)
+        out["name"] = ".".join(c) if c else ""
+    return out
+
+
+def _ctor_fields(ctor: ts.Node) -> JSON:
+    """Constructor parameter properties: `constructor(private users: UsersService)`."""
+    out: JSON = {}
+    params = ctor.child_by_field_name("parameters")
+    for p in params.named_children if params is not None else []:
+        if p.type not in ("required_parameter", "optional_parameter"):
+            continue
+        if not any(c.type in ("accessibility_modifier", "readonly") for c in p.children):
+            continue
+        pattern = p.child_by_field_name("pattern")
+        if pattern is None or pattern.type != "identifier":
+            continue
+        field: JSON = {"line": line(p)}
+        ptype = p.child_by_field_name("type")
+        if ptype is not None:
+            field["type"] = text(ptype).lstrip(":").strip()
+        decos = [_decorator(d) for d in p.children if d.type == "decorator"]
+        if decos:
+            field["decorators"] = decos
+        out[text(pattern)] = field
+    return out
 
 
 def _first_string_arg(call: ts.Node) -> str | None:

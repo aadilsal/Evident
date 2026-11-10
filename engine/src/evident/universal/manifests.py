@@ -130,3 +130,82 @@ def python_deps(name: str, text: str) -> list[str]:
         for m in re.finditer(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)\s*=", text, re.M):
             names.add(m.group(1).lower())
     return sorted(names)
+
+
+COMPOSE_NAMES = ("docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml")
+
+
+def compose_services(text: str) -> list[JSON]:
+    """Services in a compose file: name, image, build, ports, depends_on, with line ranges.
+
+    Uses the YAML node tree (no object construction, so no tags run) and never reads
+    `environment:` values.
+    """
+    import yaml
+
+    try:
+        root = yaml.compose(text, Loader=yaml.SafeLoader)
+    except yaml.YAMLError:
+        return []
+    if not isinstance(root, yaml.MappingNode):
+        return []
+    services = next(
+        (v for k, v in root.value if isinstance(k, yaml.ScalarNode) and k.value == "services"),
+        None,
+    )
+    if not isinstance(services, yaml.MappingNode):
+        return []
+    out: list[JSON] = []
+    for key, body in services.value:
+        if not isinstance(key, yaml.ScalarNode):
+            continue
+        svc: JSON = {
+            "name": str(key.value),
+            "line": key.start_mark.line + 1,
+            "end": max(key.start_mark.line + 1, body.end_mark.line),
+        }
+        if isinstance(body, yaml.MappingNode):
+            for k, v in body.value:
+                field = k.value if isinstance(k, yaml.ScalarNode) else None
+                if field == "image" and isinstance(v, yaml.ScalarNode):
+                    svc["image"] = str(v.value)
+                elif field == "build":
+                    if isinstance(v, yaml.ScalarNode):
+                        svc["build"] = str(v.value)
+                    elif isinstance(v, yaml.MappingNode):
+                        ctx = next((c for kk, c in v.value if kk.value == "context"), None)
+                        if isinstance(ctx, yaml.ScalarNode):
+                            svc["build"] = str(ctx.value)
+                elif field == "ports" and isinstance(v, yaml.SequenceNode):
+                    svc["ports"] = [str(p.value) for p in v.value if isinstance(p, yaml.ScalarNode)]
+                elif field == "depends_on":
+                    if isinstance(v, yaml.SequenceNode):
+                        deps = [str(d.value) for d in v.value if isinstance(d, yaml.ScalarNode)]
+                    elif isinstance(v, yaml.MappingNode):
+                        deps = [str(d.value) for d, _ in v.value if isinstance(d, yaml.ScalarNode)]
+                    else:
+                        deps = []
+                    svc["dependsOn"] = deps
+        out.append(svc)
+    return out
+
+
+# Post-launch ecosystems: detected (so users get the fallback message), not mapped yet.
+OTHER_MANIFESTS: dict[str, tuple[tuple[str, str], ...]] = {
+    "pom.xml": (("spring-boot", "Spring Boot"),),
+    "build.gradle": (("spring-boot", "Spring Boot"),),
+    "build.gradle.kts": (("spring-boot", "Spring Boot"),),
+    "go.mod": (("gin-gonic/gin", "Gin"), ("labstack/echo", "Echo"), ("go-chi/chi", "Chi")),
+    "composer.json": (("laravel/framework", "Laravel"),),
+    "Gemfile": (("rails", "Rails"),),
+}
+CSPROJ_MARKERS = (
+    ("Microsoft.AspNetCore", "ASP.NET Core"),
+    ("Microsoft.NET.Sdk.Web", "ASP.NET Core"),
+)
+
+
+def other_frameworks(name: str, text: str) -> list[str]:
+    """Framework names a non-JS/Python manifest declares (substring match on the manifest text)."""
+    markers = CSPROJ_MARKERS if name.endswith(".csproj") else OTHER_MANIFESTS.get(name, ())
+    return sorted({label for needle, label in markers if needle in text})

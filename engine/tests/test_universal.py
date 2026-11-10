@@ -106,10 +106,22 @@ def test_prisma_schema_parser() -> None:
 def test_unsupported_stack_falls_back_to_universal_map(
     copy_fixture: Callable[[str], Path], graph_validator: Draft202012Validator
 ) -> None:
-    g = analyse_fixture(copy_fixture("nest-only"), graph_validator)
+    g = analyse_fixture(copy_fixture("koa-only"), graph_validator)
     assert g.stack is not None
-    assert g.stack["unsupported"] == ["NestJS"]
-    assert g.stack["message"].startswith("Routes and models aren't supported for NestJS yet")
+    assert g.stack["unsupported"] == ["Koa"]
+    assert g.stack["message"].startswith("Routes and models aren't supported for Koa yet")
     assert node_ids(g, "route") == set()
     assert node_ids(g, "service") == {"service:stripe"}
     assert node_ids(g, "module") == {"module:src/main.ts"}
+
+
+def test_detects_post_launch_stacks_from_their_manifests() -> None:
+    assert manifests.other_frameworks("go.mod", "require github.com/gin-gonic/gin v1.10.0") == [
+        "Gin"
+    ]
+    assert manifests.other_frameworks("Api.csproj", '<Project Sdk="Microsoft.NET.Sdk.Web">') == [
+        "ASP.NET Core"
+    ]
+    assert manifests.other_frameworks("pom.xml", "<artifactId>spring-boot-starter-web") == [
+        "Spring Boot"
+    ]

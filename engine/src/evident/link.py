@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import posixpath
 import re
-from collections.abc import Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -51,6 +51,8 @@ class Ns:
 
 Target = Sym | Pkg | Ns
 FnKey = tuple[str, str]  # (file, scope key)
+MODULE_SCOPE = "<module>"
+_GENERIC = re.compile(r"^(?:[\w.]+<\s*)?([A-Za-z_$][\w$]*)")
 
 
 def package_name(spec: str) -> str:
@@ -328,6 +330,45 @@ class Project:
             return self.scope_of(self.resolve(target.file, refs[0]), depth + 1)
         return None
 
+    def local_binding(self, file: str, scope: str, name: str) -> JSON | None:
+        """A function-local binding seen from a scope, searching enclosing callbacks too."""
+        scopes = self.js[file]["scopes"]
+        cur: str | None = scope
+        while cur is not None and cur != MODULE_SCOPE:
+            local = scopes.get(cur, {}).get("locals", {}).get(name)
+            if local is not None:
+                found: JSON = local
+                return found
+            cur = scopes.get(cur, {}).get("parent")
+        return None
+
+    def class_of_scope(self, file: str, scope: str) -> str | None:
+        cls = scope.split(".", 1)[0] if "." in scope else None
+        return cls if cls and cls in self.js[file]["classes"] else None
+
+    def field(self, file: str, scope: str, name: str) -> JSON | None:
+        """`this.<name>` inside a class method: the field or constructor parameter property."""
+        cls = self.class_of_scope(file, scope)
+        if cls is None:
+            return None
+        found: JSON | None = self.js[file]["classes"][cls].get("fields", {}).get(name)
+        return found
+
+    def type_target(self, file: str, type_text: str | None) -> Target | None:
+        """The class or binding a type annotation names: `UsersService`, `Repository<User>`."""
+        if not type_text:
+            return None
+        m = _GENERIC.match(type_text.strip())
+        return self.resolve(file, m.group(1)) if m else None
+
+    def generic_arg(self, type_text: str | None) -> str | None:
+        """`Repository<User>` -> "User"."""
+        if not type_text or "<" not in type_text:
+            return None
+        inner = type_text.split("<", 1)[1].rstrip(">").strip()
+        m = _GENERIC.match(inner)
+        return m.group(1) if m else None
+
     def member_scope(self, file: str, obj: str, prop: str) -> FnKey | None:
         """`obj.prop` where obj is a namespace import, an object literal or a class instance."""
         target = self.resolve(file, obj)
@@ -374,6 +415,12 @@ class _PendingEdge:
     confidence: float
 
 
+Fact = tuple[
+    str, str, Evidence, JSON, str, float
+]  # (edge type, dst, evidence, attrs, source, conf)
+Classifier = Callable[["LinkContext", str, str, JSON], Fact | None]
+
+
 @dataclass
 class LinkContext:
     project: Project
@@ -386,6 +433,8 @@ class LinkContext:
     fn_meta: dict[FnKey, JSON] = field(default_factory=dict)  # middleware framework/name
     models: dict[str, str] = field(default_factory=dict)  # client accessor -> model name
     adapters: list[str] = field(default_factory=list)
+    classifiers: list[Classifier] = field(default_factory=list)  # ORM call -> reads/writes fact
+    access: dict[FnKey, list[Fact]] = field(default_factory=dict)  # adapter-found facts per fn
 
     def ev(self, file: str, start: int, end: int | None = None) -> Evidence:
         return Evidence(file, start, max(end or start, start), self.sha)

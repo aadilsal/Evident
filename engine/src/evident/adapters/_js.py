@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from importlib.resources import files
 from typing import Any
 
@@ -47,6 +48,22 @@ def describe(node: ts.Node, fn_keys: FnKeys) -> JSON:
         return {"k": "str", "value": value}
     if t == "array":
         return {"k": "array", "items": [describe(c, fn_keys) for c in n.named_children]}
+    if t == "object":
+        props: JSON = {}
+        for pair in n.named_children:
+            if pair.type == "pair":
+                key = text(pair.child_by_field_name("key")).strip("'\"")
+                val = pair.child_by_field_name("value")
+                if val is not None:
+                    props[key] = describe(val, fn_keys)
+            elif pair.type == "shorthand_property_identifier":
+                props[text(pair)] = {"k": "id", "name": text(pair)}
+            elif pair.type == "method_definition":
+                props[text(pair.child_by_field_name("name"))] = {
+                    "k": "fn",
+                    "scope": fn_keys.get((pair.start_byte, pair.end_byte)),
+                }
+        return {"k": "obj", "props": props}
     return {"k": "other"}
 
 
@@ -63,3 +80,51 @@ def enclosing_scope(node: ts.Node, fn_keys: FnKeys) -> str:
 
 def args_of(call_args: ts.Node, fn_keys: FnKeys) -> list[JSON]:
     return [describe(a, fn_keys) for a in call_args.named_children if a.type != "comment"]
+
+
+def binding_of(node: ts.Node) -> str | None:
+    """Name an expression is bound to: `const X = …`, `export default …`, `module.exports = …`."""
+    p = node.parent
+    while p is not None and p.type in (
+        "binary_expression",
+        "parenthesized_expression",
+        "await_expression",
+        "as_expression",
+        "satisfies_expression",
+        "ternary_expression",
+        "non_null_expression",
+    ):
+        p = p.parent
+    if p is None:
+        return None
+    if p.type == "variable_declarator":
+        name = p.child_by_field_name("name")
+        return text(name) if name is not None and name.type == "identifier" else None
+    if p.type == "export_statement":
+        return "default"
+    if p.type == "assignment_expression" and chain(p.child_by_field_name("left")) == [
+        "module",
+        "exports",
+    ]:
+        return "default"
+    return None
+
+
+def walk_calls(root: ts.Node) -> Iterator[ts.Node]:
+    """Every call_expression / new_expression in a tree, iteratively."""
+    stack = [root]
+    while stack:
+        n = stack.pop()
+        if n.type in ("call_expression", "new_expression"):
+            yield n
+        stack.extend(n.children)
+
+
+def callee(call: ts.Node) -> list[str] | None:
+    fn = call.child_by_field_name("function") or call.child_by_field_name("constructor")
+    return chain(fn)
+
+
+def call_args(call: ts.Node) -> list[ts.Node]:
+    args = call.child_by_field_name("arguments")
+    return [a for a in args.named_children if a.type != "comment"] if args is not None else []

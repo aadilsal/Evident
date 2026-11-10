@@ -1,0 +1,5 @@
+{
+  "name": "@acme/api",
+  "private": true,
+  "dependencies": { "@acme/db": "workspace:*", "express": "^4.21.0" }
+}

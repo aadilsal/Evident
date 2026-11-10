@@ -1,0 +1,5 @@
+{
+  "name": "fixture-koa-only",
+  "private": true,
+  "dependencies": { "koa": "^2.15.0", "stripe": "^17.0.0" }
+}

@@ -1,7 +1,8 @@
 """Universal layer, link step: modules, imports, services, env vars and the function graph.
 
-Runs after the adapters, which mark handlers and middleware. Functions become nodes when they
-are reachable through calls from a handler/middleware, or touch a model, service or env var.
+Runs after the adapters, which mark handlers and middleware and register ORM call classifiers.
+Functions become nodes when they are reachable through calls from a handler/middleware, or
+touch a model, service or env var.
 """
 
 from __future__ import annotations
@@ -14,15 +15,28 @@ from functools import cache
 from importlib.resources import files
 from typing import Any
 
-from evident.adapters.prisma import READ_OPS, WRITE_OPS
-from evident.link import AUTH_RE, FnKey, LinkContext, Project, Sym, fn_ref, package_name
+from evident.link import AUTH_RE, Fact, FnKey, LinkContext, Project, Sym, fn_ref, package_name
 from evident.universal.js import MODULE
 
 JSON = dict[str, Any]
 _ANON = re.compile(r"^L\d+(@L\d+)?$")
-PRISMA_PROVEN = 1.0
-PRISMA_THIS = 0.8
-PRISMA_GUESS = 0.7
+# Calls that validate input: zod/yup/joi/class-validator/ajv, express-validator, celebrate.
+VALIDATE_CALLS = frozenset(
+    {
+        "parse",
+        "safeParse",
+        "parseAsync",
+        "safeParseAsync",
+        "validate",
+        "validateAsync",
+        "validateSync",
+        "validateOrReject",
+        "assert",
+        "validationResult",
+        "plainToInstance",
+    }
+)
+VALIDATE_RE = re.compile(r"(?i)(valid|schema|celebrate|zod|joi|yup|sanitiz)")
 
 
 @cache
@@ -62,54 +76,43 @@ def _workspace(project: Project, file: str) -> str | None:
         d = posixpath.dirname(d)
 
 
-def _local_ctor(project: Project, file: str, scope: str, name: str) -> list[str] | None:
-    """`new C()` bound to a local in this scope or an enclosing callback's scope."""
-    scopes = project.js[file]["scopes"]
-    cur: str | None = scope
-    while cur is not None and cur != MODULE:
-        local = scopes.get(cur, {}).get("locals", {}).get(name)
-        if local is not None:
-            ctor: list[str] | None = local.get("new")
-            return ctor
-        cur = scopes.get(cur, {}).get("parent")
+def _method_of(project: Project, target: object, method: str) -> FnKey | None:
+    if isinstance(target, Sym) and target.name in project.js[target.file]["classes"]:
+        key = f"{target.name}.{method}"
+        if key in project.js[target.file]["scopes"]:
+            return (target.file, key)
     return None
 
 
-def _call_target(project: Project, file: str, scope: str, c: list[str]) -> FnKey | None:
+def call_target(project: Project, file: str, scope: str, c: list[str]) -> FnKey | None:
+    """The first-party function a call chain lands in, if it can be proven."""
     if len(c) == 1:
         return project.scope_of(project.resolve(file, c[0]))
-    if len(c) == 2:
-        if c[0] == "this" and "." in scope:
-            key = f"{scope.split('.', 1)[0]}.{c[1]}"
+    if c[0] == "this":
+        cls = project.class_of_scope(file, scope)
+        if cls is None:
+            return None
+        if len(c) == 2:
+            key = f"{cls}.{c[1]}"
             return (file, key) if key in project.js[file]["scopes"] else None
-        ctor = _local_ctor(project, file, scope, c[0])
-        if ctor and len(ctor) == 1:
-            cls = project.resolve(file, ctor[0])
-            if isinstance(cls, Sym) and f"{cls.name}.{c[1]}" in project.js[cls.file]["scopes"]:
-                return (cls.file, f"{cls.name}.{c[1]}")
+        if len(c) == 3:  # this.users.findOne(): constructor-injected or typed field
+            fld = project.field(file, scope, c[1])
+            if fld is not None:
+                return _method_of(project, project.type_target(file, fld.get("type")), c[2])
+        return None
+    if len(c) == 2:
+        local = project.local_binding(file, scope, c[0])
+        if local is not None and local.get("new") and len(local["new"]) == 1:
+            return _method_of(project, project.resolve(file, local["new"][0]), c[1])
         return project.member_scope(file, c[0], c[1])
     return None
 
 
-def _prisma_call(
-    ctx: LinkContext, file: str, c: list[str]
-) -> tuple[str, str, str, str, float] | None:
-    """(edge type, model, op, source, confidence) for `<client>.<model>.<op>()`."""
-    if len(c) < 3 or not ctx.models:
-        return None
-    op, model = c[-1], ctx.models.get(c[-2])
-    if model is None:
-        return None
-    kind = "reads" if op in READ_OPS else "writes" if op in WRITE_OPS else None
-    if kind is None:
-        return None
-    recv = c[:-2]
-    if len(recv) == 1 and recv[0] != "this":
-        taint = ctx.project.taint(file, recv[0])
-        if any(t.imported == "PrismaClient" or t.package == "@prisma/client" for t in taint):
-            return kind, model, op, "extracted", PRISMA_PROVEN
-        return kind, model, op, "inferred", PRISMA_GUESS
-    return kind, model, op, "inferred", PRISMA_THIS if recv[0] == "this" else PRISMA_GUESS
+def _validates(info: JSON) -> bool:
+    return any(
+        call["c"][-1] in VALIDATE_CALLS or VALIDATE_RE.search(call["c"][0])
+        for call in info["calls"]
+    )
 
 
 def build(ctx: LinkContext) -> None:
@@ -142,11 +145,11 @@ def build(ctx: LinkContext) -> None:
 
     # Facts per function scope.
     calls: dict[FnKey, list[tuple[FnKey, int]]] = {}
-    access: dict[FnKey, list[tuple[str, str, Any, JSON, str, float]]] = {}
+    access: dict[FnKey, list[Fact]] = {k: list(v) for k, v in ctx.access.items()}
     for file, s in project.js.items():
         imported = project.imports_of(file)
         for scope, info in s["scopes"].items():
-            facts: list[tuple[str, str, Any, JSON, str, float]] = []
+            facts: list[Fact] = []
             for name, at in info.get("env", []):
                 env_evidence.setdefault(name, []).append(ctx.ev(file, at))
                 facts.append(("reads", f"envVar:{name}", ctx.ev(file, at), {}, "extracted", 1.0))
@@ -155,13 +158,13 @@ def build(ctx: LinkContext) -> None:
             key = (file, scope)
             targets = []
             for call in info["calls"]:
-                hit = _prisma_call(ctx, file, call["c"])
-                if hit is not None:
-                    kind, model, op, source, conf = hit
-                    ev = ctx.ev(file, call["l"], call["e"])
-                    facts.append((kind, f"model:{model}", ev, {"operation": op}, source, conf))
+                fact = next(
+                    (f for clf in ctx.classifiers if (f := clf(ctx, file, scope, call))), None
+                )
+                if fact is not None:
+                    facts.append(fact)
                     continue
-                target = _call_target(project, file, scope, call["c"])
+                target = call_target(project, file, scope, call["c"])
                 if target is not None and target != key:
                     targets.append((target, call["l"]))
             for name, at in info["refs"].items():
@@ -174,7 +177,7 @@ def build(ctx: LinkContext) -> None:
                         facts.append(("uses", sid, ctx.ev(file, at), {}, "extracted", 1.0))
             calls[key] = targets
             if facts:
-                access[key] = facts
+                access.setdefault(key, []).extend(facts)
 
     # Function nodes: the call closure of every handler/middleware, plus direct accessors.
     keep: set[FnKey] = set()
@@ -185,7 +188,7 @@ def build(ctx: LinkContext) -> None:
             continue
         keep.add(key)
         queue.extend(t for t, _ in calls.get(key, []))
-    keep |= set(access)
+    keep |= {k for k in access if k[0] in project.js and k[1] in project.js[k[0]]["scopes"]}
     exported = {
         (f, local): name for f, s in project.js.items() for name, local in s["exports"].items()
     }
@@ -206,18 +209,24 @@ def build(ctx: LinkContext) -> None:
             if _ANON.match(scope)
             else f"{scope}()"
         )
+        calls_auth = key in wrapped or any(
+            AUTH_RE.search(c["c"][-1]) or AUTH_RE.search(c["c"][0]) for c in info["calls"]
+        )
         attrs: JSON = {"file": file}
         if role == "middleware":
             meta = ctx.fn_meta.get(key, {})
             attrs.update(framework=meta.get("framework", "express"), name=meta.get("name", scope))
             if meta.get("matchers") is not None:
                 attrs["matchers"] = meta["matchers"]
+            attrs["checksAuth"] = calls_auth or any(AUTH_RE.search(r) for r in info["refs"])
         else:
             attrs["exportName"] = exported.get(key)
             if role == "handler":
-                attrs["checksAuth"] = key in wrapped or any(
-                    AUTH_RE.search(c["c"][-1]) or AUTH_RE.search(c["c"][0]) for c in info["calls"]
-                )
+                attrs["checksAuth"] = calls_auth
+            if info.get("body"):
+                attrs["bodyLine"] = info["body"]
+            if _validates(info):
+                attrs["validatesBody"] = True
         ctx.node(ctx.fn_id(key), role, label, [ctx.ev(file, info["line"], info["end"])], attrs)
 
     for key in keep:
@@ -228,9 +237,22 @@ def build(ctx: LinkContext) -> None:
         for kind, dst, ev, attrs, source, conf in access.get(key, []):
             ctx.edge(kind, src, dst, [ev], attrs, source=source, confidence=conf)
 
+    # Containers from docker-compose (names, images, ports; never environment values).
+    for file, raw in sorted(project.raw.items()):
+        for svc in raw.get("compose", []):
+            attrs = {"file": file, "name": svc["name"]}
+            attrs.update({k: svc[k] for k in ("image", "build", "ports", "dependsOn") if k in svc})
+            ctx.node(
+                f"container:{svc['name']}",
+                "container",
+                svc["name"],
+                [ctx.ev(file, svc["line"], svc["end"])],
+                attrs,
+            )
+
     # Env vars, including env("X") in Prisma schemas.
     for file, raw in project.raw.items():
-        for name, at in raw.get("prisma", {}).get("env", []):
+        for name, at in raw.get("prisma", {}).get("env", []) if "js" not in raw else []:
             env_evidence.setdefault(name, []).append(ctx.ev(file, at))
     for name, evidence in sorted(env_evidence.items()):
         ctx.node(

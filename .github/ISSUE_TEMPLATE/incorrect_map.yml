@@ -1,6 +1,6 @@
 name: Incorrect map
 description: A route, model, service or edge is missing, wrong or invented
-title: "map: "
+title: 'map: '
 labels: [accuracy]
 body:
   - type: input
@@ -32,6 +32,6 @@ body:
     attributes:
       label: Details and evidence
       description: The node or edge, and the file:line that proves what's actually true.
-      placeholder: "POST /api/teams writes Membership, see packages/lib/teams.ts:88"
+      placeholder: 'POST /api/teams writes Membership, see packages/lib/teams.ts:88'
     validations:
       required: true

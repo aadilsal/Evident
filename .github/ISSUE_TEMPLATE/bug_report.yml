@@ -1,6 +1,6 @@
 name: Bug report
 description: Something crashes or behaves wrongly (not a map accuracy problem)
-title: "bug: "
+title: 'bug: '
 labels: [bug]
 body:
   - type: dropdown

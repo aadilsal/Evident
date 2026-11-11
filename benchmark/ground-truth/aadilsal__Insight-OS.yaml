@@ -1,0 +1,150 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo: { owner: aadilsal, name: Insight-OS, sha: 38ded8337547f5705d58943f481e17457ff3b841 }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-10',
+    minutes: 25,
+  }
+routes:
+  - { method: GET, path: /health, kind: api, framework: fastapi, evidence: 'backend/main.py:174' }
+  - {
+      method: POST,
+      path: /auth/sign-in,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:179',
+    }
+  - { method: GET, path: /auth/me, kind: api, framework: fastapi, evidence: 'backend/main.py:196' }
+  - {
+      method: GET,
+      path: /observability/metrics,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:200',
+    }
+  - {
+      method: POST,
+      path: /preview-sql,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:204',
+    }
+  - {
+      method: POST,
+      path: /upload-sql,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:222',
+    }
+  - {
+      method: POST,
+      path: /generate-sql,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:243',
+    }
+  - { method: POST, path: /query, kind: api, framework: fastapi, evidence: 'backend/main.py:253' }
+  - {
+      method: POST,
+      path: /query-plan,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:267',
+    }
+  - {
+      method: POST,
+      path: /cfo-report,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:281',
+    }
+  - {
+      method: POST,
+      path: /create-warehouse,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:291',
+    }
+  - {
+      method: POST,
+      path: /jobs/upload-sql,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:328',
+    }
+  - {
+      method: POST,
+      path: /jobs/cfo-report,
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:341',
+    }
+  - {
+      method: GET,
+      path: '/jobs/:job_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'backend/main.py:351',
+    }
+  - { method: GET, path: /jobs, kind: api, framework: fastapi, evidence: 'backend/main.py:371' }
+  - {
+      method: GET,
+      path: /cfo,
+      kind: page,
+      framework: nextjs,
+      evidence: 'frontend/app/cfo/page.tsx:1',
+    }
+  - { method: GET, path: /, kind: page, framework: nextjs, evidence: 'frontend/app/page.tsx:1' }
+  - {
+      method: GET,
+      path: /query,
+      kind: page,
+      framework: nextjs,
+      evidence: 'frontend/app/query/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /settings,
+      kind: page,
+      framework: nextjs,
+      evidence: 'frontend/app/settings/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /signin,
+      kind: page,
+      framework: nextjs,
+      evidence: 'frontend/app/signin/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /support,
+      kind: page,
+      framework: nextjs,
+      evidence: 'frontend/app/support/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /upload,
+      kind: page,
+      framework: nextjs,
+      evidence: 'frontend/app/upload/page.tsx:1',
+    }
+  - {
+      method: GET,
+      path: /warehouse,
+      kind: page,
+      framework: nextjs,
+      evidence: 'frontend/app/warehouse/page.tsx:1',
+    }
+  - { method: GET, path: /, kind: layout, framework: nextjs, evidence: 'frontend/app/layout.tsx:1' }
+models: []
+services:
+  - { provider: convex, evidence: 'frontend/components/ConvexClientProvider.tsx:4' }
+edges: []
+out_of_scope:
+  - api/index.py (ASGI wrapper that strips /api for Vercel; not new routes)
+  - raw SQL via sqlalchemy.text() in backend/services/db_manager.py (no models)
+notes: |
+  FastAPI app is created at backend/main.py:18; all routes are on it directly.

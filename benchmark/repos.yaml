@@ -40,13 +40,13 @@ launch_set: # Gate B: 15-20 repos covering every v1 adapter
   - owner: aadilsal
     name: Insight-OS
     sha: 38ded8337547f5705d58943f481e17457ff3b841
-    adapters: [nextjs, fastapi, sqlalchemy]
-    status: candidate
+    adapters: [nextjs, fastapi]
+    status: labelled
   - owner: aadilsal
     name: SpotterTruckLogging
     sha: 3cded29a1e127af7b772160ca1de12cb31d700f0
     adapters: [django, django-orm]
-    status: candidate
+    status: labelled
   - owner: aadilsal
     name: TourAgency
     sha: 68e26ef5036968f8bbd1423d806aec19ddfb60b6
@@ -61,6 +61,6 @@ launch_set: # Gate B: 15-20 repos covering every v1 adapter
     name: JobFinder
     sha: 13d8d0d6358f49e22307c2f055f5460838d6253f
     adapters: [fastapi]
-    status: candidate
+    status: labelled
 # Gaps: no owned repo yet uses fastify, drizzle, typeorm or flask.
 # Add public OSS repos for those before launch.

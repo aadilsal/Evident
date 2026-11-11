@@ -20,8 +20,9 @@ from typing import Any
 import yaml
 
 from evident.analyze import analyze
-from evident.models import Graph
+from evident.models import AnalysisError, Graph
 from evident.query import GraphIndex, walk
+from evident.repo import local_dirty, local_head
 
 JSON = dict[str, Any]
 CATEGORIES = ("routes", "models", "services", "edges")
@@ -208,8 +209,15 @@ def run_repo(root: Path, repo: JSON) -> JSON | None:
         return None
     gt = yaml.safe_load(gt_path.read_text(encoding="utf-8"))
     url = f"https://github.com/{repo['owner']}/{repo['name']}/tree/{repo['sha']}"
+    # A labeller's read-only clone at the pinned commit saves a fetch (never in CI).
+    local = root / "benchmark" / ".repos" / "src" / repo["name"]
+    target = str(local) if local_head(local) == repo["sha"] and not local_dirty(local) else url
     started = time.perf_counter()
-    graph = analyze(url, use_llm=False, cache_root=root / "benchmark" / ".repos").graph
+    try:
+        graph = analyze(target, use_llm=False, cache_root=root / "benchmark" / ".repos").graph
+    except AnalysisError:
+        # Network hiccups (slow GitHub fetches) shouldn't sink the run: try once more.
+        graph = analyze(target, use_llm=False, cache_root=root / "benchmark" / ".repos").graph
     seconds = time.perf_counter() - started
     required, optional = truth_items(gt)
     pred = predictions(graph)
@@ -282,10 +290,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = ap.parse_args(argv)
     root = repo_root()
     results = []
+    failed: list[str] = []
     for repo in _repos(root):
         if args.repo and repo["name"] not in args.repo:
             continue
-        res = run_repo(root, repo)
+        try:
+            res = run_repo(root, repo)
+        except AnalysisError as exc:
+            failed.append(f"{repo['owner']}/{repo['name']}: {exc}")
+            print(f"FAILED {failed[-1]}", file=sys.stderr)
+            continue
         if res is not None:
             results.append(res)
             print(f"scored {res['repo']} in {res['seconds']}s", file=sys.stderr)
@@ -301,9 +315,15 @@ def main(argv: Sequence[str] | None = None) -> int:
                 for cat, keys in r[kind].items():
                     for k in keys:
                         print(f"  {kind[:-2] if kind == 'misses' else 'extra'} {cat}: {k}")
-    if args.write:
+    if args.write and not failed:
         args.write.parent.mkdir(parents=True, exist_ok=True)
         args.write.write_text(json.dumps(summary, indent=1) + "\n", encoding="utf-8")
+    if failed:
+        print(
+            f"{len(failed)} repo(s) could not be analysed; not trusting these numbers",
+            file=sys.stderr,
+        )
+        return 3
     if args.baseline:
         problems = regressions(summary, json.loads(args.baseline.read_text(encoding="utf-8")))
         for p in problems:

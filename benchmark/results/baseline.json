@@ -1,16 +1,16 @@
 {
   "categories": {
     "routes": {
-      "tp": 366,
+      "tp": 460,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "hallucinationRate": 0.0027
+      "hallucinationRate": 0.0043
     },
     "models": {
-      "tp": 20,
+      "tp": 26,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
@@ -19,7 +19,7 @@
       "hallucinationRate": 0.0
     },
     "services": {
-      "tp": 15,
+      "tp": 16,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
@@ -28,7 +28,7 @@
       "hallucinationRate": 0.0
     },
     "edges": {
-      "tp": 161,
+      "tp": 168,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
@@ -38,6 +38,37 @@
     }
   },
   "byAdapter": {
+    "django": {
+      "routes": {
+        "tp": 23,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0417
+      }
+    },
+    "django-orm": {
+      "models": {
+        "tp": 6,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      },
+      "edges": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    },
     "express": {
       "routes": {
         "tp": 184,
@@ -47,6 +78,17 @@
         "recall": 1.0,
         "f1": 1.0,
         "hallucinationRate": 0.0054
+      }
+    },
+    "fastapi": {
+      "routes": {
+        "tp": 62,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
       }
     },
     "nestjs": {
@@ -62,7 +104,7 @@
     },
     "nextjs": {
       "routes": {
-        "tp": 166,
+        "tp": 175,
         "fp": 0,
         "fn": 0,
         "precision": 1.0,
@@ -96,7 +138,7 @@
     {
       "repo": "aadilsal/Munshi",
       "sha": "40ad91b6e58e2d20cc60f29ddc035688c8eb7ae6",
-      "seconds": 4.69,
+      "seconds": 10.23,
       "categories": {
         "routes": {
           "tp": 55,
@@ -185,7 +227,7 @@
     {
       "repo": "aadilsal/MotorAi",
       "sha": "c10fa5d77f0daa0d40a26ab681e795d5fc589a55",
-      "seconds": 5.07,
+      "seconds": 6.36,
       "categories": {
         "routes": {
           "tp": 39,
@@ -263,7 +305,7 @@
     {
       "repo": "aadilsal/AjaiConsultancyAssignment",
       "sha": "df83d726c11513d2076fdb2a764b2a7d6cdde9ef",
-      "seconds": 5.08,
+      "seconds": 10.53,
       "categories": {
         "routes": {
           "tp": 24,
@@ -352,7 +394,7 @@
     {
       "repo": "aadilsal/TournamentMatchMaker",
       "sha": "973998e38d0906dfe661505e78e77f46cdc4d42a",
-      "seconds": 8.77,
+      "seconds": 15.55,
       "categories": {
         "routes": {
           "tp": 146,
@@ -410,7 +452,7 @@
     {
       "repo": "aadilsal/MdcatExpert",
       "sha": "34c226da59c2da8989b7053cf4a41bbce4e578e3",
-      "seconds": 8.04,
+      "seconds": 12.85,
       "categories": {
         "routes": {
           "tp": 102,
@@ -455,6 +497,211 @@
         "nextjs": {
           "routes": {
             "tp": 102,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "aadilsal/Insight-OS",
+      "sha": "38ded8337547f5705d58943f481e17457ff3b841",
+      "seconds": 2.6,
+      "categories": {
+        "routes": {
+          "tp": 24,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "fastapi": {
+          "routes": {
+            "tp": 15,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        },
+        "nextjs": {
+          "routes": {
+            "tp": 9,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "aadilsal/SpotterTruckLogging",
+      "sha": "3cded29a1e127af7b772160ca1de12cb31d700f0",
+      "seconds": 4.23,
+      "categories": {
+        "routes": {
+          "tp": 23,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0417
+        },
+        "models": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "django": {
+          "routes": {
+            "tp": 23,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0417
+          }
+        },
+        "django-orm": {
+          "models": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          },
+          "edges": {
+            "tp": 7,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "aadilsal/JobFinder",
+      "sha": "13d8d0d6358f49e22307c2f055f5460838d6253f",
+      "seconds": 2.89,
+      "categories": {
+        "routes": {
+          "tp": 47,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "fastapi": {
+          "routes": {
+            "tp": 47,
             "fp": 0,
             "fn": 0,
             "precision": 1.0,

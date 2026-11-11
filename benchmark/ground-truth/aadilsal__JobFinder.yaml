@@ -1,0 +1,251 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo: { owner: aadilsal, name: JobFinder, sha: 13d8d0d6358f49e22307c2f055f5460838d6253f }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-10',
+    minutes: 20,
+  }
+routes:
+  - {
+      method: GET,
+      path: /api/auth/status,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:102',
+    }
+  - {
+      method: GET,
+      path: '/api/auth/invite/:code',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:107',
+    }
+  - {
+      method: POST,
+      path: /api/auth/signup/start,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:112',
+    }
+  - {
+      method: POST,
+      path: /api/auth/signup/finish,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:119',
+    }
+  - {
+      method: POST,
+      path: /api/auth/login,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:127',
+    }
+  - {
+      method: POST,
+      path: /api/auth/logout,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:133',
+    }
+  - { method: GET, path: /api/me, kind: api, framework: fastapi, evidence: 'server.py:139' }
+  - {
+      method: POST,
+      path: /api/profile/parse,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:175',
+    }
+  - {
+      method: POST,
+      path: /api/profile/suggest,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:190',
+    }
+  - {
+      method: POST,
+      path: /api/profile/answers,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:204',
+    }
+  - { method: GET, path: /api/profile, kind: api, framework: fastapi, evidence: 'server.py:210' }
+  - { method: PUT, path: /api/profile, kind: api, framework: fastapi, evidence: 'server.py:219' }
+  - { method: GET, path: /api/themes, kind: api, framework: fastapi, evidence: 'server.py:235' }
+  - {
+      method: GET,
+      path: '/api/cv/base/:theme',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:240',
+    }
+  - { method: GET, path: /api/jobs, kind: api, framework: fastapi, evidence: 'server.py:258' }
+  - {
+      method: GET,
+      path: '/api/jobs/:key',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:270',
+    }
+  - {
+      method: POST,
+      path: '/api/jobs/:key/state',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:275',
+    }
+  - {
+      method: POST,
+      path: '/api/jobs/:key/feedback',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:284',
+    }
+  - {
+      method: POST,
+      path: '/api/jobs/:key/score',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:299',
+    }
+  - {
+      method: POST,
+      path: '/api/jobs/:key/apply',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:308',
+    }
+  - { method: POST, path: /api/apply, kind: api, framework: fastapi, evidence: 'server.py:319' }
+  - {
+      method: GET,
+      path: '/api/packages/:name',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:334',
+    }
+  - {
+      method: POST,
+      path: '/api/packages/:name/render',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:342',
+    }
+  - {
+      method: GET,
+      path: '/api/packages/:name/files/:fname',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:350',
+    }
+  - {
+      method: POST,
+      path: '/api/packages/:name/answers',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:363',
+    }
+  - {
+      method: POST,
+      path: '/api/packages/:name/interview',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:380',
+    }
+  - {
+      method: GET,
+      path: /api/applications,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:399',
+    }
+  - {
+      method: PATCH,
+      path: '/api/applications/:row_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:404',
+    }
+  - { method: POST, path: /api/outreach, kind: api, framework: fastapi, evidence: 'server.py:414' }
+  - { method: GET, path: /api/overview, kind: api, framework: fastapi, evidence: 'server.py:447' }
+  - { method: POST, path: /api/scrape, kind: api, framework: fastapi, evidence: 'server.py:509' }
+  - {
+      method: GET,
+      path: /api/scrape/status,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:519',
+    }
+  - { method: GET, path: /api/settings, kind: api, framework: fastapi, evidence: 'server.py:528' }
+  - { method: PUT, path: /api/settings, kind: api, framework: fastapi, evidence: 'server.py:537' }
+  - { method: GET, path: /api/github, kind: api, framework: fastapi, evidence: 'server.py:550' }
+  - {
+      method: POST,
+      path: /api/github/sync,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:555',
+    }
+  - {
+      method: POST,
+      path: '/api/github/:name',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:563',
+    }
+  - { method: GET, path: /api/push/key, kind: api, framework: fastapi, evidence: 'server.py:569' }
+  - {
+      method: POST,
+      path: /api/push/subscribe,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:574',
+    }
+  - {
+      method: POST,
+      path: /api/push/unsubscribe,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:581',
+    }
+  - { method: POST, path: /api/push/test, kind: api, framework: fastapi, evidence: 'server.py:587' }
+  - { method: GET, path: /api/admin, kind: api, framework: fastapi, evidence: 'server.py:598' }
+  - {
+      method: POST,
+      path: /api/admin/invite,
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:604',
+    }
+  - {
+      method: DELETE,
+      path: '/api/admin/invites/:code',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:609',
+    }
+  - {
+      method: POST,
+      path: '/api/admin/users/:target/reset',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:615',
+    }
+  - {
+      method: DELETE,
+      path: '/api/admin/users/:target',
+      kind: api,
+      framework: fastapi,
+      evidence: 'server.py:620',
+    }
+  - { method: GET, path: /sw.js, kind: api, framework: fastapi, evidence: 'server.py:630' }
+models: []
+services: []
+edges: []
+out_of_scope:
+  - app.mount('/', StaticFiles) at server.py:635 (static files, not a route)
+  - data stored in CSV/JSON files, no ORM
+  - cli.py / scraper scripts
+notes: |
+  FastAPI app at server.py:26; an @app.middleware('http') auth gate applies to every route.

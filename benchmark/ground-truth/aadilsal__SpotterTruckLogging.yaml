@@ -1,0 +1,261 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo: { owner: aadilsal, name: SpotterTruckLogging, sha: 3cded29a1e127af7b772160ca1de12cb31d700f0 }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-10',
+    minutes: 55,
+  }
+routes:
+  - {
+      method: ALL,
+      path: /healthz,
+      kind: api,
+      framework: django,
+      evidence: 'backend/core/urls.py:7',
+    }
+  - {
+      method: POST,
+      path: /api/auth/register,
+      kind: api,
+      framework: django,
+      evidence: 'backend/accounts/urls.py:14',
+    }
+  - {
+      method: GET,
+      path: /api/auth/me,
+      kind: api,
+      framework: django,
+      evidence: 'backend/accounts/urls.py:17',
+    }
+  - {
+      method: POST,
+      path: /api/auth/password-reset,
+      kind: api,
+      framework: django,
+      evidence: 'backend/accounts/urls.py:18',
+    }
+  - {
+      method: POST,
+      path: /api/auth/password-reset/confirm,
+      kind: api,
+      framework: django,
+      evidence: 'backend/accounts/urls.py:19',
+    }
+  - {
+      method: GET,
+      path: /api/profile,
+      kind: api,
+      framework: django,
+      evidence: 'backend/accounts/urls.py:24',
+    }
+  - {
+      method: PUT,
+      path: /api/profile,
+      kind: api,
+      framework: django,
+      evidence: 'backend/accounts/urls.py:24',
+    }
+  - {
+      method: PATCH,
+      path: /api/profile,
+      kind: api,
+      framework: django,
+      evidence: 'backend/accounts/urls.py:24',
+    }
+  - {
+      method: POST,
+      path: /api/trips/check,
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:12',
+    }
+  - {
+      method: GET,
+      path: '/api/trips/:trip_id/duty-events',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:13',
+    }
+  - {
+      method: POST,
+      path: '/api/trips/:trip_id/duty-events',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:13',
+    }
+  - {
+      method: GET,
+      path: '/api/trips/:trip_id/duty-events/:pk',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:18',
+    }
+  - {
+      method: PUT,
+      path: '/api/trips/:trip_id/duty-events/:pk',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:18',
+    }
+  - {
+      method: PATCH,
+      path: '/api/trips/:trip_id/duty-events/:pk',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:18',
+    }
+  - {
+      method: DELETE,
+      path: '/api/trips/:trip_id/duty-events/:pk',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:18',
+    }
+  - {
+      method: GET,
+      path: /api/trips,
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:7',
+    }
+  - {
+      method: POST,
+      path: /api/trips,
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:7',
+    }
+  - {
+      method: GET,
+      path: '/api/trips/:pk',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:7',
+    }
+  - {
+      method: PUT,
+      path: '/api/trips/:pk',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:7',
+    }
+  - {
+      method: PATCH,
+      path: '/api/trips/:pk',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:7',
+    }
+  - {
+      method: DELETE,
+      path: '/api/trips/:pk',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:7',
+    }
+  - {
+      method: GET,
+      path: '/api/trips/:pk/logs/pdf',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/views.py:94',
+    }
+  - {
+      method: GET,
+      path: '/api/trips/:pk/logs/:log_id/pdf',
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/views.py:105',
+    }
+  - {
+      method: POST,
+      path: /api/auth/login,
+      kind: api,
+      framework: django,
+      evidence: 'backend/accounts/urls.py:15',
+      optional: true,
+    }
+  - {
+      method: POST,
+      path: /api/auth/refresh,
+      kind: api,
+      framework: django,
+      evidence: 'backend/accounts/urls.py:16',
+      optional: true,
+    }
+  - {
+      method: GET,
+      path: /api,
+      kind: api,
+      framework: django,
+      evidence: 'backend/trips/urls.py:24',
+      optional: true,
+    }
+models:
+  - { name: DriverProfile, orm: django-orm, evidence: 'backend/accounts/models.py:5' }
+  - { name: DispatchCheck, orm: django-orm, evidence: 'backend/hos/models.py:5' }
+  - { name: DutyEvent, orm: django-orm, evidence: 'backend/logs/models.py:4' }
+  - { name: DailyLog, orm: django-orm, evidence: 'backend/logs/models.py:24' }
+  - { name: Trip, orm: django-orm, evidence: 'backend/trips/models.py:4' }
+  - { name: Stop, orm: django-orm, evidence: 'backend/trips/models.py:34' }
+services: []
+edges:
+  - {
+      route: POST /api/trips/check,
+      model: DispatchCheck,
+      op: write,
+      orm: django-orm,
+      evidence: 'backend/trips/urls.py:12',
+    }
+  - {
+      route: POST /api/trips/check,
+      model: DutyEvent,
+      op: write,
+      orm: django-orm,
+      evidence: 'backend/trips/urls.py:12',
+    }
+  - {
+      route: POST /api/trips/check,
+      model: Stop,
+      op: write,
+      orm: django-orm,
+      evidence: 'backend/trips/urls.py:12',
+    }
+  - {
+      route: POST /api/trips,
+      model: Trip,
+      op: write,
+      orm: django-orm,
+      evidence: 'backend/trips/urls.py:7',
+    }
+  - {
+      route: POST /api/trips,
+      model: DutyEvent,
+      op: write,
+      orm: django-orm,
+      evidence: 'backend/trips/urls.py:7',
+    }
+  - {
+      route: POST /api/trips,
+      model: Stop,
+      op: write,
+      orm: django-orm,
+      evidence: 'backend/trips/urls.py:7',
+    }
+  - {
+      route: POST /api/trips,
+      model: DailyLog,
+      op: write,
+      orm: django-orm,
+      evidence: 'backend/trips/urls.py:7',
+    }
+out_of_scope:
+  - admin.site.urls (Django admin, not first-party)
+  - frontend/ (React SPA, no server routes)
+  - User model (django.contrib.auth, not first-party)
+  - 'ORM calls in DRF hooks (get_queryset, get_object, perform_*): framework-invoked, not reachable from a first-party handler'
+notes: |
+  ROOT_URLCONF = core.urls (settings.py:136). DRF DEFAULT_PERMISSION_CLASSES is IsAuthenticated globally.
+  Generic views get their methods from the base (CreateAPIView=POST, RetrieveUpdateAPIView=GET/PUT/PATCH, ...).
+  TripCheckView persists nothing at runtime (persist=False), but the saves are statically reachable, so they count.

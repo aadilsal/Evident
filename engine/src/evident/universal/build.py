@@ -45,7 +45,18 @@ def _catalogue() -> JSON:
     return data
 
 
-def provider_for(package: str) -> str | None:
+def provider_for(package: str, *, python: bool = False) -> str | None:
+    if python:
+        mods: dict[str, str] = _catalogue()["python"]
+        parts = package.split(".")
+        return next(
+            (
+                mods[".".join(parts[:i])]
+                for i in range(len(parts), 0, -1)
+                if ".".join(parts[:i]) in mods
+            ),
+            None,
+        )
     pkgs: dict[str, str] = _catalogue()["packages"]
     if package in pkgs:
         return pkgs[package]
@@ -102,8 +113,11 @@ def call_target(project: Project, file: str, scope: str, c: list[str]) -> FnKey 
         return None
     if len(c) == 2:
         local = project.local_binding(file, scope, c[0])
-        if local is not None and local.get("new") and len(local["new"]) == 1:
-            return _method_of(project, project.resolve(file, local["new"][0]), c[1])
+        ctor = (local or {}).get("new") or (local or {}).get("callee")
+        if ctor and len(ctor) == 1:  # `new Svc()` in JS, `Svc()` in Python
+            hit = _method_of(project, project.resolve(file, ctor[0]), c[1])
+            if hit is not None:
+                return hit
         return project.member_scope(file, c[0], c[1])
     return None
 
@@ -138,7 +152,7 @@ def build(ctx: LinkContext) -> None:
             res = project.resolve_spec(file, imp["spec"])
             if res is None or res[0] != "pkg":
                 continue
-            provider = provider_for(res[1])
+            provider = provider_for(res[1], python=file.endswith(".py"))
             if provider is not None:
                 sid = _service_node(ctx, provider, res[1], [ctx.ev(file, imp["line"])])
                 ctx.edge("uses", f"module:{file}", sid, [ctx.ev(file, imp["line"])])
@@ -171,7 +185,10 @@ def build(ctx: LinkContext) -> None:
                 if name not in imported and name not in s["vars"]:
                     continue
                 for pkg in project.taint(file, name):
-                    provider = provider_for(package_name(pkg.package))
+                    is_py = file.endswith(".py")
+                    provider = provider_for(
+                        pkg.package if is_py else package_name(pkg.package), python=is_py
+                    )
                     sid = f"service:{provider}"
                     if provider is not None and sid in ctx.nodes:
                         facts.append(("uses", sid, ctx.ev(file, at), {}, "extracted", 1.0))
@@ -196,7 +213,7 @@ def build(ctx: LinkContext) -> None:
         (f, fn)
         for f, s in project.js.items()
         for var in s["vars"].values()
-        if AUTH_RE.search(".".join(var.get("callee", [])) or "")
+        if AUTH_RE.search(".".join(var.get("callee") or []))
         for fn in var.get("fns", [])
     }
     for key in sorted(keep):

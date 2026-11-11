@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 from evident.models import JSON, Edge, Node
 
-PARSED_SUFFIXES = (".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs", ".prisma")
+PARSED_SUFFIXES = (".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs", ".prisma", ".py")
 PARSED_NAMES = (
     "package.json",
     "tsconfig.json",
@@ -98,6 +98,13 @@ def extract_file(rel_path: str, text: str, sha: str) -> FileFacts:
             raw["otherFrameworks"] = manifests.other_frameworks(name, text)
         elif name in ("requirements.txt", "pyproject.toml"):
             raw["pyDeps"] = manifests.python_deps(name, text)
+        elif name.endswith(".py"):
+            from evident.universal.py import summarise as summarise_py
+
+            tree = parse(rel_path, text)
+            if tree is None:
+                return FileFacts()
+            raw["py"], _ = summarise_py(tree)
         else:
             tree = parse(rel_path, text)
             if tree is None:

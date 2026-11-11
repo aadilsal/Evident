@@ -12,7 +12,21 @@ from typing import Any
 
 import tree_sitter as ts
 
-from evident.adapters import drizzle, express, fastify, mongoose, nestjs, nextjs, prisma, typeorm
+from evident.adapters import (
+    django,
+    django_orm,
+    drizzle,
+    express,
+    fastapi,
+    fastify,
+    flask,
+    mongoose,
+    nestjs,
+    nextjs,
+    prisma,
+    sqlalchemy,
+    typeorm,
+)
 from evident.link import LinkContext, Project
 from evident.universal.js import FnKeys
 
@@ -35,10 +49,15 @@ ADAPTERS: tuple[Adapter, ...] = (
     Adapter("drizzle", "Drizzle", "orm", "js", drizzle.link, drizzle.extract),
     Adapter("typeorm", "TypeORM", "orm", "js", typeorm.link, typeorm.extract),
     Adapter("mongoose", "Mongoose", "orm", "js", mongoose.link, mongoose.extract),
+    Adapter("django-orm", "Django ORM", "orm", "python", django_orm.link),
+    Adapter("sqlalchemy", "SQLAlchemy", "orm", "python", sqlalchemy.link),
     Adapter("express", "Express", "framework", "js", express.link, express.extract),
     Adapter("fastify", "Fastify", "framework", "js", fastify.link),
     Adapter("nestjs", "NestJS", "framework", "js", nestjs.link, nestjs.extract),
     Adapter("nextjs", "Next.js", "framework", "js", nextjs.link),
+    Adapter("fastapi", "FastAPI", "framework", "python", fastapi.link),
+    Adapter("flask", "Flask", "framework", "python", flask.link),
+    Adapter("django", "Django", "framework", "python", django.link),
 )
 
 # Detected from manifests, mapped by a future adapter. Until then: universal map + a message.
@@ -49,11 +68,15 @@ NOT_YET: dict[str, str] = {
     "nuxt": "Nuxt",
     "@sveltejs/kit": "SvelteKit",
 }
-NOT_YET_PY: dict[str, str] = {
+NOT_YET_PY: dict[str, str] = {"tornado": "Tornado", "sanic": "Sanic", "pyramid": "Pyramid"}
+SUPPORTED_PY: dict[str, str] = {
     "django": "Django",
+    "djangorestframework": "Django",
     "fastapi": "FastAPI",
     "flask": "Flask",
     "sqlalchemy": "SQLAlchemy",
+    "sqlmodel": "SQLAlchemy",
+    "flask-sqlalchemy": "SQLAlchemy",
 }
 SUPPORTED_DEPS: dict[str, str] = {
     "next": "Next.js",
@@ -72,7 +95,10 @@ def detect_stack(project: Project, active: list[str]) -> JSON:
     """Frameworks named in manifests, which adapters ran, and the graceful-fallback message."""
     js_deps = {d for pkg in project.packages.values() for d in pkg.get("deps", [])}
     py_deps = {d for raw in project.raw.values() for d in raw.get("pyDeps", [])}
-    detected = sorted({v for k, v in SUPPORTED_DEPS.items() if k in js_deps})
+    detected = sorted(
+        {v for k, v in SUPPORTED_DEPS.items() if k in js_deps}
+        | {v for k, v in SUPPORTED_PY.items() if k in py_deps}
+    )
     other = {f for raw in project.raw.values() for f in raw.get("otherFrameworks", [])}
     unsupported = sorted(
         {v for k, v in NOT_YET.items() if k in js_deps}

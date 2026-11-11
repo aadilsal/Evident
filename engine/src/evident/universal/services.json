@@ -1,5 +1,5 @@
 {
-  "_comment": "Service catalogue: npm package (or prefix ending in /) -> provider. Slugs match docs/labelling-guide.md.",
+  "_comment": "Service catalogue: npm package (or prefix ending in /) -> provider. Slugs match docs/labelling-guide.md. `python` maps importable module names (dotted prefixes) to the same slugs.",
   "packages": {
     "stripe": "stripe",
     "@aws-sdk/client-s3": "aws-s3",
@@ -48,5 +48,21 @@
     "convex": "Convex",
     "safepay": "Safepay",
     "aws-ses": "AWS SES"
+  },
+  "python": {
+    "stripe": "stripe",
+    "openai": "openai",
+    "anthropic": "anthropic",
+    "redis": "redis",
+    "resend": "resend",
+    "twilio": "twilio",
+    "sentry_sdk": "sentry",
+    "groq": "groq",
+    "supabase": "supabase",
+    "boto3": "aws-s3",
+    "google.generativeai": "google-gemini",
+    "google.genai": "google-gemini",
+    "cloudinary": "cloudinary",
+    "sendgrid": "sendgrid"
   }
 }

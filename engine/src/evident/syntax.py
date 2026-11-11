@@ -6,6 +6,7 @@ from functools import cache
 
 import tree_sitter as ts
 import tree_sitter_javascript as tsj
+import tree_sitter_python as tsp
 import tree_sitter_typescript as tst
 
 JS_SUFFIXES = (".js", ".jsx", ".mjs", ".cjs")
@@ -19,6 +20,8 @@ def language(kind: str) -> ts.Language:
         return ts.Language(tst.language_typescript())
     if kind == "tsx":
         return ts.Language(tst.language_tsx())
+    if kind == "python":
+        return ts.Language(tsp.language())
     return ts.Language(tsj.language())
 
 
@@ -31,11 +34,13 @@ def grammar_for(rel_path: str) -> str | None:
         return "typescript"
     if rel_path.endswith(JS_SUFFIXES):
         return "javascript"
+    if rel_path.endswith(".py"):
+        return "python"
     return None
 
 
 def is_js(rel_path: str) -> bool:
-    return grammar_for(rel_path) is not None
+    return grammar_for(rel_path) not in (None, "python")
 
 
 def parse(rel_path: str, text: str) -> ts.Tree | None:

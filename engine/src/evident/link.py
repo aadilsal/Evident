@@ -21,8 +21,8 @@ MAX_EVIDENCE = 10
 MAX_DEPTH = 16
 # Names that signal an authentication or authorisation step (middleware, wrappers, calls).
 AUTH_RE = re.compile(
-    r"(?i)(auth|session|jwt|token|protect|guard|login|logged|permission|currentuser|"
-    r"requireuser|clerk|passport|acl|rbac|role)"
+    r"(?i)(auth|session|jwt|token|protect|guard|login|logged|permission|current_?user|"
+    r"require_?user|clerk|passport|acl|rbac|role|isadmin|is_?staff)"
 )
 
 
@@ -71,7 +71,18 @@ def _norm(path: str) -> str | None:
 class Project:
     def __init__(self, raw: dict[str, JSON]) -> None:
         self.raw = raw
-        self.js: dict[str, JSON] = {p: r["js"] for p, r in raw.items() if "js" in r}
+        # Every code module (JS/TS and Python) in one table; the summaries share a shape.
+        self.js: dict[str, JSON] = {
+            p: r["js"] if "js" in r else r["py"] for p, r in raw.items() if "js" in r or "py" in r
+        }
+        self._py_index: dict[str, list[str]] = {}
+        for path in self.js:
+            if path.endswith(".py"):
+                parts = path[:-3].split("/")
+                if parts[-1] == "__init__":
+                    parts = parts[:-1]
+                for i in range(len(parts)):
+                    self._py_index.setdefault(".".join(parts[i:]), []).append(path)
         self.packages: dict[str, JSON] = {
             posixpath.dirname(p): r["package"] for p, r in raw.items() if "package" in r
         }
@@ -155,7 +166,34 @@ class Project:
             self._spec_cache[key] = self._resolve_spec(from_file, spec)
         return self._spec_cache[key]
 
+    def _py_module(self, from_file: str, spec: str) -> str | None:
+        """Dotted (or relative) Python module -> file, preferring the one nearest the importer."""
+        if spec.startswith("."):
+            dots = len(spec) - len(spec.lstrip("."))
+            base = posixpath.dirname(from_file)
+            for _ in range(dots - 1):
+                base = posixpath.dirname(base)
+            rest = spec[dots:].replace(".", "/")
+            target = posixpath.join(base, rest) if rest else base
+            for cand in (f"{target}.py", f"{target}/__init__.py"):
+                if cand in self.js:
+                    return cand
+            return None
+        hits = self._py_index.get(spec)
+        if not hits:
+            return None
+        here = from_file.split("/")
+        return max(
+            hits,
+            key=lambda h: (len(posixpath.commonprefix([here, h.split("/")])), -len(h)),
+        )
+
     def _resolve_spec(self, from_file: str, spec: str) -> tuple[str, str] | None:
+        if from_file.endswith(".py"):
+            hit = self._py_module(from_file, spec)
+            if hit is not None:
+                return ("file", hit)
+            return None if spec.startswith(".") else ("pkg", spec)
         directory = posixpath.dirname(from_file)
         if spec.startswith((".", "/")):
             if spec.startswith("/"):
@@ -251,6 +289,16 @@ class Project:
             target = res[1]
             if imported == "*":
                 return Ns(target)
+            if file.endswith(".py"):
+                # `from pkg import mod` may name a submodule rather than an attribute.
+                spec = imp["spec"]
+                sub = self._py_module(file, f"{spec}{'' if spec.endswith('.') else '.'}{imported}")
+                t = self.js[target]
+                defined = (
+                    imported in t["scopes"] or imported in t["vars"] or imported in t["classes"]
+                )
+                if sub is not None and not defined:
+                    return Ns(sub)
             if imp.get("cjs"):
                 return self.resolve_export(target, "default", depth + 1) or Ns(target)
             return self.resolve_export(target, imported, depth + 1)
@@ -271,6 +319,11 @@ class Project:
         s = self.js.get(file)
         if s is None or depth > MAX_DEPTH:
             return None
+        if file.endswith(".py"):
+            # Python exports every module-level name, including imported ones.
+            if exported in s["scopes"] or exported in s["vars"] or exported in s["classes"]:
+                return Sym(file, exported)
+            return self.resolve(file, exported, depth + 1)
         local = s["exports"].get(exported)
         if local is not None:
             return self.resolve(file, local, depth + 1) or Sym(file, local)

@@ -108,7 +108,11 @@ def remote_head(repo: GitHubRepo) -> str:
 def check_size(repo: GitHubRepo) -> None:
     """Reject oversized or missing repos before cloning. Network errors are not fatal."""
     url = f"https://api.github.com/repos/{repo.owner}/{repo.name}"
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json"})
+    headers = {"Accept": "application/vnd.github+json"}
+    token = os.environ.get("GITHUB_TOKEN", "").strip()
+    if token:  # metadata only (60 -> 5000 req/h); clones stay plain, tokenless https
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:  # noqa: S310
             size_kb = int(json.load(resp).get("size", 0))

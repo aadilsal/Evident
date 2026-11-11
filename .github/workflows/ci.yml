@@ -37,9 +37,51 @@ jobs:
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           python-version: '3.12'
-      - run: uv sync --locked
+      - run: uv sync --locked --all-extras
       - run: uv run python -m mypy
       - run: uv run python -m pytest
+
+  service:
+    name: service (Postgres + Redis)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: evident
+          POSTGRES_PASSWORD: evident
+          POSTGRES_DB: evident
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U evident" --health-interval 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: engine
+    env:
+      EVIDENT_TEST_DATABASE_URL: postgresql://evident:evident@localhost:5432/evident
+      EVIDENT_TEST_REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          python-version: '3.12'
+      - run: uv sync --locked --all-extras
+      - run: uv run python -m pytest tests/test_service.py tests/test_service_integration.py -v
+      - name: End-to-end smoke (real API + arq worker)
+        env:
+          DATABASE_URL: postgresql://evident:evident@localhost:5432/evident
+          REDIS_URL: redis://localhost:6379/0
+          EVIDENT_LLM: 'off'
+        run: |
+          uv run uvicorn evident.service.api:app --port 8000 &
+          uv run arq evident.service.worker.WorkerSettings &
+          for i in $(seq 1 30); do curl -fs localhost:8000/api/health && break; sleep 1; done
+          uv run python scripts/smoke_service.py http://localhost:8000
 
   benchmark:
     name: benchmark gate

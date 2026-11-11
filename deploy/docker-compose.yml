@@ -1,0 +1,72 @@
+# Evident service stack (ADR-0004). `docker compose -f deploy/docker-compose.yml up --build`
+# Caddy and the web app join this file in Phases 4-5. Secrets come from ../.env (gitignored).
+name: evident
+
+x-hardening: &hardening
+  read_only: true
+  security_opt: ['no-new-privileges:true']
+  cap_drop: [ALL]
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: evident
+      POSTGRES_USER: evident
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-evident-dev-only}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U evident']
+      interval: 5s
+      retries: 10
+    networks: [internal]
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--save', '', '--appendonly', 'no']
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      retries: 10
+    networks: [internal]
+
+  api:
+    <<: *hardening
+    build: ../engine
+    env_file: [../.env]
+    environment: &app-env
+      DATABASE_URL: postgresql://evident:${POSTGRES_PASSWORD:-evident-dev-only}@postgres:5432/evident
+      REDIS_URL: redis://redis:6379/0
+      EVIDENT_TRUST_PROXY: '1'
+      EVIDENT_BENCHMARK_PATH: /data/benchmark.json
+    volumes: ['../benchmark/results/baseline.json:/data/benchmark.json:ro']
+    tmpfs: [/tmp]
+    ports: ['127.0.0.1:8000:8000']
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    networks: [internal, egress]
+
+  worker:
+    <<: *hardening
+    build: ../engine
+    command: ['arq', 'evident.service.worker.WorkerSettings']
+    env_file: [../.env]
+    environment: *app-env
+    # Clones and parsing happen in RAM-backed /tmp, wiped with the container (security.md T5).
+    tmpfs: ['/tmp:size=1g']
+    deploy:
+      resources:
+        limits: { cpus: '1.0', memory: 1g, pids: 256 }
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    networks: [internal, egress]
+
+networks:
+  internal:
+    internal: true # postgres and redis are unreachable from outside
+  egress: {}
+
+volumes:
+  pgdata:

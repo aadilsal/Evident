@@ -15,6 +15,8 @@ Both schemas carry a semver `schemaVersion`.
 - **Minor** (`1.0 → 1.1`): additive only (new optional fields, new enum values the reader can ignore). Old readers keep working.
 - **Major** (`1.x → 2.0`): breaking. Engine, web and skill must update in the same PR.
 
+**CLI 1.2.0** (additive): the `export` command.
+
 **1.1.0** (additive): `container` nodes (`containerAttrs`), a top-level `stack` object, `action:<file>#<export>` paths for server actions, `nestjs`/`fastify` frameworks, model `orm`, function `checksAuth`/`bodyLine`/`validatesBody`, middleware `checksAuth`; CLI `stats.stack`.
 
 The engine's `ENGINE_VERSION` is separate. It bumps whenever extraction output can change, and it's part of the cache key.

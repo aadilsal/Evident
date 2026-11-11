@@ -6,6 +6,7 @@ import argparse
 import json
 import sys
 from collections.abc import Callable, Sequence
+from pathlib import Path
 
 from evident import __version__
 from evident.analyze import analyze
@@ -22,6 +23,7 @@ from evident.query import (
     resolve_targets,
     walk,
 )
+from evident.report import render_markdown
 
 EXIT_OK, EXIT_MATCH, EXIT_USAGE, EXIT_ERROR = 0, 1, 2, 3
 DEFAULT_LIMIT = 20
@@ -82,6 +84,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     s = sub.add_parser("show", parents=[common], help="one node with its evidence and edges")
     s.add_argument("node_id", metavar="NODE")
+
+    e = sub.add_parser("export", parents=[common], help="architecture report (md) or graph (json)")
+    e.add_argument("--format", choices=["md", "json"], default="md", dest="fmt")
+    e.add_argument(
+        "--out",
+        metavar="FILE",
+        help="write here (the only write outside .evident/, and only when asked); default stdout",
+    )
     return p
 
 
@@ -89,7 +99,12 @@ def _cap(items: list[ResultItem], limit: int) -> tuple[list[ResultItem], int, bo
     return items[:limit], len(items), len(items) > limit
 
 
+SUMMARY_TYPES = ("route", "model", "service")
+SUMMARY_FINDINGS = 5
+
+
 def _analyze_cmd(args: argparse.Namespace, graph: Graph | None) -> CommandResult:
+    """Summary-first: counts, then the top routes, models, services and findings with file:line."""
     res = analyze(args.target or args.repo, use_llm=not args.no_llm)
     g, st = res.graph, res.stats()
     counts = ", ".join(f"{v} {k}s" for k, v in sorted(st["byType"].items())) or "no nodes yet"
@@ -97,9 +112,43 @@ def _analyze_cmd(args: argparse.Namespace, graph: Graph | None) -> CommandResult
         f"Analysed {st['files']} files ({st['parsed']} parsed, {st['reused']} cached): "
         f"{counts}, {st['findings']} findings in {st['durationMs']} ms."
     )
+    if g.stack and g.stack.get("adapters"):
+        summary += "\n  stack: " + ", ".join(g.stack["adapters"])
     if g.stack and g.stack.get("message"):
         summary += "\n  note: " + str(g.stack["message"])
-    return CommandResult("analyze", EXIT_OK, summary, repo=g.repo, stats=st)
+    items: list[ResultItem] = []
+    per_type = max(1, min(args.limit, 10))
+    for node_type in SUMMARY_TYPES:
+        nodes = sorted((n for n in g.nodes if n.type == node_type), key=lambda n: n.label)
+        items += [ResultItem.from_node(n) for n in nodes[:per_type]]
+    findings = filter_findings(g, rules=None, files=None, min_severity="info")
+    items += [finding_item(f) for f in findings[:SUMMARY_FINDINGS]]
+    total = sum(st["byType"].get(t, 0) for t in SUMMARY_TYPES) + len(findings)
+    return CommandResult(
+        "analyze", EXIT_OK, summary, items, total, len(items) < total, repo=g.repo, stats=st
+    )
+
+
+def _export_cmd(args: argparse.Namespace, graph: Graph | None) -> CommandResult:
+    graph = _require(graph)
+    if args.fmt == "md":
+        content = render_markdown(graph)
+    else:
+        content = json.dumps(graph.to_dict(), indent=1) + "\n"
+    query: dict[str, object] = {"format": args.fmt, "out": args.out}
+    if args.out:
+        out = Path(args.out)
+        if out.suffix == "" or out.is_dir():
+            raise UsageError(f"--out must be a file path, got {args.out!r}")
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(content, encoding="utf-8")
+        size = len(content.encode("utf-8"))
+        return CommandResult(
+            "export", EXIT_OK, f"Wrote {args.fmt} export to {args.out} ({size} bytes).", query=query
+        )
+    if not args.json:
+        print(content, end="")
+    return CommandResult("export", EXIT_OK, f"{args.fmt} export printed.", query=query)
 
 
 def _require(graph: Graph | None) -> Graph:
@@ -208,6 +257,7 @@ COMMANDS: dict[str, Callable[[argparse.Namespace, Graph | None], CommandResult]]
     "find": _find_cmd,
     "health": _health_cmd,
     "show": _show_cmd,
+    "export": _export_cmd,
 }
 
 
@@ -238,6 +288,11 @@ def render(result: CommandResult) -> str:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(
+                encoding="utf-8", errors="replace"
+            )  # Windows consoles default to cp1252
     args = build_parser().parse_args(argv)
     try:
         graph = None
@@ -253,6 +308,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         result = CommandResult(args.command, EXIT_ERROR, f"Analysis failed: {exc}", error=str(exc))
     if args.json:
         print(json.dumps(result.to_dict(), separators=(",", ":")))
+    elif args.command == "export" and not result.error and not args.out:
+        pass  # the export itself went to stdout; keep it clean for piping
     else:
         print(render(result), file=sys.stderr if result.error else sys.stdout)
     return result.exit_code

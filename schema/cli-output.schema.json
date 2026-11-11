@@ -29,7 +29,7 @@
       "required": ["name", "version"],
       "properties": { "name": { "const": "evident" }, "version": { "type": "string" } }
     },
-    "command": { "enum": ["analyze", "trace", "impact", "find", "health", "show"] },
+    "command": { "enum": ["analyze", "trace", "impact", "find", "health", "show", "export"] },
     "exitCode": {
       "description": "0 ok, 1 findings or no match, 2 usage error, 3 analysis error.",
       "enum": [0, 1, 2, 3]

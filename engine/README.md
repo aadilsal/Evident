@@ -12,13 +12,14 @@ evident impact User.email
 evident find --writes Invoice
 evident health --severity warning
 evident show model:User
+evident export --format md --out docs/architecture.md   # report; --format json = the graph
 ```
 
 Every command takes `--json` (the [CLI output schema](../schema/cli-output.schema.json)), `--limit`, `--depth`, `--no-llm` and `--repo PATH|URL`.
 
 **Exit codes:** `0` ok · `1` findings or no match · `2` usage error · `3` analysis error.
 
-**Safety:** never executes repo code, never follows symlinks, and writes only inside `.evident/`. See [docs/security.md](../docs/security.md).
+**Safety:** never executes repo code, never follows symlinks, and writes only inside `.evident/` (plus an explicit `export --out` file). See [docs/security.md](../docs/security.md).
 
 ## Development
 

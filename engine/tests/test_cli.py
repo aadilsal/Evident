@@ -9,13 +9,14 @@ from jsonschema import Draft202012Validator
 
 from evident.cli import build_parser, main
 
-COMMANDS = ["analyze", "trace", "impact", "find", "health", "show"]
+COMMANDS = ["analyze", "trace", "impact", "find", "health", "show", "export"]
 QUERIES = [
     ["trace", "POST /api/users"],
     ["impact", "User.email"],
     ["find", "--writes", "Invoice"],
     ["health"],
     ["show", "model:User"],
+    ["export", "--format", "md"],
 ]
 
 
@@ -33,7 +34,7 @@ def snapshot(root: Path) -> dict[str, bytes]:
     }
 
 
-def test_help_lists_all_six_commands(capsys: pytest.CaptureFixture[str]) -> None:
+def test_help_lists_every_command(capsys: pytest.CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as exc:
         build_parser().parse_args(["--help"])
     assert exc.value.code == 0
@@ -121,3 +122,36 @@ def test_human_output_is_summary_first(
     assert main(["analyze", str(fixture_repo), "--no-llm"]) == 0
     first_line = capsys.readouterr().out.splitlines()[0]
     assert first_line.startswith("Analysed 9 files")
+
+
+def test_analyze_is_summary_first(fixture_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    _, out = run_json(capsys, "analyze", str(fixture_repo), "--limit", "3")
+    types = [r.get("type") or r.get("rule") for r in out["results"]]
+    assert types[:3] == ["route", "route", "route"]
+    assert "unguarded-write" in types and "model" in types and "service" in types
+    assert out["truncated"] is True
+    assert all(r["evidence"] for r in out["results"])
+
+
+def test_export_markdown_cites_code_and_writes_only_where_asked(
+    fixture_repo: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    target = tmp_path / "out" / "architecture.md"
+    before = snapshot(fixture_repo)
+    code = main(["export", "--repo", str(fixture_repo), "--format", "md", "--out", str(target)])
+    assert code == 0
+    assert snapshot(fixture_repo) == before
+    md = target.read_text(encoding="utf-8")
+    for section in ("# Architecture:", "## Routes", "## Data model", "## Health findings"):
+        assert section in md
+    assert "| `POST /api/users` | api | users.ts:17 handler | - | User (write) |" in md
+    assert "`src/routes/users.ts:17-20`" in md
+    assert "Wrote md export" in capsys.readouterr().out
+
+
+def test_export_json_is_the_graph(
+    fixture_repo: Path, capsys: pytest.CaptureFixture[str], graph_validator: Draft202012Validator
+) -> None:
+    assert main(["export", "--repo", str(fixture_repo), "--format", "json"]) == 0
+    graph = json.loads(capsys.readouterr().out)
+    assert not [e.message for e in graph_validator.iter_errors(graph)]

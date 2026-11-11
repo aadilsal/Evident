@@ -1,0 +1,71 @@
+# Agent tasks run with vs without the Evident skill (tracker §9). Graded deterministically:
+# every `expect` must appear in the final answer (case-insensitive; `re:` = regex) and no `forbid`.
+# Fixtures live in engine/tests/fixtures/ and are copied to a temp dir per run.
+suffix: >-
+  Answer concisely. Cite file:line for every route, model, call or dependency you mention.
+
+tasks:
+  - id: who-writes-user
+    fixture: express-prisma
+    prompt: Which API routes write to the User table?
+    expect: ['POST /api/users', 'users.ts:18']
+    forbid: ['POST /api/invoices writes']
+
+  - id: invoices-auth
+    fixture: express-prisma
+    prompt: Is POST /api/invoices behind authentication? Which middleware, and where is it applied?
+    expect: ['requireAuth', 'app.ts:11']
+
+  - id: rename-user-email
+    fixture: express-prisma
+    prompt: I'm about to rename the email field on the User model. Which API routes could break?
+    expect: ['POST /api/users', 'GET /api/users', "re:GET /api/users/(:id|\\{id\\})"]
+
+  - id: undocumented-env
+    fixture: express-prisma
+    prompt: Which environment variables does the code read that are not documented in .env.example?
+    expect: ['STRIPE_SECRET_KEY', 'billing.ts:3']
+
+  - id: trace-create-invoice
+    fixture: express-prisma
+    prompt: Trace what happens when a client calls POST /api/invoices, down to the database and any external service.
+    expect: ['requireAuth', 'chargeCustomer', 're:stripe', 're:invoice', 'invoices.ts:16']
+
+  - id: cjs-delete-path
+    fixture: express-cjs
+    prompt: What is the full URL path of the endpoint that deletes items, and which middleware protects it?
+    expect: ['DELETE /admin/items/:id', 'requireUser']
+
+  - id: cjs-create-unguarded
+    fixture: express-cjs
+    prompt: Which endpoint creates items, which function handles it, and does it require authentication?
+    expect: ['POST /v1/items', 'createItem', 're:(not|no|without|unauthenticated|unguarded|public)']
+
+  - id: next-actions-write
+    fixture: next-prisma
+    prompt: Which server actions write to the database, and with which Prisma operation?
+    expect: ['deleteInvoice', 're:delete', 'actions.ts:6']
+
+  - id: next-middleware-scope
+    fixture: next-prisma
+    prompt: Which pages and routes does middleware.ts run on? Is the invoices API covered?
+    expect:
+      [
+        '/dashboard/:path*',
+        "re:(not covered|isn't covered|is not covered|never runs|does not run|doesn't run)",
+      ]
+
+  - id: nest-users-write
+    fixture: nest-typeorm
+    prompt: Which HTTP endpoint ends up writing to the users table, through which service method, and is it guarded?
+    expect: ['POST /api/users', "re:UsersService\\.create|usersService\\.create", 'JwtAuthGuard']
+
+  - id: fastify-unauthed-writes
+    fixture: fastify-drizzle
+    prompt: Which routes modify the users table, and which of those have no authentication?
+    expect: ['POST /users', 'PUT /users/:id', 'updateUser']
+
+  - id: mongoose-writers
+    fixture: express-mongoose
+    prompt: Which routes create, update or delete MongoDB documents, and on which models?
+    expect: ['POST /users', 'DELETE /posts/:id', 're:Post', 're:User']

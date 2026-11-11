@@ -54,3 +54,9 @@ def copy_fixture(tmp_path: Path) -> Callable[[str], Path]:
         return dest
 
     return copy
+
+
+@pytest.fixture(autouse=True)
+def _no_real_llm(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Tests never call a real LLM, even if the developer has GROQ_API_KEY exported."""
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)

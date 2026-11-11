@@ -7,6 +7,7 @@ import os
 import shutil
 import tempfile
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -14,6 +15,7 @@ from typing import Any, Literal
 
 from evident import cache
 from evident.extract import FileFacts, extract_file, is_parsed
+from evident.group import LLMClient, assign_groups, client_from_env
 from evident.health import run_health
 from evident.models import AnalysisError, Graph, RepoInfo
 from evident.pipeline import link
@@ -35,6 +37,12 @@ SKIP_DIRS = frozenset(
     {"node_modules", "dist", "build", "out", "coverage", "vendor", "__pycache__", "generated"}
 )
 CacheState = Literal["hit", "partial", "miss"]
+# Progress hook: (stage, counts). Stages: fetch, parse, extract, link, analyse, group, done.
+Progress = Callable[[str, dict[str, int]], None]
+
+
+def _quiet(stage: str, counts: dict[str, int]) -> None:
+    del stage, counts
 
 
 @dataclass
@@ -97,13 +105,25 @@ def discover(root: Path) -> list[tuple[str, Path, os.stat_result]]:
 
 
 def analyze(
-    target: str = ".", *, use_llm: bool = True, cache_root: Path | None = None
+    target: str = ".",
+    *,
+    use_llm: bool = True,
+    cache_root: Path | None = None,
+    llm: LLMClient | None = None,
+    progress: Progress | None = None,
 ) -> AnalyzeResult:
-    """Analyse a local folder (cache in <folder>/.evident) or a GitHub URL (cache in ./.evident)."""
+    """Analyse a local folder (cache in <folder>/.evident) or a GitHub URL (cache in ./.evident).
+
+    With use_llm, the client defaults to Groq when GROQ_API_KEY is set in the environment.
+    """
     started = time.perf_counter()
+    report = progress or _quiet
+    client = (llm or client_from_env()) if use_llm else None
     gh = parse_github(target)
     if gh is not None:
-        result = _analyze_github(gh, use_llm=use_llm, cache_root=cache_root or Path.cwd())
+        result = _analyze_github(
+            gh, use_llm=use_llm, cache_root=cache_root or Path.cwd(), llm=client, report=report
+        )
     elif looks_like_url(target):
         raise AnalysisError(f"only https://github.com/<owner>/<repo> URLs are supported: {target}")
     else:
@@ -118,13 +138,19 @@ def analyze(
             host="local",
             dirty=local_dirty(root),
             use_llm=use_llm,
+            llm=client,
+            report=report,
         )
     result.duration_ms = int((time.perf_counter() - started) * 1000)
+    report("done", {"nodes": len(result.graph.nodes), "edges": len(result.graph.edges)})
     return result
 
 
-def _analyze_github(gh: GitHubRepo, *, use_llm: bool, cache_root: Path) -> AnalyzeResult:
+def _analyze_github(
+    gh: GitHubRepo, *, use_llm: bool, cache_root: Path, llm: LLMClient | None, report: Progress
+) -> AnalyzeResult:
     cache_dir = cache_root / cache.CACHE_DIR / "github" / gh.owner / gh.name
+    report("fetch", {})
     sha = remote_head(gh)
     cached = cache.load_graph(cache_dir)
     if cached is not None and cached.repo.sha == sha:
@@ -144,6 +170,8 @@ def _analyze_github(gh: GitHubRepo, *, use_llm: bool, cache_root: Path) -> Analy
             owner=gh.owner,
             ref=gh.ref,
             use_llm=use_llm,
+            llm=llm,
+            report=report,
         )
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -160,8 +188,11 @@ def _analyze_dir(
     ref: str | None = None,
     dirty: bool | None = None,
     use_llm: bool,
+    llm: LLMClient | None = None,
+    report: Progress = _quiet,
 ) -> AnalyzeResult:
     files = discover(root)
+    report("parse", {"files": len(files)})
     if sum(st.st_size for _, _, st in files) > MAX_REPO_BYTES:
         raise AnalysisError(f"analysable files exceed {MAX_REPO_BYTES >> 20} MB")
     previous = cache.load_manifest(cache_dir)
@@ -197,19 +228,23 @@ def _analyze_dir(
             cached_graph, cache_dir, len(entries), 0, len(entries), "hit", "skipped", 0
         )
 
+    report("extract", {"files": len(entries), "parsed": len(fresh)})
     for rel in fresh:
         text = (root / rel).read_bytes().decode("utf-8", errors="replace")
         entries[rel].facts = extract_file(rel, text, sha)
 
     repo = RepoInfo(host, repo_name, sha, _now(), owner, ref, dirty, worktree_hash)
     graph = link({rel: e.facts for rel, e in entries.items()}, repo)
+    routes = sum(1 for n in graph.nodes if n.type == "route")
+    report("link", {"nodes": len(graph.nodes), "edges": len(graph.edges), "routes": routes})
     graph.findings = run_health(graph)
-    # shortcut: LLM grouping isn't built yet; with an LLM requested we report it as unavailable.
-    llm: Literal["used", "skipped", "unavailable"] = "unavailable" if use_llm else "skipped"
+    report("analyse", {"findings": len(graph.findings)})
+    llm_state = assign_groups(graph, llm, use_llm=use_llm)
+    report("group", {"groups": len(graph.groups)})
     problems = graph.check_integrity()
     if problems:
         raise AnalysisError("engine produced an invalid graph: " + "; ".join(problems[:5]))
     cache.save(cache_dir, entries, graph)
     return AnalyzeResult(
-        graph, cache_dir, len(entries), len(fresh), len(entries) - len(fresh), state, llm, 0
+        graph, cache_dir, len(entries), len(fresh), len(entries) - len(fresh), state, llm_state, 0
     )

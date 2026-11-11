@@ -39,7 +39,16 @@ jobs:
           python-version: '3.12'
       - run: uv sync --locked --all-extras
       - run: uv run python -m mypy
-      - run: uv run python -m pytest
+      - name: pytest
+        shell: bash
+        # Failing test ids become annotations, readable without log access.
+        run: |
+          set -o pipefail
+          uv run python -m pytest -rfE --tb=short 2>&1 | tee pytest.log || {
+            grep -E "^(FAILED|ERROR) " pytest.log | sed 's/^/::error title=pytest::/'
+            grep -E "^E  " pytest.log | head -20 | sed 's/^/::error title=detail::/'
+            exit 1
+          }
 
   service:
     name: service (Postgres + Redis)

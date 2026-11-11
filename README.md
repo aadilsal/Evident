@@ -83,21 +83,23 @@ Not a static Mermaid image. A zoomable map built with React Flow and ELK auto-la
 
 ## Status
 
-Pre-alpha. **Phases 1 (Engine) and 2 (Claude skill) are complete.** Next up: Phase 3, the service (API, worker, Groq grouping, Python adapters). This table is updated at the end of every phase.
+Pre-alpha. **Phases 1 (Engine), 2 (Claude skill) and 3 (Service) are complete.** Next up: Phase 4, the map UI. This table is updated at the end of every phase.
 
 | Piece | State |
 | --- | --- |
-| Graph schema `1.1.0` + CLI output schema `1.1.0` | ✅ Done |
+| Graph schema `1.2.0` + CLI output schema `1.2.0` | ✅ Done |
 | JS/TS adapters: Next.js, Express, NestJS, Fastify, Prisma, Drizzle, TypeORM, Mongoose | ✅ Done, with fixture tests |
-| Universal layer: module graph, SDK services, env vars, `docker-compose` containers, `tsconfig` aliases, workspaces | ✅ Done (JS/TS) |
+| Python adapters: FastAPI, Flask, Django (+ DRF), Django ORM, SQLAlchemy | ✅ Done, with fixture tests |
+| Universal layer: module graph, SDK services, env vars, `docker-compose` containers, `tsconfig` aliases, workspaces | ✅ Done (JS/TS and Python) |
 | Stack detection + fallback map for unsupported stacks | ✅ Done |
 | CLI: `analyze` (summary-first), `trace`, `impact`, `find`, `health`, `show`, `export` (Markdown report, graph JSON) with `--json` | ✅ Done |
 | Health rules: unguarded write, unvalidated body, import cycle, unused model, undocumented env | ✅ Done |
-| Benchmark: 5 repos labelled, `evident-bench`, CI gate (>2 pt drop fails) | ✅ Done |
+| Benchmark: 8 repos labelled (5 JS/TS, 3 Python), `evident-bench`, CI gate (>2 pt drop fails) | ✅ Done |
+| LLM grouping: Groq, validated against node IDs, directory fallback | ✅ Done |
+| Service: FastAPI API, arq worker, Postgres cache, SSE progress, rate limits, job timeouts, Docker Compose | ✅ Done (CI runs it end to end) |
 | CI: pre-commit, mypy + pytest on Linux and Windows, benchmark gate | ✅ Done |
 | Claude skill (`skills/evident/`) + skill-task evals | ✅ Done: 24/24 tasks with the skill vs 21/24 without |
 | `open`, `share`, PNG/SVG/PDF exports | ⏳ Phase 4 (with the map UI) |
-| API, worker, Groq grouping, Python adapters | ⏳ Phase 3 |
 | Web map UI, `/benchmarks` page, gallery | ⏳ Phase 4 |
 
 ## Accuracy, measured not promised
@@ -108,12 +110,12 @@ A hand-labelled benchmark of **15–20 repos**, each pinned to a commit and cove
 
 | Category | Target precision | Target recall | Current |
 | --- | :-: | :-: | :-: |
-| Routes | ≥ 90% | ≥ 85% | **100% / 100%** (366 routes) |
-| Models | ≥ 90% | ≥ 85% | **100% / 100%** (20 models) |
-| Route → model read/write edges | ≥ 90% | ≥ 85% | **100% / 100%** (161 edges) |
-| External services | tracked | tracked | **100% / 100%** (15 services) |
+| Routes | ≥ 90% | ≥ 85% | **100% / 100%** (460 routes) |
+| Models | ≥ 90% | ≥ 85% | **100% / 100%** (26 models) |
+| Route → model read/write edges | ≥ 90% | ≥ 85% | **100% / 100%** (168 edges) |
+| External services | tracked | tracked | **100% / 100%** (16 services) |
 
-*Current* = precision / recall at Gate A (2026-11-10) on the first 5 repos (Next.js, Express, NestJS and Prisma), hallucination rate 0.3%. The labels were written from source by an AI assistant and are awaiting the owner's review, and these repos are fairly conventional. Expect the numbers to drop as the set grows to 15–20 repos with public open-source apps. Fastify, Drizzle, TypeORM and Mongoose have fixture tests but no labelled repos yet. Run it yourself: `cd engine && uv run evident-bench --verbose`.
+*Current* = precision / recall on 8 labelled repos (Next.js, Express, NestJS, FastAPI, Django with Prisma and Django ORM), hallucination rate 0.4% (2026-11-11). The labels were written from source by an AI assistant and are awaiting the owner's review, and these repos are fairly conventional. Expect the numbers to drop as the set grows to 15–20 repos with public open-source apps. Fastify, Flask, Drizzle, TypeORM, Mongoose and SQLAlchemy have fixture tests but no labelled repos yet. Run it yourself: `cd engine && uv run evident-bench --verbose`.
 
 The same repos are run through GitDiagram as a baseline, so the comparison is honest and reproducible. Method: [benchmark labelling guide](docs/labelling-guide.md). Results: the public `/benchmarks` page *(at launch)*.
 
@@ -139,8 +141,8 @@ Adapters are tree-sitter queries plus a small mapper ([ADR-0006](docs/adr/0006-a
 | Ecosystem | Frameworks | ORMs | State |
 | --- | --- | --- | --- |
 | JS / TS | Next.js (App Router, server actions, middleware), Express, NestJS, Fastify | Prisma, Drizzle, TypeORM, Mongoose | ✅ v1 |
-| Python | Django, FastAPI, Flask | Django ORM, SQLAlchemy | ⏳ v1 (Phase 3) |
-| Any language | Universal layer: imports, SDK services, env vars, `docker-compose` containers | | ✅ JS/TS · ⏳ Python |
+| Python | Django (+ Django REST Framework), FastAPI, Flask | Django ORM, SQLAlchemy (incl. SQLModel, Flask-SQLAlchemy) | ✅ v1 |
+| Any language | Universal layer: imports, SDK services, env vars, `docker-compose` containers | | ✅ JS/TS and Python |
 | Java/Kotlin · PHP · Ruby · C# · Go | Spring Boot, Laravel, Rails, ASP.NET Core, Gin/Echo/Chi | JPA, Eloquent, ActiveRecord, EF Core, GORM | After launch |
 
 Plus `tsconfig` path aliases and npm/pnpm/yarn workspaces.
@@ -208,14 +210,24 @@ Five of the six stages are deterministic. The LLM stage can only label node IDs 
 
 ## Quick start
 
-> The hosted stack (`docker compose up`) arrives in Phase 3. Today, the engine CLI runs from a clone:
+The engine CLI runs from a clone:
 
 ```bash
 git clone https://github.com/aadilsal/Evident.git
 cd Evident/engine
 uv sync
-uv run evident analyze /path/to/your/app
+uv run evident analyze /path/to/your/app     # add GROQ_API_KEY to the environment for LLM group names
 ```
+
+The service (API, worker, Postgres, Redis) runs with Docker Compose. The web UI arrives in Phase 4:
+
+```bash
+cp .env.example .env                        # GROQ_API_KEY, POSTGRES_PASSWORD, ...
+docker compose -f deploy/docker-compose.yml up --build
+python engine/scripts/smoke_service.py      # submits a repo, follows the SSE stream, checks the graph
+```
+
+API docs: <http://localhost:8000/api/docs>.
 
 Working on the code instead? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -226,9 +238,9 @@ Working on the code instead? See [CONTRIBUTING.md](CONTRIBUTING.md).
 | Analysis engine + CLI | Python 3.12, tree-sitter (per-language grammars), custom import resolver, adapter registry |
 | Agent integration | Claude skill (`skills/evident/`); MCP server in v2 |
 | API | FastAPI, Server-Sent Events, auto-generated OpenAPI docs |
-| Jobs | arq on Redis |
+| Jobs | arq on Redis; each analysis in a child process killed at the job timeout |
 | Storage | Postgres (jobs, cached graphs, findings, benchmark history) |
-| AI | Groq (free tier): one call per graph for grouping and labelling, validated against node IDs, auto-fallback to `--no-llm` |
+| AI | Groq (free tier, `openai/gpt-oss-20b` by default): one call per uncached commit, IDs and labels only (never code), validated against node IDs, directory-group fallback |
 | Frontend | Next.js, TypeScript, React Flow, ELK.js (also bundled into the pip package for `evident open`) |
 | Infra | Docker Compose on a single VM, Caddy (automatic HTTPS), Cloudflare Tunnel |
 | Quality | ruff, mypy, pytest, ESLint, Prettier, pre-commit, Conventional Commits, benchmark gate in CI (Linux + Windows) |

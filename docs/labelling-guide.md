@@ -20,7 +20,7 @@ How a route, model, service or edge is counted in the ground-truth YAML. If the 
 
 ## Adapters covered
 
-The rules below cover the JS/TS adapters: **Next.js, Express, NestJS, Fastify, Prisma, Drizzle, TypeORM and Mongoose**. The Python adapters ([ADR-0006](adr/0006-adapter-architecture.md): Django, FastAPI, Flask, Django ORM, SQLAlchemy) get their own counting rules here **in the same PR as the adapter**. Until an adapter has rules, its benchmark items aren't scored. Record which adapters a repo uses under `adapters:` in `benchmark/repos.yaml`, and tag each route with `framework:` and each model and edge with `orm:`, so metrics can be reported per adapter.
+The rules below cover every v1 adapter ([ADR-0006](adr/0006-adapter-architecture.md)): **Next.js, Express, NestJS, Fastify, Prisma, Drizzle, TypeORM, Mongoose** (JS/TS) and **FastAPI, Flask, Django, Django ORM, SQLAlchemy** (Python). A new adapter gets its counting rules here **in the same PR as the adapter**. Until it has them, its benchmark items aren't scored. Record which adapters a repo uses under `adapters:` in `benchmark/repos.yaml`, and tag each route with `framework:` and each model and edge with `orm:`, so metrics can be reported per adapter.
 
 ## Routes
 
@@ -66,6 +66,41 @@ Trailing slashes are removed (`/api/users/` → `/api/users`). The root page is 
 | `app.register(plugin, { prefix: '/api' })` | Routes inside the plugin get the prefix, nested registrations stack |
 | A plugin that is never registered | Its local paths, `optional: true` |
 
+### FastAPI
+
+| Situation | Count as |
+| --- | --- |
+| `@router.get("/{id}")` on `APIRouter(prefix="/users")`, included with `include_router(router, prefix="/api")` | `GET /api/users/:id` (prefixes stack) |
+| `@app.api_route("/x", methods=["GET", "POST"])` | 1 route per method |
+| `{file_path:path}` | `:file_path*` |
+| `app.mount("/", StaticFiles(...))` | Not a route |
+
+### Flask
+
+| Situation | Count as |
+| --- | --- |
+| `@app.route("/x")` with no `methods` | `GET /x` |
+| `@bp.route("/x", methods=["GET", "POST"])` / `@bp.post("/x")` | 1 route per method |
+| `Blueprint(..., url_prefix="/a")` registered with `register_blueprint(bp, url_prefix="/b")` | Blueprint prefix and registration prefix stack |
+| `<int:id>` / `<path:p>` | `:id` / `:p*` |
+| `app.add_url_rule("/x", view_func=f, methods=[...])` | 1 route per method |
+
+### Django (and Django REST Framework)
+
+| Situation | Count as |
+| --- | --- |
+| `path("users/<int:pk>/", view)` reached from `ROOT_URLCONF` through `include("app.urls")` | `/users/:pk` (prefixes join; trailing slash removed) |
+| Function view with no method decorator | Method `ALL` |
+| `@require_http_methods(["GET", "POST"])`, `@require_GET`, `@api_view(["POST"])` | Those methods |
+| Class view (`as_view()`) | 1 route per HTTP method it defines, plus the methods its generic base implies (`ListView`/`RetrieveAPIView` = GET, `CreateAPIView` = POST, `RetrieveUpdateAPIView` = GET/PUT/PATCH, `RetrieveUpdateDestroyAPIView` = GET/PUT/PATCH/DELETE, ...) |
+| A view class from a library (simplejwt `TokenObtainPairView`) | `optional: true` (its methods aren't in the repo) |
+| DRF `router.register("trips", TripViewSet)` | `ModelViewSet`: `GET /trips`, `POST /trips`, `GET`/`PUT`/`PATCH`/`DELETE /trips/:pk`; mixins and defined actions likewise |
+| `@action(detail=True, methods=["get"], url_path="logs/pdf")` | `GET /trips/:pk/logs/pdf`; regex groups in `url_path` become params |
+| `DefaultRouter`'s API root, `admin.site.urls` | Optional / out of scope |
+| `re_path` with a pattern beyond named groups | `optional: true`, `dynamic: true` |
+
+When the engine can't know a class view's methods it emits `ALL` with `dynamic: true`; it is scored like an optional item.
+
 ## Models
 
 One entry per model the app defines, by ORM:
@@ -76,6 +111,10 @@ One entry per model the app defines, by ORM:
 | Drizzle | `pgTable` / `mysqlTable` / `sqliteTable` call | The exported **variable** (`export const users = pgTable('users', …)` → `users`) |
 | TypeORM | `@Entity()` class | Class name; table from `@Entity('name')` |
 | Mongoose | `model('Name', schema)` call | The string name |
+| Django ORM | Concrete `models.Model` subclass (not `abstract = True`); table from `Meta.db_table` or `<app>_<model>` | Class name |
+| SQLAlchemy | Declarative class with `__tablename__` (or SQLModel with `table=True`, Flask-SQLAlchemy `db.Model`) | Class name |
+
+Models from libraries (Django's `User`) are not counted.
 
 **Match rule:** model name, case-sensitive.
 
@@ -104,6 +143,8 @@ One entry per **provider** the app talks to, identified by an SDK import from fi
 | `@clerk/*` | `clerk` |
 | `@arcjet/*` | `arcjet` |
 | `@sfpy/node-core` | `safepay` |
+| Python: `stripe`, `openai`, `anthropic`, `redis`, `resend`, `twilio`, `groq`, `supabase`, `cloudinary`, `sendgrid` | Same slugs |
+| Python: `sentry_sdk` / `boto3` / `google.generativeai`, `google.genai` | `sentry` / `aws-s3` / `google-gemini` |
 
 Hosted backends (Supabase, Convex) count as services even when they hold the app's data: the app reaches them over the network through a vendor SDK. A package declared in `package.json` but never imported is not a service. A dynamic `import('stripe')` counts.
 
@@ -130,6 +171,8 @@ The edge that matters most: **does this route read or write this model?**
 | Repository class or wrapper (`userRepo.save()`) that ends in a Prisma call | Count it. This is what makes the benchmark hard. |
 | A server component (page/layout) that calls a server action or function directly | Count the callee's edges for that page. JSX children (`<Header />`) are not calls. |
 | Work enqueued on a job queue (`queue.add(...)`) | Not counted: the worker isn't statically reachable from the route |
+| Framework-invoked hooks (DRF `get_queryset`, `get_object`, `perform_create`; class-level `queryset = ...`) | Not counted: no first-party handler calls them |
+| A write behind a runtime flag (`if self.persist: event.save()`) | Counted: it's statically reachable |
 
 The same reachability rule applies to the other ORMs; only the call shapes differ:
 
@@ -137,6 +180,8 @@ The same reachability rule applies to the other ORMs; only the call shapes diffe
 | --- | --- | --- |
 | Drizzle | `select().from(t)`, joins on `t`, `db.query.t.findMany/findFirst` | `insert(t)`, `update(t)`, `delete(t)` |
 | TypeORM (repository from `getRepository(E)`, `@InjectRepository(E)` or a `Repository<E>` field) | `find*`, `count*`, `exist*`, `sum`/`average`/`minimum`/`maximum` | `save`, `insert`, `update`, `upsert`, `delete`, `remove`, `softDelete`, `softRemove`, `restore`, `increment`, `decrement`, `clear` |
+| Django ORM | `Model.objects.<all/filter/get/exclude/first/last/count/exists/aggregate/annotate/values/...>`, `get_object_or_404(Model)` | `Model.objects.<create/bulk_create/update/delete/get_or_create/update_or_create/bulk_update>`, `.save()`/`.delete()` on an instance built as `Model(...)` or loaded with `Model.objects.get(...)` |
+| SQLAlchemy | `session.query(M)`, `select(M)`, `session.get(M, id)`, Flask-SQLAlchemy `M.query.<op>()` | `insert(M)`, `update(M)`, `delete(M)`, `session.add/merge/delete(x)` where `x = M(...)` or `x = M.query.<op>()` |
 | Mongoose (model binding, or `@InjectModel` field typed `Model<E>`) | `find*`, `countDocuments`, `estimatedDocumentCount`, `exists`, `aggregate`, `distinct` | `create`, `insertMany`, `update*`, `delete*`, `replaceOne`, `bulkWrite`, `findOneAnd*`/`findByIdAnd*`, `new Model().save()` |
 
 A route with both a read and a write to the same model gets two edges. Multiple calls of the same op count once.

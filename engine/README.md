@@ -21,11 +21,15 @@ Every command takes `--json` (the [CLI output schema](../schema/cli-output.schem
 
 **Safety:** never executes repo code, never follows symlinks, and writes only inside `.evident/` (plus an explicit `export --out` file). See [docs/security.md](../docs/security.md).
 
+## Service
+
+`pip install evident-map[service]` adds the hosted service: `uvicorn evident.service.api:app` (API, OpenAPI at `/api/docs`) and `arq evident.service.worker.WorkerSettings` (worker). Configuration is read from the environment (`DATABASE_URL`, `REDIS_URL`, `GROQ_API_KEY`, `EVIDENT_*`); see `.env.example` and `deploy/docker-compose.yml`.
+
 ## Development
 
 ```bash
 cd engine
-uv sync
+uv sync --all-extras
 uv run python -m pytest && uv run python -m mypy && uv run ruff check . && uv run ruff format --check .
 uv run evident-bench --verbose     # score against benchmark/ground-truth (clones pinned repos read-only)
 ```

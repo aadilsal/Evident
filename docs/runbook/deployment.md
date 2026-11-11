@@ -5,7 +5,7 @@
 ## Overview
 
 - **Host:** _VM provider, size, region / home + Cloudflare Tunnel_
-- **Stack:** Docker Compose: Caddy, web, api, worker, Redis, Postgres
+- **Stack:** Docker Compose (`deploy/docker-compose.yml`): api, worker, Redis, Postgres today; Caddy and web join in Phases 4-5
 - **Domain / DNS:** _…_
 - **Secrets:** `.env` on the VM only (never committed). Keys: _list names, not values_
 
@@ -14,7 +14,7 @@
 1. _Tag a release (`vX.Y.Z`) and update CHANGELOG.md_
 2. _On the VM: pull, build or pull images, `docker compose up -d`_
 3. _Run DB migrations_
-4. _Smoke test: `/api/health`, landing page, one gallery map, one fresh analysis_
+4. Smoke test: `python engine/scripts/smoke_service.py https://<host>` checks health, submits a pinned repo, follows SSE to `done` and verifies the graph's route count; then check the landing page and one gallery map
 
 ## Roll back
 

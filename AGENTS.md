@@ -10,7 +10,7 @@ Evident turns a repo (a public GitHub URL or a local folder) into an evidence-ba
 
 | Path | What lives there |
 | --- | --- |
-| `engine/` | Python package `evident-map`: CLI, cache, queries, health checks, universal layer, adapters, linker; later API, worker, LLM grouping, benchmark runner |
+| `engine/` | Python package `evident-map`: CLI, cache, queries, health checks, universal layer (JS/TS + Python), adapters, linker, LLM grouping, benchmark runner; `evident.service` (API, worker, store, broker) behind the `[service]` extra |
 | `skills/evident/` | Claude skill that drives the CLI; `engine/tests/test_skill.py` keeps it in sync with the CLI |
 | `skill-tasks/` | Graded agent tasks run with vs without the skill (`uv run --project engine python skill-tasks/run.py`) |
 | `web/` | Next.js + TypeScript frontend (map UI, gallery, benchmarks page) |
@@ -18,7 +18,7 @@ Evident turns a repo (a public GitHub URL or a local folder) into an evidence-ba
 | `benchmark/` | `repos.yaml` (pinned SHAs) + `ground-truth/` hand-labelled YAML per repo |
 | `DESIGN.md` | Visual design system (tokens + rules). Read before writing any UI. |
 | `docs/` | Design doc (source of truth), PRD, architecture, ADRs, threat model, labelling guide, runbook |
-| `deploy/` | Docker Compose, Caddyfile *(added with infra work)* |
+| `deploy/` | Docker Compose for the service stack (Caddyfile at launch) |
 
 ## Non-negotiable rules
 
@@ -35,7 +35,7 @@ Evident turns a repo (a public GitHub URL or a local folder) into an evidence-ba
 ```bash
 # setup
 pre-commit install --hook-type pre-commit --hook-type commit-msg
-cd engine && uv sync          # Python deps
+cd engine && uv sync --all-extras   # Python deps, incl. the service
 cd web && npm ci              # Node deps
 
 # check before every commit

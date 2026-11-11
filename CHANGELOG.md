@@ -7,6 +7,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- **Phase 3 (Service) complete:** `evident.service` (`pip install evident-map[service]`): FastAPI API (`POST /api/analyses`, status, SSE events, immutable graphs, gallery, benchmarks, health, OpenAPI at `/api/docs`), arq worker running each analysis in a child process with a hard timeout, Postgres store (jobs, graphs, findings, benchmark runs), Redis broker (queue, progress pub/sub, per-IP-hash rate limits), job dedupe per commit, temp-dir sweeper; `engine/Dockerfile`, hardened `deploy/docker-compose.yml`, `scripts/smoke_service.py`, and a CI job that runs it end to end against Postgres and Redis
+- LLM grouping (ADR-0003/0007): Groq client behind a provider interface, compact `key|type|label|path` prompt under a size budget, strict validator (existing IDs only, one group per node), same-file and same-directory propagation, 429 retry, directory-group fallback; `analyze` progress hooks per stage
+- Python support: tree-sitter Python summaries, module resolution (relative, dotted, packages, submodules), Python SDK catalogue, env reads (`os.environ`, `os.getenv`), request-body reads; adapters for FastAPI, Flask, Django (URLconf, class views, DRF routers and actions), Django ORM and SQLAlchemy (incl. SQLModel and Flask-SQLAlchemy)
+- Benchmark: Insight-OS, SpotterTruckLogging and JobFinder labelled (8 repos, 100% P/R per category); the runner retries a failed fetch, reuses verified local clones, and refuses to trust a partial run
+- Graph schema `1.2.0` (`fastapi`/`flask`/`django` frameworks, `django-orm`/`sqlalchemy` ORMs); `GITHUB_TOKEN` for GitHub metadata calls
 - **Phase 2 (Claude skill) complete:** `skills/evident/` with `SKILL.md` and `ensure_installed.sh`/`.ps1` (installs from the official repo until PyPI). Skill-task evals: 24/24 with the skill vs 21/24 without (Claude Haiku, 12 tasks x 2 runs)
 - `skill-tasks/`: 12 graded agent tasks and an isolated `claude -p` runner (project settings only, no MCP, tools limited to `evident` and read-only commands)
 - `evident export --format md|json [--out FILE]`: commit-stamped architecture report with GitHub permalinks, or the graph JSON

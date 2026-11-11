@@ -6,5 +6,5 @@ Library entry points: ``evident.analyze.analyze`` builds a graph; ``evident.quer
 __version__ = "0.2.0"
 # Bump whenever extraction output can change; part of the cache key.
 ENGINE_VERSION = "0.2.0"
-GRAPH_SCHEMA_VERSION = "1.1.0"
+GRAPH_SCHEMA_VERSION = "1.2.0"
 CLI_SCHEMA_VERSION = "1.2.0"

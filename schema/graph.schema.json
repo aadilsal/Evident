@@ -225,7 +225,9 @@
           "type": "string",
           "pattern": "^(/|action:)"
         },
-        "framework": { "enum": ["next-app-router", "express", "nestjs", "fastify"] },
+        "framework": {
+          "enum": ["next-app-router", "express", "nestjs", "fastify", "fastapi", "flask", "django"]
+        },
         "kind": { "enum": ["api", "page", "layout", "serverAction"] },
         "handlerRef": { "$ref": "#/$defs/nodeId" },
         "dynamic": {
@@ -262,7 +264,9 @@
       "required": ["file", "framework"],
       "properties": {
         "file": { "$ref": "#/$defs/repoPath" },
-        "framework": { "enum": ["next-app-router", "express", "nestjs", "fastify"] },
+        "framework": {
+          "enum": ["next-app-router", "express", "nestjs", "fastify", "fastapi", "flask", "django"]
+        },
         "name": { "type": ["string", "null"] },
         "matchers": {
           "description": "Next.js middleware matcher patterns, as written.",
@@ -283,7 +287,7 @@
         "tableName": { "description": "@@map value, or the model name.", "type": "string" },
         "orm": {
           "description": "Since 1.1.0. Adapter that found the model.",
-          "enum": ["prisma", "drizzle", "typeorm", "mongoose"]
+          "enum": ["prisma", "drizzle", "typeorm", "mongoose", "django-orm", "sqlalchemy"]
         },
         "fields": {
           "type": "array",

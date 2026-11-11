@@ -11,7 +11,8 @@ Evident turns a repo (a public GitHub URL or a local folder) into an evidence-ba
 | Path | What lives there |
 | --- | --- |
 | `engine/` | Python package `evident-map`: CLI, cache, queries, health checks, universal layer, adapters, linker; later API, worker, LLM grouping, benchmark runner |
-| `skills/evident/` | Claude skill that drives the CLI *(week 4)* |
+| `skills/evident/` | Claude skill that drives the CLI; `engine/tests/test_skill.py` keeps it in sync with the CLI |
+| `skill-tasks/` | Graded agent tasks run with vs without the skill (`uv run --project engine python skill-tasks/run.py`) |
 | `web/` | Next.js + TypeScript frontend (map UI, gallery, benchmarks page) |
 | `schema/graph.schema.json` | **The contract** between engine and web. Versioned. |
 | `benchmark/` | `repos.yaml` (pinned SHAs) + `ground-truth/` hand-labelled YAML per repo |
@@ -52,7 +53,7 @@ cd engine && uv run evident-bench --baseline ../benchmark/results/baseline.json
 - TypeScript: ESLint + Prettier, `strict` tsconfig. Graph types are generated from or checked against the JSON Schema. Don't hand-write a divergent copy.
 - UI: follow `DESIGN.md` exactly: tokens only (no raw hex), anime.js for in-app motion, Aceternity UI only from its allowlist and only on marketing pages.
 - Comments: one line, saying why. History goes in commit messages.
-- Commits: [Conventional Commits](https://www.conventionalcommits.org/) (`feat(engine): extract express router mounts`). Scopes: `engine`, `api`, `worker`, `web`, `schema`, `bench`, `infra`, `docs`.
+- Commits: [Conventional Commits](https://www.conventionalcommits.org/) (`feat(engine): extract express router mounts`). Scopes: `engine`, `api`, `worker`, `web`, `skill`, `schema`, `bench`, `infra`, `docs`.
 
 ## Testing expectations
 

@@ -7,6 +7,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- **Phase 2 (Claude skill) complete:** `skills/evident/` with `SKILL.md` and `ensure_installed.sh`/`.ps1` (installs from the official repo until PyPI). Skill-task evals: 24/24 with the skill vs 21/24 without (Claude Haiku, 12 tasks x 2 runs)
+- `skill-tasks/`: 12 graded agent tasks and an isolated `claude -p` runner (project settings only, no MCP, tools limited to `evident` and read-only commands)
+- `evident export --format md|json [--out FILE]`: commit-stamped architecture report with GitHub permalinks, or the graph JSON
+- `analyze` is summary-first: top routes, models, services and findings with `file:line` (also as `--json` results)
+- CLI output schema `1.2.0` (`export` command); package version `0.2.0`; CLI streams are UTF-8 on Windows
 - **Phase 1 (Engine) complete, Gate A met:** 100% precision and recall on routes, models, services and route→model edges across the first 5 labelled repos
 - tree-sitter parsing (TS/TSX/JS) and a cacheable per-file summary: imports, exports, CommonJS, scopes, calls, locals, decorators, env reads, request-body reads
 - Linker: relative, `tsconfig`/`jsconfig` path and workspace module resolution; symbol resolution through re-exports and `export *`; package taint tracking (Prisma client, SDK bindings); NestJS-style `this.field.method()` resolution

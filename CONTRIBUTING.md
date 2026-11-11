@@ -39,7 +39,7 @@ fix(web): keep trace highlight when collapsing a group
 docs(adr): supersede 0002 with canvas renderer decision
 ```
 
-Types: `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `build`, `ci`, `chore`. Scopes: `engine`, `api`, `worker`, `web`, `schema`, `bench`, `infra`, `docs`.
+Types: `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `build`, `ci`, `chore`. Scopes: `engine`, `api`, `worker`, `web`, `skill`, `schema`, `bench`, `infra`, `docs`.
 
 ## The benchmark rule
 

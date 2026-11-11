@@ -83,7 +83,7 @@ Not a static Mermaid image. A zoomable map built with React Flow and ELK auto-la
 
 ## Status
 
-Pre-alpha. **Phase 1 (Engine) is complete and Gate A is met.** Next up: Phase 2, the Claude skill. This table is updated at the end of every phase.
+Pre-alpha. **Phases 1 (Engine) and 2 (Claude skill) are complete.** Next up: Phase 3, the service (API, worker, Groq grouping, Python adapters). This table is updated at the end of every phase.
 
 | Piece | State |
 | --- | --- |
@@ -91,11 +91,12 @@ Pre-alpha. **Phase 1 (Engine) is complete and Gate A is met.** Next up: Phase 2,
 | JS/TS adapters: Next.js, Express, NestJS, Fastify, Prisma, Drizzle, TypeORM, Mongoose | ✅ Done, with fixture tests |
 | Universal layer: module graph, SDK services, env vars, `docker-compose` containers, `tsconfig` aliases, workspaces | ✅ Done (JS/TS) |
 | Stack detection + fallback map for unsupported stacks | ✅ Done |
-| CLI: `analyze`, `trace`, `impact`, `find`, `health`, `show` with `--json` | ✅ Done |
+| CLI: `analyze` (summary-first), `trace`, `impact`, `find`, `health`, `show`, `export` (Markdown report, graph JSON) with `--json` | ✅ Done |
 | Health rules: unguarded write, unvalidated body, import cycle, unused model, undocumented env | ✅ Done |
 | Benchmark: 5 repos labelled, `evident-bench`, CI gate (>2 pt drop fails) | ✅ Done |
 | CI: pre-commit, mypy + pytest on Linux and Windows, benchmark gate | ✅ Done |
-| Claude skill, `export`, `open`, `share` | ⏳ Phase 2 (week 4) |
+| Claude skill (`skills/evident/`) + skill-task evals | ✅ Done: 24/24 tasks with the skill vs 21/24 without |
+| `open`, `share`, PNG/SVG/PDF exports | ⏳ Phase 4 (with the map UI) |
 | API, worker, Groq grouping, Python adapters | ⏳ Phase 3 |
 | Web map UI, `/benchmarks` page, gallery | ⏳ Phase 4 |
 
@@ -158,13 +159,24 @@ evident health --severity warning
 evident show model:User
 ```
 
-Every command takes `--json`, `--limit`, `--depth`, `--no-llm` and `--repo PATH|URL`. Exit codes: `0` ok · `1` findings or no match · `2` usage error · `3` analysis error. Coming in v1: `export`, `open` (local map UI, no Node needed) and `share` (opt-in, metadata only).
+`evident export --format md --out docs/architecture.md` writes a commit-stamped architecture report in which every row cites `file:line`; `--format json` prints the graph.
+
+Every command takes `--json`, `--limit`, `--depth`, `--no-llm` and `--repo PATH|URL`. Exit codes: `0` ok · `1` findings or no match · `2` usage error · `3` analysis error. Coming in v1: `open` (local map UI, no Node needed) and `share` (opt-in, metadata only).
 
 `uv run evident-bench` scores the engine against the labelled benchmark repos (cloned read-only at their pinned commits).
 
 ## Use with Claude
 
-*Planned for week 4.* A Claude skill in `skills/evident/` drives the CLI for you. It runs `evident analyze --no-llm` once per session, runs `impact` before editing models or shared code, uses `trace` to explain flows and `health` on new routes, and never claims a dependency the tool didn't return.
+The Claude skill in [`skills/evident/`](skills/evident/SKILL.md) drives the CLI for you:
+
+- Once per session it runs `evident analyze . --no-llm` (offline) and leads with a short summary.
+- Before you edit a model, shared module, middleware or env var, it runs `evident impact` and tells you which routes are affected.
+- It explains flows with `trace` and checks new routes with `health`.
+- It cites `file:line` for every claim and flags inferred edges. It never claims a dependency the tool didn't return and never runs `share` unless you ask.
+
+**Install** (Claude Code): copy `skills/evident/` into your project's `.claude/skills/` (or `~/.claude/skills/` for every project). If the `evident` CLI is missing, the skill asks before running `scripts/ensure_installed.sh` (or `.ps1` on Windows).
+
+**Does it help?** [`skill-tasks/`](skill-tasks/) runs 12 architecture questions over the fixture repos, twice each, with and without the skill, and grades the answers against expected facts and citations. On Claude Haiku: **24/24 passed with the skill, 21/24 without**, with about 5.0 vs 6.2 tool calls per task ([results](skill-tasks/results/latest.md)). Without the skill, the misses were dropped citations and missed Mongoose routes.
 
 ## How it works
 

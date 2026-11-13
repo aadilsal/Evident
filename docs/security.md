@@ -6,7 +6,7 @@ Evident clones and analyses repositories **it did not write and must not trust**
 
 | Asset | Why it matters |
 | --- | --- |
-| The VM and its network | Compromise exposes everything, including the home network if self-hosted |
+| The API server and its network | Compromise exposes the backend, including the home network if self-hosted |
 | LLM API key (`GROQ_API_KEY`), GitHub token | Direct cost and abuse |
 | Service availability | A dead recruiter link is the main business risk |
 | Integrity of published maps | The product's whole claim is "every edge is proven" |
@@ -29,9 +29,9 @@ Evident clones and analyses repositories **it did not write and must not trust**
 | T4 | **Path traversal / symlink escape** out of the temp dir | Don't follow symlinks; resolve every path and assert it stays under the job's temp root. Evidence paths are repo-relative POSIX, and the schema rejects `..`, absolute paths and backslashes. |
 | T5 | **Leftover data** between jobs | Each job gets a fresh `mkdtemp` dir, removed in a `finally` block, plus a periodic sweeper for orphaned dirs older than 10 min. Use tmpfs where RAM allows. |
 | T6 | **Prompt injection** from repo text (comments, names, README) steering the LLM | Send the LLM only node IDs, types, short labels and paths, never file contents. Validate the output strictly: unknown IDs are dropped, lengths capped, and the schema is enforced. LLM text is always shown as `inferred`. |
-| T7 | **XSS** via labels, paths, snippets or LLM summaries | Render everything as text; no `dangerouslySetInnerHTML`. Shiki output only from escaped source. Strict CSP. |
+| T7 | **XSS** via labels, paths, snippets or LLM summaries | Render everything as React text; no `dangerouslySetInnerHTML` anywhere. Shiki returns tokens that React renders as text, never HTML. CSP on the site (`web/vercel.json`) and on `evident open`. |
 | T8 | **Publishing secrets** found in repos | Env var **names** only; values are never read or stored. `.env.example` yields names only; `docker-compose` `environment:` blocks are never read. Snippets come from public repos, but a takedown path exists ([SECURITY.md](../SECURITY.md)) along with a per-repo delete. |
-| T9 | **Abuse / cost blow-up**: scripted submissions, LLM spend | Per-client rate limit in Redis, keyed by a salted SHA-256 of the IP so raw IPs are never stored. Global queued-job cap (503 when full), dedupe of identical submissions, cache by commit SHA, a free-tier model for grouping, gallery precomputed. |
+| T9 | **Abuse / cost blow-up**: scripted submissions, shares and reports, LLM spend | Per-client rate limit in Redis, keyed by a salted SHA-256 of the IP so raw IPs are never stored. Global queued-job cap (503 when full), dedupe of identical submissions, cache by commit SHA, a free-tier model for grouping, gallery precomputed. |
 | T10 | **Secret leakage** from our own infra | Keys only in the worker's env, never in graphs, logs or the frontend bundle. `.env` git-ignored, gitleaks in pre-commit, least-privilege fine-grained GitHub token (public read only). |
 | T11 | **Container escape / lateral movement** | API and worker run as a non-root user with a read-only root filesystem, `no-new-privileges`, all capabilities dropped and a RAM-backed `/tmp`. Postgres and Redis sit on an `internal: true` network with no route out. The API is published on 127.0.0.1 only, behind Caddy at launch. |
 | T12 | **Supply chain** in our own dependencies | Lockfiles committed, Dependabot, CI on pinned action SHAs, minimal dependencies. |
@@ -57,6 +57,7 @@ The same engine runs on a developer's machine ([ADR-0005](adr/0005-cli-first-thr
 
 - **Read-only.** The engine never executes repo code and writes only inside `<repo>/.evident/`, which ignores itself (it contains its own `.gitignore`). The single exception is `evident export --out FILE`, which writes exactly the file the user named. It never follows symlinks. Git calls use a fixed argv with hooks, fsmonitor and symlinks disabled and https-only protocols.
 - **Offline by default for the skill.** The skill runs `analyze --no-llm`, so nothing leaves the machine. It asks before running its installer, which installs Evident from the official repo only (not a PyPI name we haven't claimed yet). With an LLM, only node IDs, types, labels and paths are sent (T6), never file contents.
+- **`evident open`** binds to `127.0.0.1` only and serves the bundled static UI plus two read-only endpoints: the graph, and file text for snippets. File text is served only for files the graph cites as evidence, resolved inside the repo, never through a symlink, up to 1 MB. Requests whose `Host` isn't `127.0.0.1:<port>` or `localhost:<port>` get 403, which blocks DNS rebinding. Responses carry a CSP and `nosniff`.
 - **Telemetry** is opt-in only.
 
 ## Share-data rules (`evident share`)
@@ -65,7 +66,8 @@ The same engine runs on a developer's machine ([ADR-0005](adr/0005-cli-first-thr
 2. Uploads **graph metadata only**: node and edge IDs, types, labels, paths, line ranges, findings. **No source code or snippets.** The hosted viewer shows "snippet unavailable" for shared local graphs.
 3. Env var names only, never values (T8).
 4. Links expire, and can be deleted early.
-5. Uploads are validated against the graph schema and size-capped like any other untrusted input (T3, T7).
+5. Uploads are validated against the graph schema (whose per-type `attrs` allow no extra fields, so code can't ride along) and integrity checks, size-capped (2 MB) and rate-limited per IP hash. The server stores the re-serialised graph, never the raw body (T3, T7).
+6. Links expire after 7 days by default (30 at most). The delete token is returned once, stored only as a SHA-256 hash, and kept by the CLI in `.evident/shares.json`.
 
 ## Out of scope (v1)
 

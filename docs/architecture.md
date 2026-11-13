@@ -20,8 +20,8 @@ Hosted:
 
 ```mermaid
 flowchart LR
-    user([Developer / visitor]) -->|HTTPS| caddy[Caddy<br/>TLS, reverse proxy]
-    caddy --> web[Next.js web]
+    user([Developer / visitor]) -->|HTTPS| web[Static web app<br/>Vercel CDN]
+    user -->|HTTPS, CORS| caddy[Caddy<br/>TLS, reverse proxy]
     caddy -->|/api| api[FastAPI]
     api <--> redis[(Redis<br/>queue + rate limits)]
     api <--> pg[(Postgres)]
@@ -32,7 +32,7 @@ flowchart LR
     web -.->|static JSON| gallery[(Gallery graphs)]
 ```
 
-All services run as one Docker Compose stack on a single VM ([ADR-0004](adr/0004-self-host-on-a-vm.md)). Only the worker talks to GitHub and the LLM provider. Only Caddy is exposed.
+The web app is a static export served from Vercel; the browser calls the API cross-origin and loads code snippets from GitHub at the pinned commit ([ADR-0008](adr/0008-static-web-on-vercel-api-on-one-server.md)). The backend runs as one Docker Compose stack on a single server ([ADR-0004](adr/0004-self-host-on-a-vm.md)). Only the worker talks to GitHub and the LLM provider. Only Caddy is exposed.
 
 ## 2. Components
 
@@ -40,12 +40,12 @@ All services run as one Docker Compose stack on a single VM ([ADR-0004](adr/0004
 | --- | --- | --- |
 | **engine / CLI** | `evident-map` package: stack detection, universal layer, adapters, linker, health checks, queries, `.evident/` cache, CLI | Python 3.12, tree-sitter, argparse |
 | **skill** | Claude skill that drives the CLI for coding agents | `skills/evident/SKILL.md` + scripts |
-| **web** | Landing page, map UI (five views), evidence panel, gallery, `/benchmarks`, supported-stacks page; same UI bundled into the pip package for `evident open` | Next.js, TypeScript, React Flow, elkjs, anime.js, Tailwind (tokens from [DESIGN.md](../DESIGN.md)) |
+| **web** | Landing page, map UI (five views), evidence panel, gallery, `/benchmarks`, supported-stacks page, report page; static export on Vercel, also bundled into the pip package for `evident open` | Next.js (static export), TypeScript, React Flow, elkjs, anime.js, Shiki, Tailwind (tokens generated from [DESIGN.md](../DESIGN.md)) |
 | **api** | Validate submissions, cache lookup, enqueue, SSE progress, serve graphs | FastAPI, Pydantic |
 | **worker** | Run the six-stage pipeline in a sandboxed temp dir | Python 3.12, arq, tree-sitter |
 | **redis** | Job queue, job progress pub/sub, per-IP rate limits | Redis 7 |
 | **postgres** | Jobs, cached graphs (JSONB), findings, benchmark history | Postgres 16 |
-| **caddy** | Automatic HTTPS, routing, request size limits | Caddy 2 |
+| **caddy** | Automatic HTTPS for `api.<domain>`, request size limits | Caddy 2 |
 
 ## 3. Request lifecycle
 
@@ -123,7 +123,13 @@ FastAPI serves OpenAPI at `/api/docs`; each endpoint gets a one-line description
 | `GET` | `/api/graphs/{owner}/{repo}/{sha}` | Graph JSON (immutable, long cache headers) |
 | `GET` | `/api/gallery` | Featured repos with graph URLs |
 | `GET` | `/api/benchmarks` | Latest and historical benchmark results |
+| `POST` | `/api/shares` | `evident share` upload: schema-validated, size-capped graph metadata; returns an expiring link and a delete token |
+| `GET` | `/api/shares/{id}` | A shared graph until it expires |
+| `DELETE` | `/api/shares/{id}` | Delete early (`X-Delete-Token`) |
+| `POST` | `/api/reports` | "Report a wrong node/edge" from the map |
 | `GET` | `/api/health` | Liveness for the uptime monitor |
+
+CORS allows only the origins in `EVIDENT_CORS_ORIGINS` (the site), with no credentials.
 
 ## 7. Storage
 
@@ -133,17 +139,21 @@ FastAPI serves OpenAPI at `/api/docs`; each endpoint gets a one-line description
 | `graphs` | `(owner, repo, sha, engine_version)` | `graph` JSONB, node/edge counts, created_at |
 | `findings` | `graph_id, finding_id` | Denormalised for querying across repos |
 | `benchmark_runs` | `id` | git sha of Evident, per-repo per-category P/R/F1, cost, duration |
+| `shares` | `id` | validated graph JSONB, hashed delete token, IP hash, expiry |
+| `reports` | `id` | repo, sha, engine version, element id, kind, note, IP hash |
 
-The gallery is exported to static JSON in `web/public/gallery/` at build time, so it survives an API outage.
+The gallery is pre-analysed into static JSON in `web/public/data/gallery/` (`engine/scripts/build_gallery.py`), and benchmark results are copied in at build time, so both survive an API outage.
 
 ## 8. Frontend
 
-- **Data source switch:** API mode (hosted) or local-file mode (`evident open` serves `.evident/graph.json` with the static export bundled in the pip package; no Node needed).
-- **Data flow:** fetch graph JSON → validate `schemaVersion` major → build indexes (by ID, adjacency in/out) → derive views (overview, routes, ERD, trace, findings) as pure selectors.
-- **Layout:** elkjs `layered` algorithm with orthogonal routing, run in a Web Worker and cached per view.
-- **Trace and blast radius** are graph traversals over the adjacency index (BFS forward for traces, reverse for blast radius) with no server round-trip.
-- **Permalinks:** `/{owner}/{repo}/{sha}?view=trace&node=<id>&layers=route,model` holds all state in the URL.
-- **Design system:** [DESIGN.md](../DESIGN.md). Tokens are exported to Tailwind v4, and anime.js handles trace choreography.
+- **Static export** (`output: "export"`, [ADR-0008](adr/0008-static-web-on-vercel-api-on-one-server.md)): one build serves Vercel and `evident open`.
+- **Data source switch** (`web/src/lib/source.ts`): the hosted API (`?repo=&sha=`), the static gallery (`?gallery=`), `evident open` (`?local=1`, served from `/local/graph.json`), or a share link (`?share=`). Snippets come from `raw.githubusercontent.com` at the pinned SHA for GitHub graphs and from `/local/file` (allowlisted to cited files) for local ones; shared local graphs have none.
+- **Data flow:** fetch graph JSON → check the `schemaVersion` major → build indexes (by ID, adjacency in/out) → derive views as pure functions (`web/src/lib/views.ts`): overview (groups collapsed, one line per pair), route map (routes → models/services reached through handlers), data model, trace, blast radius, focus (findings).
+- **Layout:** elkjs `layered` with orthogonal routing in a Web Worker (`/elk-worker.min.js`, main-thread fallback); edges are drawn along ELK's routes with 6px corners.
+- **Trace and blast radius** are the engine's BFS ported to TypeScript (`web/src/lib/graph.ts`); Vitest checks them against goldens generated by the engine (`engine/tests/test_web_contract.py`).
+- **Permalinks:** `/map/?repo=owner/name&sha=…&view=trace&root=<id>&node=<id>&hide=env&open=group:x` holds all state in the URL.
+- **Types** are generated from the schema (`npm run gen:types`); **tokens** from DESIGN.md (`npm run tokens`). CI fails if either is stale.
+- **Design system:** [DESIGN.md](../DESIGN.md); anime.js draws the trace hop by hop and counts up progress.
 
 ## 9. Repository layout
 
@@ -154,7 +164,7 @@ The gallery is exported to static JSON in `web/public/gallery/` at build time, s
 │   └── tests/fixtures/     tiny per-adapter snippets with expected graphs
 ├── skills/evident/         Claude skill: SKILL.md, scripts/ensure_installed.sh
 ├── skill-tasks/            agent tasks run with vs without the skill
-├── web/                    Next.js frontend
+├── web/                    Next.js static export: app/ (pages), components/map/, lib/ (graph, views, layout, url, source)
 ├── schema/                 graph.schema.json + examples (the contract)
 ├── benchmark/              repos.yaml (pinned SHAs), ground-truth/ (labelled YAML), results/baseline.json (CI gate)
 ├── deploy/                 docker-compose.yml (Caddyfile added at launch)

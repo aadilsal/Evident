@@ -1,18 +1,20 @@
 # Deployment runbook
 
-> **Skeleton.** Fill this in during Phase 4 (launch) and test every section once before relying on it.
+> **Skeleton.** Completed during Phase 5 (launch), once the domain and server exist; test every section once before relying on it.
 
 ## Overview
 
 - **Host:** _VM provider, size, region / home + Cloudflare Tunnel_
-- **Stack:** Docker Compose (`deploy/docker-compose.yml`): api, worker, Redis, Postgres today; Caddy and web join in Phases 4-5
+- **Stack:** Docker Compose (`deploy/docker-compose.yml`, build context = repo root): api, worker, Redis, Postgres; Caddy joins at launch. The web app is a static export on Vercel ([ADR-0008](../adr/0008-static-web-on-vercel-api-on-one-server.md)).
 - **Domain / DNS:** _…_
-- **Secrets:** `.env` on the VM only (never committed). Keys: _list names, not values_
+- **Secrets:** `.env` on the server only (never committed). Names: `GROQ_API_KEY`, `POSTGRES_PASSWORD`, `EVIDENT_IP_SALT`, `GITHUB_TOKEN`, `EVIDENT_CORS_ORIGINS`, `EVIDENT_PUBLIC_URL`, plus the limits in `.env.example`. Vercel holds `NEXT_PUBLIC_API_URL` (not a secret).
+- **Local check (done 2026-11-13):** the full stack builds and passes `scripts/smoke_service.py` under Docker Desktop. On Windows, Compose's bake builder misreads the Dockerfile path; run it with `BUILDX_BAKE_ENTITLEMENTS_FS=0`.
 
 ## Deploy
 
 1. _Tag a release (`vX.Y.Z`) and update CHANGELOG.md_
-2. _On the VM: pull, build or pull images, `docker compose up -d`_
+2. _On the server: pull, build or pull images, `docker compose up -d`_
+3. Web: push to `main`; Vercel builds `web/` (`npm run build`, output `out/`). Set `NEXT_PUBLIC_API_URL` in the Vercel project.
 3. _Run DB migrations_
 4. Smoke test: `python engine/scripts/smoke_service.py https://<host>` checks health, submits a pinned repo, follows SSE to `done` and verifies the graph's route count; then check the landing page and one gallery map
 
@@ -28,7 +30,7 @@
 - **Restore drill:** _steps, last tested on YYYY-MM-DD_
 - **Gallery JSON:** _rebuilt from the repo, no backup needed_
 
-## Rebuild the VM from scratch
+## Rebuild the server from scratch
 
 _Provision → install Docker → clone → restore `.env` → restore DB → deploy → DNS / tunnel_
 

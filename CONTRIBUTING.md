@@ -25,7 +25,7 @@ cd ../web && npm ci
    ```bash
    pre-commit run --all-files
    cd engine && uv run mypy && uv run pytest
-   cd web && npm run lint && npm run typecheck
+   cd web && npm run check:generated && npm run format:check && npm run lint && npm run typecheck && npm test
    ```
 5. Open a PR using the template. CI runs lint, types, tests, schema validation and the benchmark.
 
@@ -53,7 +53,7 @@ Decisions live in [docs/adr/](docs/adr/). To change one, add a new ADR that supe
 
 ## Changing the graph schema
 
-`schema/graph.schema.json` is the contract between engine and web. Bump `schemaVersion` (minor = additive, major = breaking), update `schema/examples/`, and change both sides in the same PR.
+`schema/graph.schema.json` is the contract between engine and web. Bump `schemaVersion` (minor = additive, major = breaking), update `schema/examples/`, and change both sides in the same PR. Then copy it to `engine/src/evident/graph.schema.json` (a test checks they match) and run `npm run gen:types` in `web/`.
 
 ## Code of conduct
 

@@ -83,7 +83,7 @@ Not a static Mermaid image. A zoomable map built with React Flow and ELK auto-la
 
 ## Status
 
-Pre-alpha. **Phases 1 (Engine), 2 (Claude skill) and 3 (Service) are complete.** Next up: Phase 4, the map UI. This table is updated at the end of every phase.
+Pre-alpha. **Phases 1 (Engine), 2 (Claude skill), 3 (Service) and 4 (Interface) are complete.** Next up: Phase 5, launch (deploy, more benchmark repos, demo video). This table is updated at the end of every phase.
 
 | Piece | State |
 | --- | --- |
@@ -92,15 +92,18 @@ Pre-alpha. **Phases 1 (Engine), 2 (Claude skill) and 3 (Service) are complete.**
 | Python adapters: FastAPI, Flask, Django (+ DRF), Django ORM, SQLAlchemy | ✅ Done, with fixture tests |
 | Universal layer: module graph, SDK services, env vars, `docker-compose` containers, `tsconfig` aliases, workspaces | ✅ Done (JS/TS and Python) |
 | Stack detection + fallback map for unsupported stacks | ✅ Done |
-| CLI: `analyze` (summary-first), `trace`, `impact`, `find`, `health`, `show`, `export` (Markdown report, graph JSON) with `--json` | ✅ Done |
+| CLI: `analyze` (summary-first), `trace`, `impact`, `find`, `health`, `show`, `export` (Markdown report, graph JSON), `open`, `share` with `--json` | ✅ Done |
 | Health rules: unguarded write, unvalidated body, import cycle, unused model, undocumented env | ✅ Done |
 | Benchmark: 8 repos labelled (5 JS/TS, 3 Python), `evident-bench`, CI gate (>2 pt drop fails) | ✅ Done |
 | LLM grouping: Groq, validated against node IDs, directory fallback | ✅ Done |
 | Service: FastAPI API, arq worker, Postgres cache, SSE progress, rate limits, job timeouts, Docker Compose | ✅ Done (CI runs it end to end) |
 | CI: pre-commit, mypy + pytest on Linux and Windows, benchmark gate | ✅ Done |
 | Claude skill (`skills/evident/`) + skill-task evals | ✅ Done: 24/24 tasks with the skill vs 21/24 without |
-| `open`, `share`, PNG/SVG/PDF exports | ⏳ Phase 4 (with the map UI) |
-| Web map UI, `/benchmarks` page, gallery | ⏳ Phase 4 |
+| Web map UI: five views, request tracer, blast radius, evidence panel with snippets, layer filters, ⌘K search, permalinks, light/dark | ✅ Done ([ADR-0008](docs/adr/0008-static-web-on-vercel-api-on-one-server.md): static export) |
+| Landing page with a live map, gallery, `/benchmarks` (history chart), supported stacks, live analysis progress, mobile layout, unsupported-stack screen | ✅ Done |
+| Exports: PNG/SVG of the current view, graph JSON, printable architecture report (PDF); "report a wrong edge" | ✅ Done |
+| `evident open` (UI bundled into the package, localhost only) and `evident share` (opt-in, metadata only, expiring) | ✅ Done |
+| Hosting: site on Vercel, API on one server | ⏳ Phase 5 (domain and server pending) |
 
 ## Accuracy, measured not promised
 
@@ -163,7 +166,9 @@ evident show model:User
 
 `evident export --format md --out docs/architecture.md` writes a commit-stamped architecture report in which every row cites `file:line`; `--format json` prints the graph.
 
-Every command takes `--json`, `--limit`, `--depth`, `--no-llm` and `--repo PATH|URL`. Exit codes: `0` ok · `1` findings or no match · `2` usage error · `3` analysis error. Coming in v1: `open` (local map UI, no Node needed) and `share` (opt-in, metadata only).
+`evident open` serves the interactive map for the repo on `127.0.0.1` (no Node, nothing uploaded). `evident share` uploads the graph's metadata, never code, to the hosted viewer and prints an expiring link; it asks first, and `evident share --delete ID` removes it early.
+
+Every command takes `--json`, `--limit`, `--depth`, `--no-llm` and `--repo PATH|URL`. Exit codes: `0` ok · `1` findings or no match · `2` usage error · `3` analysis error.
 
 `uv run evident-bench` scores the engine against the labelled benchmark repos (cloned read-only at their pinned commits).
 
@@ -219,7 +224,7 @@ uv sync
 uv run evident analyze /path/to/your/app     # add GROQ_API_KEY to the environment for LLM group names
 ```
 
-The service (API, worker, Postgres, Redis) runs with Docker Compose. The web UI arrives in Phase 4:
+The service (API, worker, Postgres, Redis) runs with Docker Compose:
 
 ```bash
 cp .env.example .env                        # GROQ_API_KEY, POSTGRES_PASSWORD, ...
@@ -228,6 +233,14 @@ python engine/scripts/smoke_service.py      # submits a repo, follows the SSE st
 ```
 
 API docs: <http://localhost:8000/api/docs>.
+
+The web app (`web/`) is a static Next.js export. Point it at an API with `NEXT_PUBLIC_API_URL`; without one it still serves the gallery, benchmarks and local maps:
+
+```bash
+cd web && npm ci
+NEXT_PUBLIC_API_URL=http://localhost:8000 npm run dev   # the API needs EVIDENT_CORS_ORIGINS=http://localhost:3000
+npm run build:bundle                                    # build and copy the UI into the package for `evident open`
+```
 
 Working on the code instead? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -241,9 +254,9 @@ Working on the code instead? See [CONTRIBUTING.md](CONTRIBUTING.md).
 | Jobs | arq on Redis; each analysis in a child process killed at the job timeout |
 | Storage | Postgres (jobs, cached graphs, findings, benchmark history) |
 | AI | Groq (free tier, `openai/gpt-oss-20b` by default): one call per uncached commit, IDs and labels only (never code), validated against node IDs, directory-group fallback |
-| Frontend | Next.js, TypeScript, React Flow, ELK.js (also bundled into the pip package for `evident open`) |
-| Infra | Docker Compose on a single VM, Caddy (automatic HTTPS), Cloudflare Tunnel |
-| Quality | ruff, mypy, pytest, ESLint, Prettier, pre-commit, Conventional Commits, benchmark gate in CI (Linux + Windows) |
+| Frontend | Next.js static export, TypeScript, React Flow, ELK.js (orthogonal routing, Web Worker), anime.js, Shiki, Tailwind v4 with tokens generated from DESIGN.md; the same build is bundled into the pip package for `evident open` |
+| Infra | Site on Vercel; API stack in Docker Compose on one server with Caddy (automatic HTTPS) ([ADR-0008](docs/adr/0008-static-web-on-vercel-api-on-one-server.md)) |
+| Quality | ruff, mypy, pytest, ESLint, Prettier, Vitest (TS queries checked against the CLI's answers), pre-commit, Conventional Commits, benchmark gate in CI (Linux + Windows) |
 
 ## Roadmap
 

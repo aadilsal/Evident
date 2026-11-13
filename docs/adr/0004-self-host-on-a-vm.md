@@ -1,6 +1,6 @@
 # 0004. Self-host everything on one VM with Docker Compose
 
-- **Status:** Accepted
+- **Status:** Accepted. The frontend part is superseded by [ADR-0008](0008-static-web-on-vercel-api-on-one-server.md): the web app is a static export on Vercel; this ADR still governs the backend stack.
 - **Date:** 2026-11-07
 
 ## Context

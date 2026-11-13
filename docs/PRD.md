@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Owner | Aadil Salman Butt |
-| Status | Phases 1 (Engine, Gate A 2026-11-10), 2 (Skill) and 3 (Service) complete (2026-11-11); Phase 4 (Interface) next |
+| Status | Phases 1 (Engine, Gate A 2026-11-10), 2 (Skill), 3 (Service) (2026-11-11) and 4 (Interface, 2026-11-13) complete; Phase 5 (Launch) next |
 | Scope reference | This PRD plus the [ADRs](adr/). Scope follows the internal feature tracker; update all three when a decision changes. |
 | Last updated | 2026-11-10 |
 
@@ -94,7 +94,7 @@ All commands support `--json` (schema-valid envelope) and human output, `file:li
 - **FR-29** Commit-pinned permalinks encode selected node, filters and active trace.
 - **FR-30** "Report a wrong edge": one-click flag that becomes a benchmark case.
 - **FR-31** Mobile layout (at minimum a summary plus route and model lists) and an unsupported-stack screen.
-- **FR-32** The map UI is its own frontend package with a data-source switch: API mode or local-file mode.
+- **FR-32** The map UI is its own frontend package with a data-source switch: API mode or local-file mode. It is a static export, deployed to Vercel and bundled into the pip package ([ADR-0008](adr/0008-static-web-on-vercel-api-on-one-server.md)).
 
 ### 5.6 Gallery, benchmarks and stacks
 - **FR-33** Featured gallery of pre-analysed repos served as static JSON (works when the worker is down).
@@ -139,8 +139,8 @@ All commands support `--json` (schema-valid envelope) and human output, `file:li
 | 1. Engine | 1–3 | Universal layer, JS/TS adapters, linker, schema validator, CLI; label the first 5 benchmark repos | **Gate A:** baseline F1 measured on 5 repos ✅ *(100% P/R per category)* |
 | 2. Skill release | 4 | `skills/evident/`, skill-task evals | Skill usable on fixture repos; evals run ✅ *(24/24 with skill vs 21/24 without)* |
 | 3. Service | 4–5 | FastAPI, arq worker, SSE, Postgres cache, validated Groq grouping, Python adapters, limits and sandboxing | ✅ *(8 repos at 100% P/R; CI runs the service end to end)* |
-| 4. Interface | 5–7 | Dual-mode map UI, five views, tracer, blast radius, exports, mobile | — |
-| 5. Launch | 8–10 | 15–20 benchmark repos, `/benchmarks`, VM deploy, demo video, case study | **Gate B:** all targets met; runbook tested (deploy, rollback, restore) |
+| 4. Interface | 5–7 | Dual-mode map UI, five views, tracer, blast radius, exports, mobile | ✅ *(static export; TS queries match the CLI on goldens; `open`/`share` shipped; Compose stack verified end to end)* |
+| 5. Launch | 8–10 | 15–20 benchmark repos, GitDiagram baseline, server + Vercel deploy, demo video, case study | **Gate B:** all targets met; runbook tested (deploy, rollback, restore) |
 
 ## 9. Risks
 
@@ -153,7 +153,8 @@ All commands support `--json` (schema-valid envelope) and human output, `file:li
 
 ## 10. Open questions
 
-- [ ] VM specs and location (cloud or home)? *(Owner will provide.)*
+- [x] Frontend hosting: **Vercel**, static export ([ADR-0008](adr/0008-static-web-on-vercel-api-on-one-server.md))
+- [ ] Backend server: one free-tier cloud server (AWS Free plan or Oracle Always Free under evaluation); domain to be bought by the owner
 - [x] LLM provider: **Groq, free tier** ([ADR-0007](adr/0007-groq-for-llm-grouping.md))
 - [x] Product name: **Evident**; PyPI package **`evident-map`** (`evident` is taken). Domain still open.
 - [x] First benchmark repos: owner's own repos, pinned in [`benchmark/repos.yaml`](../benchmark/repos.yaml)

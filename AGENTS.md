@@ -13,19 +13,19 @@ Evident turns a repo (a public GitHub URL or a local folder) into an evidence-ba
 | `engine/` | Python package `evident-map`: CLI, cache, queries, health checks, universal layer (JS/TS + Python), adapters, linker, LLM grouping, benchmark runner; `evident.service` (API, worker, store, broker) behind the `[service]` extra |
 | `skills/evident/` | Claude skill that drives the CLI; `engine/tests/test_skill.py` keeps it in sync with the CLI |
 | `skill-tasks/` | Graded agent tasks run with vs without the skill (`uv run --project engine python skill-tasks/run.py`) |
-| `web/` | Next.js + TypeScript frontend (map UI, gallery, benchmarks page) |
+| `web/` | Next.js static export (map UI, gallery, benchmarks, stacks, report). Tokens generated from DESIGN.md, types from the schema; `npm run build:bundle` copies it into the package for `evident open` |
 | `schema/graph.schema.json` | **The contract** between engine and web. Versioned. |
 | `benchmark/` | `repos.yaml` (pinned SHAs) + `ground-truth/` hand-labelled YAML per repo |
 | `DESIGN.md` | Visual design system (tokens + rules). Read before writing any UI. |
 | `docs/` | Design doc (source of truth), PRD, architecture, ADRs, threat model, labelling guide, runbook |
-| `deploy/` | Docker Compose for the service stack (Caddyfile at launch) |
+| `deploy/` | Docker Compose for the service stack, built from the repo root (Caddyfile at launch). The site deploys to Vercel ([ADR-0008](docs/adr/0008-static-web-on-vercel-api-on-one-server.md)) |
 
 ## Non-negotiable rules
 
 1. **Never execute analysed repo code.** No `npm install`, `npx`, builds, `eval`, `require()`/`import()` of cloned files, or git hooks. Parse with tree-sitter and read files as text only. See [docs/security.md](docs/security.md).
 2. **Every node and edge needs evidence** (`file`, `startLine`, `endLine`, `sha`). If you can't point to a line, don't emit the element.
 3. **The LLM never creates nodes or edges.** It may only return groups and labels that reference existing node IDs; the validator drops anything else. Don't loosen the validator to make a test pass.
-4. **Schema changes are contract changes.** Edit `schema/graph.schema.json`, bump `schemaVersion` (minor = additive, major = breaking), update `schema/examples/`, and update both engine and web in the same PR.
+4. **Schema changes are contract changes.** Edit `schema/graph.schema.json`, bump `schemaVersion` (minor = additive, major = breaking), update `schema/examples/`, copy it to `engine/src/evident/graph.schema.json`, run `npm run gen:types` in `web/`, and update both engine and web in the same PR.
 5. **Never read or store env var values**, only names.
 6. **Don't regress the benchmark.** CI fails if precision or recall drops more than 2 points in any category. If a change trades one metric for another, say so in the PR.
 7. **Decisions go in ADRs.** If you change a decision recorded in `docs/adr/` or `docs/PRD.md`, write a new ADR that supersedes it. Don't silently diverge.
@@ -41,7 +41,7 @@ cd web && npm ci              # Node deps
 # check before every commit
 pre-commit run --all-files    # ruff, prettier, schema validation, secret scan
 cd engine && uv run mypy && uv run pytest
-cd web && npm run lint && npm run typecheck
+cd web && npm run check:generated && npm run format:check && npm run lint && npm run typecheck && npm test
 
 # benchmark (needs network to clone pinned repos; fails on a >2 point drop)
 cd engine && uv run evident-bench --baseline ../benchmark/results/baseline.json

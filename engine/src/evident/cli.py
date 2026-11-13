@@ -5,10 +5,13 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
+import webbrowser
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
-from evident import __version__
+from evident import __version__, viewer
+from evident import share as sharing
 from evident.analyze import analyze
 from evident.models import AnalysisError, CommandResult, Graph, ResultItem, UsageError
 from evident.query import (
@@ -50,8 +53,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = argparse.ArgumentParser(
         prog="evident",
-        description="Evidence-backed architecture maps for Next.js, Express and Prisma apps. "
-        "Static and read-only: never runs repo code; writes only inside .evident/.",
+        description="Evidence-backed architecture maps: routes, middleware, models and services, "
+        "each linked to the line that proves it. JS/TS and Python. Static and read-only: never "
+        "runs repo code; writes only inside .evident/.",
         epilog="Exit codes: 0 ok, 1 findings or no match, 2 usage error, 3 analysis error.",
     )
     p.add_argument("--version", action="version", version=f"evident {__version__}")
@@ -92,6 +96,18 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="FILE",
         help="write here (the only write outside .evident/, and only when asked); default stdout",
     )
+    o = sub.add_parser("open", parents=[common], help="open the local map UI in the browser")
+    o.add_argument("--port", type=_positive, default=0, help="port on 127.0.0.1 (default: any)")
+    o.add_argument("--no-browser", action="store_true", help="print the URL, don't launch it")
+
+    sh = sub.add_parser(
+        "share", parents=[common], help="upload graph metadata (no code) for a share link"
+    )
+    sh.add_argument("--yes", action="store_true", help="skip the confirmation prompt")
+    sh.add_argument("--ttl-days", type=_positive, default=None, help="link lifetime (max 30)")
+    sh.add_argument("--api", default=None, metavar="URL", help="share server (or EVIDENT_API_URL)")
+    sh.add_argument("--delete", default=None, metavar="ID", help="delete a share you created")
+
     return p
 
 
@@ -250,6 +266,59 @@ def _show_cmd(args: argparse.Namespace, graph: Graph | None) -> CommandResult:
     return CommandResult("show", EXIT_OK, summary, shown, total, cut, query=query)
 
 
+def _cache_dir(args: argparse.Namespace) -> Path:
+    repo = Path(args.repo)
+    return (repo if repo.is_dir() else Path.cwd()) / ".evident"
+
+
+def _open_cmd(args: argparse.Namespace, graph: Graph | None) -> CommandResult:
+    graph = _require(graph)
+    repo = Path(args.repo)
+    # GitHub analyses keep no checkout; the UI loads their snippets from GitHub instead.
+    root = repo.resolve() if graph.repo.host == "local" and repo.is_dir() else None
+    try:
+        server = viewer.start(graph, root, args.port)
+    except FileNotFoundError as exc:
+        raise AnalysisError(
+            "the map UI isn't bundled in this install. Install a release, or build it from a "
+            "clone: cd web && npm ci && npm run build:bundle"
+        ) from exc
+    except OSError as exc:
+        raise UsageError(f"can't listen on port {args.port}: {exc.strerror}") from exc
+    args.server = server
+    if not args.no_browser:
+        webbrowser.open(server.url)
+    summary = f"Map UI at {server.url} (local only; Ctrl+C to stop)."
+    return CommandResult("open", EXIT_OK, summary, query={"url": server.url})
+
+
+def _share_cmd(args: argparse.Namespace, graph: Graph | None) -> CommandResult:
+    cache_dir = _cache_dir(args)
+    if args.delete:
+        sharing.delete(args.delete, cache_dir)
+        return CommandResult("share", EXIT_OK, f"Deleted share {args.delete}.")
+    graph = _require(graph)
+    api = sharing.api_url(args.api)
+    what = (
+        f"{len(graph.nodes)} nodes, {len(graph.edges)} edges and {len(graph.findings)} findings "
+        "(ids, labels, paths, line numbers; no source code, no env values)"
+    )
+    if not args.yes:
+        if args.json or not sys.stdin.isatty():
+            raise UsageError("share uploads data: pass --yes to confirm")
+        answer = input(f"Upload {what} to {api}? [y/N] ")
+        if answer.strip().lower() not in ("y", "yes"):
+            return CommandResult("share", EXIT_MATCH, "Not shared.")
+    res = sharing.upload(graph, api, args.ttl_days, cache_dir)
+    link = res.url or f"{api}/api/shares/{res.id} (no viewer URL configured on the server)"
+    summary = (
+        f"Shared {what}.\n  link: {link}\n  expires: {res.expires_at}\n"
+        f"  delete early: evident share --delete {res.id}"
+    )
+    query = {"id": res.id, "url": res.url, "expiresAt": res.expires_at}
+    return CommandResult("share", EXIT_OK, summary, query=query)
+
+
 COMMANDS: dict[str, Callable[[argparse.Namespace, Graph | None], CommandResult]] = {
     "analyze": _analyze_cmd,
     "trace": _trace_cmd,
@@ -258,6 +327,8 @@ COMMANDS: dict[str, Callable[[argparse.Namespace, Graph | None], CommandResult]]
     "health": _health_cmd,
     "show": _show_cmd,
     "export": _export_cmd,
+    "open": _open_cmd,
+    "share": _share_cmd,
 }
 
 
@@ -296,7 +367,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         graph = None
-        if args.command != "analyze":
+        if args.command != "analyze" and not (args.command == "share" and args.delete):
             # Queries refresh incrementally first, so answers never come from a stale graph.
             graph = analyze(args.repo, use_llm=not args.no_llm).graph
         result = COMMANDS[args.command](args, graph)
@@ -312,7 +383,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         pass  # the export itself went to stdout; keep it clean for piping
     else:
         print(render(result), file=sys.stderr if result.error else sys.stdout)
+    server = getattr(args, "server", None)
+    if server is not None:
+        _serve_until_interrupted(server)
     return result.exit_code
+
+
+def _serve_until_interrupted(server: viewer.Viewer) -> None:
+    try:
+        while True:
+            time.sleep(3600)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.shutdown()
+        server.server_close()
 
 
 def run() -> None:

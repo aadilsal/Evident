@@ -15,7 +15,7 @@ from typing import Any, Literal
 
 from evident import cache
 from evident.extract import FileFacts, extract_file, is_parsed
-from evident.group import LLMClient, assign_groups, client_from_env
+from evident.group import GroupSource, LLMClient, assign_groups, client_from_env, has_llm_groups
 from evident.health import run_health
 from evident.models import AnalysisError, Graph, RepoInfo
 from evident.pipeline import link
@@ -224,8 +224,15 @@ def _analyze_dir(
         and cached_graph.repo.sha == sha
         and cached_graph.repo.worktree_hash == worktree_hash
     ):
+        llm_state: GroupSource = "skipped"
+        # A --no-llm run caches directory groups; regroup (no re-parse) when the LLM is now wanted.
+        if use_llm and llm is not None and not has_llm_groups(cached_graph):
+            report("group", {})
+            llm_state = assign_groups(cached_graph, llm, use_llm=True)
+            if llm_state == "used":
+                cache.save(cache_dir, entries, cached_graph)
         return AnalyzeResult(
-            cached_graph, cache_dir, len(entries), 0, len(entries), "hit", "skipped", 0
+            cached_graph, cache_dir, len(entries), 0, len(entries), "hit", llm_state, 0
         )
 
     report("extract", {"files": len(entries), "parsed": len(fresh)})

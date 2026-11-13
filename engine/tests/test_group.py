@@ -125,3 +125,26 @@ def test_client_reads_key_name_from_env_only() -> None:
     assert client_from_env({}) is None
     client = client_from_env({"GROQ_API_KEY": "k", "EVIDENT_LLM_MODEL": "qwen/x"})
     assert isinstance(client, GroqClient) and client.model == "qwen/x"
+
+
+def test_cache_hit_regroups_with_the_llm_when_cache_has_directory_groups(
+    fixture_repo: Path,
+) -> None:
+    """Regression: a --no-llm run cached directory groups, and a later LLM run reused them."""
+    first = analyze(str(fixture_repo), use_llm=False)
+    assert first.llm == "skipped"
+    fake = FakeLLM(
+        json.dumps(
+            {
+                "groups": [
+                    {"label": "Auth", "members": ["middleware:src/middleware/auth.ts#requireAuth"]}
+                ]
+            }
+        )
+    )
+    second = analyze(str(fixture_repo), llm=fake)
+    assert second.cache_state == "hit" and second.parsed == 0
+    assert second.llm == "used" and second.graph.groups[0].label == "Auth"
+    # The LLM groups are cached too: the next run neither re-parses nor calls the LLM again.
+    third = analyze(str(fixture_repo), llm=FakeLLM(error=True))
+    assert third.graph.groups[0].label == "Auth" and third.llm == "skipped"

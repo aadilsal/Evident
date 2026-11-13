@@ -273,6 +273,11 @@ def validate_groups(raw: str, graph: Graph, keys: dict[str, str] | None = None) 
     return groups
 
 
+def has_llm_groups(graph: Graph) -> bool:
+    """Directory fallback groups carry DIR_CONFIDENCE; any other group came from the LLM."""
+    return any(g.confidence == LLM_CONFIDENCE for g in graph.groups)
+
+
 def assign_groups(
     graph: Graph,
     client: LLMClient | None,

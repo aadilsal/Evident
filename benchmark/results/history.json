@@ -1,0 +1,66 @@
+{
+  "runs": [
+    {
+      "date": "2026-11-10",
+      "evidentSha": "ed1ae09a51d081355ff4ff587579498fc8376667",
+      "repos": 5,
+      "categories": {
+        "routes": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0027
+        },
+        "models": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      }
+    },
+    {
+      "date": "2026-11-11",
+      "evidentSha": "112e6a4e85e3c7c12c6e8c5d899a34561dc90d26",
+      "repos": 8,
+      "categories": {
+        "routes": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0043
+        },
+        "models": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      }
+    }
+  ]
+}

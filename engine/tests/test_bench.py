@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -66,3 +67,27 @@ def test_gate_fails_on_more_than_two_points() -> None:
     bad = {"categories": {"routes": {"precision": 0.92, "recall": 0.90}}}
     assert regressions(ok, base) == []
     assert regressions(bad, base) == ["routes precision: 95.0% -> 92.0%"]
+
+
+def test_history_appends_one_point_per_evident_commit(tmp_path: Path) -> None:
+    from evident.bench import append_history
+
+    summary = {
+        "repos": [{}, {}],
+        "categories": {
+            "routes": {
+                "precision": 1.0,
+                "recall": 0.9,
+                "f1": 0.947,
+                "hallucinationRate": 0.0,
+                "tp": 9,
+            }
+        },
+    }
+    path = tmp_path / "history.json"
+    append_history(path, summary, "a" * 40)
+    append_history(path, summary, "a" * 40)  # same commit: replaced, not duplicated
+    append_history(path, summary, "b" * 40)
+    runs = json.loads(path.read_text(encoding="utf-8"))["runs"]
+    assert [r["evidentSha"] for r in runs] == ["a" * 40, "b" * 40]
+    assert runs[0]["repos"] == 2 and "tp" not in runs[0]["categories"]["routes"]

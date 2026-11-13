@@ -14,6 +14,7 @@ import sys
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -281,12 +282,47 @@ def _table(summary: JSON) -> str:
     return "\n".join(lines)
 
 
+HISTORY_METRICS = ("precision", "recall", "f1", "hallucinationRate")
+
+
+def history_entry(summary: JSON, evident_sha: str | None, date: str) -> JSON:
+    return {
+        "date": date,
+        "evidentSha": evident_sha,
+        "repos": len(summary["repos"]),
+        "categories": {
+            cat: {m: s[m] for m in HISTORY_METRICS} for cat, s in summary["categories"].items()
+        },
+    }
+
+
+def append_history(path: Path, summary: JSON, evident_sha: str | None) -> None:
+    """One point per run; a rerun on the same Evident commit replaces its point."""
+    try:
+        data: JSON = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        data = {"runs": []}
+    today = datetime.now(UTC).date().isoformat()
+    entry = history_entry(summary, evident_sha, today)
+    runs = [
+        r for r in data.get("runs", []) if not evident_sha or r.get("evidentSha") != evident_sha
+    ]
+    data["runs"] = [*runs, entry]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="evident-bench", description=__doc__)
     ap.add_argument("--repo", action="append", help="only this repo name (repeatable)")
     ap.add_argument("--baseline", type=Path, help="fail on a >2 point drop against this file")
     ap.add_argument("--write", type=Path, help="write the summary JSON here")
     ap.add_argument("--verbose", action="store_true", help="list misses and extras per repo")
+    ap.add_argument(
+        "--history",
+        type=Path,
+        help="append this run to a history file (the /benchmarks chart)",
+    )
     args = ap.parse_args(argv)
     root = repo_root()
     results = []
@@ -318,6 +354,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.write and not failed:
         args.write.parent.mkdir(parents=True, exist_ok=True)
         args.write.write_text(json.dumps(summary, indent=1) + "\n", encoding="utf-8")
+    if args.history and not failed:
+        append_history(args.history, summary, local_head(root))
     if failed:
         print(
             f"{len(failed)} repo(s) could not be analysed; not trusting these numbers",

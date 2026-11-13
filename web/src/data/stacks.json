@@ -1,0 +1,83 @@
+{
+  "adapters": [
+    {
+      "name": "prisma",
+      "label": "Prisma",
+      "kind": "orm",
+      "ecosystem": "js"
+    },
+    {
+      "name": "drizzle",
+      "label": "Drizzle",
+      "kind": "orm",
+      "ecosystem": "js"
+    },
+    {
+      "name": "typeorm",
+      "label": "TypeORM",
+      "kind": "orm",
+      "ecosystem": "js"
+    },
+    {
+      "name": "mongoose",
+      "label": "Mongoose",
+      "kind": "orm",
+      "ecosystem": "js"
+    },
+    {
+      "name": "django-orm",
+      "label": "Django ORM",
+      "kind": "orm",
+      "ecosystem": "python"
+    },
+    {
+      "name": "sqlalchemy",
+      "label": "SQLAlchemy",
+      "kind": "orm",
+      "ecosystem": "python"
+    },
+    {
+      "name": "express",
+      "label": "Express",
+      "kind": "framework",
+      "ecosystem": "js"
+    },
+    {
+      "name": "fastify",
+      "label": "Fastify",
+      "kind": "framework",
+      "ecosystem": "js"
+    },
+    {
+      "name": "nestjs",
+      "label": "NestJS",
+      "kind": "framework",
+      "ecosystem": "js"
+    },
+    {
+      "name": "nextjs",
+      "label": "Next.js",
+      "kind": "framework",
+      "ecosystem": "js"
+    },
+    {
+      "name": "fastapi",
+      "label": "FastAPI",
+      "kind": "framework",
+      "ecosystem": "python"
+    },
+    {
+      "name": "flask",
+      "label": "Flask",
+      "kind": "framework",
+      "ecosystem": "python"
+    },
+    {
+      "name": "django",
+      "label": "Django",
+      "kind": "framework",
+      "ecosystem": "python"
+    }
+  ],
+  "notYet": ["Hono", "Koa", "Nuxt", "Remix", "SvelteKit"]
+}

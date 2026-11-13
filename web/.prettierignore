@@ -1,0 +1,8 @@
+# Build output, copied assets and generated code
+.next/
+out/
+public/
+src/lib/schema.ts
+src/styles/tokens.css
+next-env.d.ts
+package-lock.json

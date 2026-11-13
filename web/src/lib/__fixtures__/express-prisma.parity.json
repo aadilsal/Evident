@@ -1,0 +1,1269 @@
+{
+  "graph": {
+    "schemaVersion": "1.2.0",
+    "engineVersion": "0.2.0",
+    "repo": {
+      "host": "local",
+      "name": "express-prisma",
+      "sha": "a5255e8389d85044b0f1309d08156485ceb651a8",
+      "worktreeHash": "a5255e8389d85044b0f1309d08156485ceb651a8",
+      "analyzedAt": "2026-01-01T00:00:00Z"
+    },
+    "stack": {
+      "detected": ["Express", "Prisma"],
+      "adapters": ["Prisma", "Express"]
+    },
+    "nodes": [
+      {
+        "id": "envVar:API_TOKEN",
+        "type": "envVar",
+        "label": "API_TOKEN",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/middleware/auth.ts",
+            "startLine": 4,
+            "endLine": 4,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "name": "API_TOKEN",
+          "documented": true
+        }
+      },
+      {
+        "id": "envVar:DATABASE_URL",
+        "type": "envVar",
+        "label": "DATABASE_URL",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "prisma/schema.prisma",
+            "startLine": 3,
+            "endLine": 3,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "name": "DATABASE_URL",
+          "documented": true
+        }
+      },
+      {
+        "id": "envVar:STRIPE_SECRET_KEY",
+        "type": "envVar",
+        "label": "STRIPE_SECRET_KEY",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/lib/billing.ts",
+            "startLine": 3,
+            "endLine": 3,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "name": "STRIPE_SECRET_KEY",
+          "documented": false
+        }
+      },
+      {
+        "id": "function:src/lib/billing.ts#chargeCustomer",
+        "type": "function",
+        "label": "chargeCustomer()",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/lib/billing.ts",
+            "startLine": 5,
+            "endLine": 7,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "file": "src/lib/billing.ts",
+          "exportName": "chargeCustomer"
+        }
+      },
+      {
+        "id": "handler:src/app.ts#L9",
+        "type": "handler",
+        "label": "app.ts:9 handler",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "startLine": 9,
+            "endLine": 9,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "file": "src/app.ts",
+          "exportName": null,
+          "checksAuth": false
+        }
+      },
+      {
+        "id": "handler:src/routes/invoices.ts#L10",
+        "type": "handler",
+        "label": "invoices.ts:10 handler",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 10,
+            "endLine": 12,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "file": "src/routes/invoices.ts",
+          "exportName": null,
+          "checksAuth": false
+        }
+      },
+      {
+        "id": "handler:src/routes/invoices.ts#L14",
+        "type": "handler",
+        "label": "invoices.ts:14 handler",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 14,
+            "endLine": 19,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "file": "src/routes/invoices.ts",
+          "exportName": null,
+          "checksAuth": false,
+          "bodyLine": 15,
+          "validatesBody": true
+        }
+      },
+      {
+        "id": "handler:src/routes/users.ts#L11",
+        "type": "handler",
+        "label": "users.ts:11 handler",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 11,
+            "endLine": 14,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "file": "src/routes/users.ts",
+          "exportName": null,
+          "checksAuth": false
+        }
+      },
+      {
+        "id": "handler:src/routes/users.ts#L17",
+        "type": "handler",
+        "label": "users.ts:17 handler",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 17,
+            "endLine": 20,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "file": "src/routes/users.ts",
+          "exportName": null,
+          "checksAuth": false,
+          "bodyLine": 18
+        }
+      },
+      {
+        "id": "handler:src/routes/users.ts#L6",
+        "type": "handler",
+        "label": "users.ts:6 handler",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 6,
+            "endLine": 9,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "file": "src/routes/users.ts",
+          "exportName": null,
+          "checksAuth": false
+        }
+      },
+      {
+        "id": "middleware:src/middleware/auth.ts#requireAuth",
+        "type": "middleware",
+        "label": "requireAuth()",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/middleware/auth.ts",
+            "startLine": 3,
+            "endLine": 8,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "file": "src/middleware/auth.ts",
+          "framework": "express",
+          "name": "requireAuth",
+          "checksAuth": true
+        }
+      },
+      {
+        "id": "model:AuditLog",
+        "type": "model",
+        "label": "AuditLog",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "prisma/schema.prisma",
+            "startLine": 27,
+            "endLine": 30,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "tableName": "AuditLog",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "isId": true
+            },
+            {
+              "name": "message",
+              "type": "String"
+            }
+          ],
+          "orm": "prisma"
+        }
+      },
+      {
+        "id": "model:Invoice",
+        "type": "model",
+        "label": "Invoice",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "prisma/schema.prisma",
+            "startLine": 17,
+            "endLine": 25,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "tableName": "invoices",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "isId": true
+            },
+            {
+              "name": "amount",
+              "type": "Int"
+            },
+            {
+              "name": "customer",
+              "type": "User",
+              "isRelation": true
+            },
+            {
+              "name": "customerId",
+              "type": "String"
+            },
+            {
+              "name": "createdAt",
+              "type": "DateTime"
+            }
+          ],
+          "orm": "prisma"
+        }
+      },
+      {
+        "id": "model:User",
+        "type": "model",
+        "label": "User",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "prisma/schema.prisma",
+            "startLine": 10,
+            "endLine": 15,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "tableName": "User",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "isId": true
+            },
+            {
+              "name": "email",
+              "type": "String"
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "isOptional": true
+            },
+            {
+              "name": "invoices",
+              "type": "Invoice",
+              "isList": true,
+              "isRelation": true
+            }
+          ],
+          "orm": "prisma"
+        }
+      },
+      {
+        "id": "module:src/app.ts",
+        "type": "module",
+        "label": "src/app.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "startLine": 1,
+            "endLine": 1,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "path": "src/app.ts",
+          "workspace": null
+        }
+      },
+      {
+        "id": "module:src/db.ts",
+        "type": "module",
+        "label": "src/db.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/db.ts",
+            "startLine": 1,
+            "endLine": 1,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "path": "src/db.ts",
+          "workspace": null
+        }
+      },
+      {
+        "id": "module:src/lib/billing.ts",
+        "type": "module",
+        "label": "src/lib/billing.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/lib/billing.ts",
+            "startLine": 1,
+            "endLine": 1,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "path": "src/lib/billing.ts",
+          "workspace": null
+        }
+      },
+      {
+        "id": "module:src/middleware/auth.ts",
+        "type": "module",
+        "label": "src/middleware/auth.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/middleware/auth.ts",
+            "startLine": 1,
+            "endLine": 1,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "path": "src/middleware/auth.ts",
+          "workspace": null
+        }
+      },
+      {
+        "id": "module:src/routes/invoices.ts",
+        "type": "module",
+        "label": "src/routes/invoices.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 1,
+            "endLine": 1,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "path": "src/routes/invoices.ts",
+          "workspace": null
+        }
+      },
+      {
+        "id": "module:src/routes/users.ts",
+        "type": "module",
+        "label": "src/routes/users.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 1,
+            "endLine": 1,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "path": "src/routes/users.ts",
+          "workspace": null
+        }
+      },
+      {
+        "id": "route:GET /api/invoices",
+        "type": "route",
+        "label": "GET /api/invoices",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 10,
+            "endLine": 12,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "method": "GET",
+          "path": "/api/invoices",
+          "framework": "express",
+          "kind": "api",
+          "handlerRef": "handler:src/routes/invoices.ts#L10"
+        }
+      },
+      {
+        "id": "route:GET /api/users",
+        "type": "route",
+        "label": "GET /api/users",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 6,
+            "endLine": 9,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "method": "GET",
+          "path": "/api/users",
+          "framework": "express",
+          "kind": "api",
+          "handlerRef": "handler:src/routes/users.ts#L6"
+        }
+      },
+      {
+        "id": "route:GET /api/users/:id",
+        "type": "route",
+        "label": "GET /api/users/:id",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 11,
+            "endLine": 14,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "method": "GET",
+          "path": "/api/users/:id",
+          "framework": "express",
+          "kind": "api",
+          "handlerRef": "handler:src/routes/users.ts#L11"
+        }
+      },
+      {
+        "id": "route:GET /health",
+        "type": "route",
+        "label": "GET /health",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "startLine": 9,
+            "endLine": 9,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "method": "GET",
+          "path": "/health",
+          "framework": "express",
+          "kind": "api",
+          "handlerRef": "handler:src/app.ts#L9"
+        }
+      },
+      {
+        "id": "route:POST /api/invoices",
+        "type": "route",
+        "label": "POST /api/invoices",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 14,
+            "endLine": 19,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "method": "POST",
+          "path": "/api/invoices",
+          "framework": "express",
+          "kind": "api",
+          "handlerRef": "handler:src/routes/invoices.ts#L14"
+        }
+      },
+      {
+        "id": "route:POST /api/users",
+        "type": "route",
+        "label": "POST /api/users",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 17,
+            "endLine": 20,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "method": "POST",
+          "path": "/api/users",
+          "framework": "express",
+          "kind": "api",
+          "handlerRef": "handler:src/routes/users.ts#L17"
+        }
+      },
+      {
+        "id": "service:stripe",
+        "type": "service",
+        "label": "Stripe",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/lib/billing.ts",
+            "startLine": 1,
+            "endLine": 1,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "provider": "stripe",
+          "packages": ["stripe"]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "calls:handler:src/routes/invoices.ts#L14->function:src/lib/billing.ts#chargeCustomer",
+        "type": "calls",
+        "from": "handler:src/routes/invoices.ts#L14",
+        "to": "function:src/lib/billing.ts#chargeCustomer",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 17,
+            "endLine": 17,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "guards:middleware:src/middleware/auth.ts#requireAuth->route:GET /api/invoices",
+        "type": "guards",
+        "from": "middleware:src/middleware/auth.ts#requireAuth",
+        "to": "route:GET /api/invoices",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "startLine": 11,
+            "endLine": 11,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "guards:middleware:src/middleware/auth.ts#requireAuth->route:POST /api/invoices",
+        "type": "guards",
+        "from": "middleware:src/middleware/auth.ts#requireAuth",
+        "to": "route:POST /api/invoices",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "startLine": 11,
+            "endLine": 11,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "handles:route:GET /api/invoices->handler:src/routes/invoices.ts#L10",
+        "type": "handles",
+        "from": "route:GET /api/invoices",
+        "to": "handler:src/routes/invoices.ts#L10",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 10,
+            "endLine": 10,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "handles:route:GET /api/users->handler:src/routes/users.ts#L6",
+        "type": "handles",
+        "from": "route:GET /api/users",
+        "to": "handler:src/routes/users.ts#L6",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 6,
+            "endLine": 6,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "handles:route:GET /api/users/:id->handler:src/routes/users.ts#L11",
+        "type": "handles",
+        "from": "route:GET /api/users/:id",
+        "to": "handler:src/routes/users.ts#L11",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 11,
+            "endLine": 11,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "handles:route:GET /health->handler:src/app.ts#L9",
+        "type": "handles",
+        "from": "route:GET /health",
+        "to": "handler:src/app.ts#L9",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "startLine": 9,
+            "endLine": 9,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "handles:route:POST /api/invoices->handler:src/routes/invoices.ts#L14",
+        "type": "handles",
+        "from": "route:POST /api/invoices",
+        "to": "handler:src/routes/invoices.ts#L14",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 14,
+            "endLine": 14,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "handles:route:POST /api/users->handler:src/routes/users.ts#L17",
+        "type": "handles",
+        "from": "route:POST /api/users",
+        "to": "handler:src/routes/users.ts#L17",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 17,
+            "endLine": 17,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "imports:module:src/app.ts->module:src/middleware/auth.ts",
+        "type": "imports",
+        "from": "module:src/app.ts",
+        "to": "module:src/middleware/auth.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "startLine": 2,
+            "endLine": 2,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "imports:module:src/app.ts->module:src/routes/invoices.ts",
+        "type": "imports",
+        "from": "module:src/app.ts",
+        "to": "module:src/routes/invoices.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "startLine": 3,
+            "endLine": 3,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "imports:module:src/app.ts->module:src/routes/users.ts",
+        "type": "imports",
+        "from": "module:src/app.ts",
+        "to": "module:src/routes/users.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "startLine": 4,
+            "endLine": 4,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "imports:module:src/routes/invoices.ts->module:src/db.ts",
+        "type": "imports",
+        "from": "module:src/routes/invoices.ts",
+        "to": "module:src/db.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 3,
+            "endLine": 3,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "imports:module:src/routes/invoices.ts->module:src/lib/billing.ts",
+        "type": "imports",
+        "from": "module:src/routes/invoices.ts",
+        "to": "module:src/lib/billing.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 4,
+            "endLine": 4,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "imports:module:src/routes/users.ts->module:src/db.ts",
+        "type": "imports",
+        "from": "module:src/routes/users.ts",
+        "to": "module:src/db.ts",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 2,
+            "endLine": 2,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "reads:handler:src/routes/invoices.ts#L10->model:Invoice",
+        "type": "reads",
+        "from": "handler:src/routes/invoices.ts#L10",
+        "to": "model:Invoice",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 11,
+            "endLine": 11,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "operation": "findMany"
+        }
+      },
+      {
+        "id": "reads:handler:src/routes/users.ts#L11->model:User",
+        "type": "reads",
+        "from": "handler:src/routes/users.ts#L11",
+        "to": "model:User",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 12,
+            "endLine": 12,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "operation": "findUnique"
+        }
+      },
+      {
+        "id": "reads:handler:src/routes/users.ts#L6->model:User",
+        "type": "reads",
+        "from": "handler:src/routes/users.ts#L6",
+        "to": "model:User",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 7,
+            "endLine": 7,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "operation": "findMany"
+        }
+      },
+      {
+        "id": "reads:middleware:src/middleware/auth.ts#requireAuth->envVar:API_TOKEN",
+        "type": "reads",
+        "from": "middleware:src/middleware/auth.ts#requireAuth",
+        "to": "envVar:API_TOKEN",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/middleware/auth.ts",
+            "startLine": 4,
+            "endLine": 4,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "relates:model:Invoice->model:User",
+        "type": "relates",
+        "from": "model:Invoice",
+        "to": "model:User",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "prisma/schema.prisma",
+            "startLine": 20,
+            "endLine": 20,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "relationField": "customer"
+        }
+      },
+      {
+        "id": "relates:model:User->model:Invoice",
+        "type": "relates",
+        "from": "model:User",
+        "to": "model:Invoice",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "prisma/schema.prisma",
+            "startLine": 14,
+            "endLine": 14,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "relationField": "invoices"
+        }
+      },
+      {
+        "id": "uses:function:src/lib/billing.ts#chargeCustomer->service:stripe",
+        "type": "uses",
+        "from": "function:src/lib/billing.ts#chargeCustomer",
+        "to": "service:stripe",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/lib/billing.ts",
+            "startLine": 6,
+            "endLine": 6,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "uses:module:src/lib/billing.ts->service:stripe",
+        "type": "uses",
+        "from": "module:src/lib/billing.ts",
+        "to": "service:stripe",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/lib/billing.ts",
+            "startLine": 1,
+            "endLine": 1,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "writes:handler:src/routes/invoices.ts#L14->model:Invoice",
+        "type": "writes",
+        "from": "handler:src/routes/invoices.ts#L14",
+        "to": "model:Invoice",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/invoices.ts",
+            "startLine": 16,
+            "endLine": 16,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "operation": "create"
+        }
+      },
+      {
+        "id": "writes:handler:src/routes/users.ts#L17->model:User",
+        "type": "writes",
+        "from": "handler:src/routes/users.ts#L17",
+        "to": "model:User",
+        "source": "extracted",
+        "confidence": 1.0,
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 18,
+            "endLine": 18,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ],
+        "attrs": {
+          "operation": "create"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "id": "group:lib",
+        "label": "lib",
+        "summary": "Code under lib.",
+        "members": ["function:src/lib/billing.ts#chargeCustomer", "module:src/lib/billing.ts"],
+        "source": "inferred",
+        "confidence": 0.5
+      },
+      {
+        "id": "group:middleware",
+        "label": "middleware",
+        "summary": "Code under middleware.",
+        "members": [
+          "middleware:src/middleware/auth.ts#requireAuth",
+          "module:src/middleware/auth.ts"
+        ],
+        "source": "inferred",
+        "confidence": 0.5
+      },
+      {
+        "id": "group:routes",
+        "label": "routes",
+        "summary": "Code under routes.",
+        "members": [
+          "handler:src/routes/invoices.ts#L10",
+          "handler:src/routes/invoices.ts#L14",
+          "handler:src/routes/users.ts#L11",
+          "handler:src/routes/users.ts#L17",
+          "handler:src/routes/users.ts#L6",
+          "module:src/routes/invoices.ts",
+          "module:src/routes/users.ts",
+          "route:GET /api/invoices",
+          "route:GET /api/users",
+          "route:GET /api/users/:id",
+          "route:POST /api/invoices",
+          "route:POST /api/users"
+        ],
+        "source": "inferred",
+        "confidence": 0.5
+      },
+      {
+        "id": "group:src",
+        "label": "src",
+        "summary": "Code under src.",
+        "members": [
+          "handler:src/app.ts#L9",
+          "module:src/app.ts",
+          "module:src/db.ts",
+          "route:GET /health"
+        ],
+        "source": "inferred",
+        "confidence": 0.5
+      },
+      {
+        "id": "group:configuration",
+        "label": "Configuration",
+        "summary": "Environment variables the code reads.",
+        "members": ["envVar:API_TOKEN", "envVar:DATABASE_URL", "envVar:STRIPE_SECRET_KEY"],
+        "source": "inferred",
+        "confidence": 0.5
+      },
+      {
+        "id": "group:data-model",
+        "label": "Data model",
+        "summary": "Database models and their relations.",
+        "members": ["model:AuditLog", "model:Invoice", "model:User"],
+        "source": "inferred",
+        "confidence": 0.5
+      },
+      {
+        "id": "group:external-services",
+        "label": "External services",
+        "summary": "Third-party SDKs the app calls.",
+        "members": ["service:stripe"],
+        "source": "inferred",
+        "confidence": 0.5
+      }
+    ],
+    "findings": [
+      {
+        "id": "undocumented-env:STRIPE_SECRET_KEY",
+        "rule": "undocumented-env",
+        "severity": "info",
+        "message": "STRIPE_SECRET_KEY is read but not listed in .env.example.",
+        "nodeIds": ["envVar:STRIPE_SECRET_KEY"],
+        "evidence": [
+          {
+            "file": "src/lib/billing.ts",
+            "startLine": 3,
+            "endLine": 3,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "unguarded-write:route:POST /api/users->model:User",
+        "rule": "unguarded-write",
+        "severity": "warning",
+        "message": "POST /api/users writes to User with no auth middleware.",
+        "nodeIds": ["route:POST /api/users", "model:User"],
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 18,
+            "endLine": 18,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "unused-model:AuditLog",
+        "rule": "unused-model",
+        "severity": "info",
+        "message": "AuditLog is never read or written.",
+        "nodeIds": ["model:AuditLog"],
+        "evidence": [
+          {
+            "file": "prisma/schema.prisma",
+            "startLine": 27,
+            "endLine": 30,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      },
+      {
+        "id": "unvalidated-body:route:POST /api/users",
+        "rule": "unvalidated-body",
+        "severity": "warning",
+        "message": "POST /api/users reads the request body without validating it.",
+        "nodeIds": ["route:POST /api/users", "handler:src/routes/users.ts#L17"],
+        "evidence": [
+          {
+            "file": "src/routes/users.ts",
+            "startLine": 18,
+            "endLine": 18,
+            "sha": "a5255e8389d85044b0f1309d08156485ceb651a8"
+          }
+        ]
+      }
+    ]
+  },
+  "trace": {
+    "route:GET /api/invoices": [
+      "route:GET /api/invoices",
+      "middleware:src/middleware/auth.ts#requireAuth",
+      "handler:src/routes/invoices.ts#L10",
+      "envVar:API_TOKEN",
+      "model:Invoice"
+    ],
+    "route:GET /api/users": [
+      "route:GET /api/users",
+      "handler:src/routes/users.ts#L6",
+      "model:User"
+    ],
+    "route:GET /api/users/:id": [
+      "route:GET /api/users/:id",
+      "handler:src/routes/users.ts#L11",
+      "model:User"
+    ],
+    "route:GET /health": ["route:GET /health", "handler:src/app.ts#L9"],
+    "route:POST /api/invoices": [
+      "route:POST /api/invoices",
+      "middleware:src/middleware/auth.ts#requireAuth",
+      "handler:src/routes/invoices.ts#L14",
+      "envVar:API_TOKEN",
+      "function:src/lib/billing.ts#chargeCustomer",
+      "model:Invoice",
+      "service:stripe"
+    ],
+    "route:POST /api/users": [
+      "route:POST /api/users",
+      "handler:src/routes/users.ts#L17",
+      "model:User"
+    ]
+  },
+  "impact": {
+    "envVar:API_TOKEN": [
+      "envVar:API_TOKEN",
+      "middleware:src/middleware/auth.ts#requireAuth",
+      "route:GET /api/invoices",
+      "route:POST /api/invoices"
+    ],
+    "envVar:DATABASE_URL": ["envVar:DATABASE_URL"],
+    "envVar:STRIPE_SECRET_KEY": ["envVar:STRIPE_SECRET_KEY"],
+    "middleware:src/middleware/auth.ts#requireAuth": [
+      "middleware:src/middleware/auth.ts#requireAuth",
+      "route:GET /api/invoices",
+      "route:POST /api/invoices"
+    ],
+    "model:AuditLog": ["model:AuditLog"],
+    "model:Invoice": [
+      "model:Invoice",
+      "handler:src/routes/invoices.ts#L10",
+      "model:User",
+      "handler:src/routes/invoices.ts#L14",
+      "route:GET /api/invoices",
+      "handler:src/routes/users.ts#L11",
+      "handler:src/routes/users.ts#L6",
+      "handler:src/routes/users.ts#L17",
+      "route:POST /api/invoices",
+      "route:GET /api/users/:id",
+      "route:GET /api/users",
+      "route:POST /api/users"
+    ],
+    "model:User": [
+      "model:User",
+      "handler:src/routes/users.ts#L11",
+      "handler:src/routes/users.ts#L6",
+      "model:Invoice",
+      "handler:src/routes/users.ts#L17",
+      "route:GET /api/users/:id",
+      "route:GET /api/users",
+      "handler:src/routes/invoices.ts#L10",
+      "handler:src/routes/invoices.ts#L14",
+      "route:POST /api/users",
+      "route:GET /api/invoices",
+      "route:POST /api/invoices"
+    ],
+    "service:stripe": [
+      "service:stripe",
+      "function:src/lib/billing.ts#chargeCustomer",
+      "module:src/lib/billing.ts",
+      "handler:src/routes/invoices.ts#L14",
+      "module:src/routes/invoices.ts",
+      "route:POST /api/invoices",
+      "module:src/app.ts"
+    ]
+  }
+}

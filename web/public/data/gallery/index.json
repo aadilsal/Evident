@@ -1,0 +1,71 @@
+{
+  "repos": [
+    {
+      "slug": "motorai",
+      "repo": "aadilsal/MotorAi",
+      "sha": "c10fa5d77f0daa0d40a26ab681e795d5fc589a55",
+      "blurb": "Prisma + Next.js",
+      "stack": [
+        "Prisma",
+        "Next.js"
+      ],
+      "routes": 39,
+      "models": 6,
+      "findings": 7
+    },
+    {
+      "slug": "munshi",
+      "repo": "aadilsal/Munshi",
+      "sha": "40ad91b6e58e2d20cc60f29ddc035688c8eb7ae6",
+      "blurb": "Prisma + Express + Next.js",
+      "stack": [
+        "Prisma",
+        "Express",
+        "Next.js"
+      ],
+      "routes": 56,
+      "models": 11,
+      "findings": 10
+    },
+    {
+      "slug": "ajaiconsultancyassignment",
+      "repo": "aadilsal/AjaiConsultancyAssignment",
+      "sha": "df83d726c11513d2076fdb2a764b2a7d6cdde9ef",
+      "blurb": "Prisma + NestJS + Next.js",
+      "stack": [
+        "Prisma",
+        "NestJS",
+        "Next.js"
+      ],
+      "routes": 24,
+      "models": 3,
+      "findings": 7
+    },
+    {
+      "slug": "insight-os",
+      "repo": "aadilsal/Insight-OS",
+      "sha": "38ded8337547f5705d58943f481e17457ff3b841",
+      "blurb": "Next.js + FastAPI",
+      "stack": [
+        "Next.js",
+        "FastAPI"
+      ],
+      "routes": 24,
+      "models": 0,
+      "findings": 4
+    },
+    {
+      "slug": "spottertrucklogging",
+      "repo": "aadilsal/SpotterTruckLogging",
+      "sha": "3cded29a1e127af7b772160ca1de12cb31d700f0",
+      "blurb": "Django ORM + Django",
+      "stack": [
+        "Django ORM",
+        "Django"
+      ],
+      "routes": 24,
+      "models": 6,
+      "findings": 23
+    }
+  ]
+}

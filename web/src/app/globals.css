@@ -1,0 +1,144 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "@xyflow/react/dist/base.css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  html[data-theme="light"] {
+    color-scheme: light;
+  }
+  body {
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-sans);
+    font-size: var(--text-body-md);
+    line-height: var(--text-body-md--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-on-surface);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-highlight);
+  }
+}
+
+@utility font-condensed {
+  font-family: var(--font-condensed);
+}
+
+/* Faint drafting grid at the canvas grid size (DESIGN.md Layout). */
+@utility drafting-grid {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-outline) 40%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-outline) 40%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: var(--spacing-canvas-grid) var(--spacing-canvas-grid);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Floating layers are the only things with a shadow (DESIGN.md Elevation). */
+@utility float-shadow {
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.45);
+}
+
+.react-flow {
+  --xy-background-color: transparent;
+  --xy-edge-stroke: var(--color-outline-strong);
+}
+.react-flow__attribution {
+  display: none;
+}
+.react-flow__handle {
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+}
+.react-flow__controls {
+  box-shadow: none;
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.react-flow__controls-button {
+  background: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-outline);
+  fill: var(--color-on-surface-muted);
+  width: 28px;
+  height: 28px;
+}
+.react-flow__controls-button:hover {
+  background: var(--color-surface-sunken);
+}
+.react-flow__minimap {
+  background: var(--color-surface-sunken);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-md);
+}
+
+.ev-edge path.ev-edge-line {
+  transition:
+    stroke-width var(--ev-motion-feedback) var(--ease-standard),
+    opacity var(--ev-motion-feedback) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}
+
+@media print {
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Shiki CSS-variable theme, built from the design tokens (DESIGN.md: Code snippets). */
+:root {
+  --shiki-foreground: var(--color-on-surface);
+  --shiki-background: var(--color-surface-sunken);
+  --shiki-token-constant: var(--color-warning);
+  --shiki-token-string: var(--color-layer-model);
+  --shiki-token-string-expression: var(--color-layer-model);
+  --shiki-token-comment: var(--color-on-surface-muted);
+  --shiki-token-keyword: var(--color-layer-route);
+  --shiki-token-parameter: var(--color-on-surface);
+  --shiki-token-function: var(--color-layer-env);
+  --shiki-token-punctuation: var(--color-on-surface-muted);
+  --shiki-token-link: var(--color-layer-route);
+}
+
+/* The export stamp's date only appears in exported images. */
+.export-only {
+  display: none;
+}
+[data-exporting] .export-only {
+  display: inline;
+}

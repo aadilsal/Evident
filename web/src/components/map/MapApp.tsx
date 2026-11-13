@@ -95,7 +95,7 @@ export function MapApp() {
   if (load.status === "error") {
     return (
       <Centered>
-        <p role="alert" className="max-w-md text-center">
+        <p role="alert" className="max-w-[28rem] text-center">
           {load.message}
         </p>
         <ButtonLink href="/">Back to start</ButtonLink>

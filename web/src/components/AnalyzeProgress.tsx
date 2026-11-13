@@ -163,7 +163,7 @@ export function AnalyzeProgress() {
         {error ? "Analysis stopped" : progress.stage === "queued" ? "Queued" : "Mapping the repo"}
       </h1>
       <ol
-        className="relative mt-lg flex w-full max-w-3xl justify-between"
+        className="relative mt-lg flex w-full max-w-[48rem] justify-between"
         aria-label="Pipeline progress"
       >
         <span aria-hidden className="absolute left-2 right-2 top-[7px] h-[3px] bg-outline" />
@@ -210,7 +210,7 @@ export function AnalyzeProgress() {
       </div>
       {error && (
         <div className="mt-lg flex flex-col items-center gap-md">
-          <p role="alert" className="max-w-lg text-center text-error">
+          <p role="alert" className="max-w-[32rem] text-center text-error">
             {error}
           </p>
           <ButtonLink href="/gallery/">Open a gallery map</ButtonLink>

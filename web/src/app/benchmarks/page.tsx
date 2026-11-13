@@ -56,7 +56,7 @@ export default function BenchmarksPage() {
   return (
     <Page>
       <h1 className="pt-2xl text-headline-lg">Benchmarks</h1>
-      <p className="mt-sm max-w-3xl text-body-lg text-on-surface-muted">
+      <p className="mt-sm max-w-[48rem] text-body-lg text-on-surface-muted">
         {latest.repos.length} repos, each pinned to a commit and labelled by hand following the{" "}
         <a
           className="underline underline-offset-4"
@@ -124,7 +124,7 @@ export default function BenchmarksPage() {
         </table>
       </section>
 
-      <section className="mt-2xl max-w-3xl text-body-md text-on-surface-muted">
+      <section className="mt-2xl max-w-[48rem] text-body-md text-on-surface-muted">
         <h2 className="text-headline-md text-on-surface">How to read this</h2>
         <ul className="mt-md list-disc space-y-sm pl-xl">
           <li>

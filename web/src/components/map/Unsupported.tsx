@@ -6,7 +6,7 @@ export function Unsupported({ graph }: { graph: Graph }) {
   const stack = graph.stack;
   const repo = graph.repo.owner ? `${graph.repo.owner}/${graph.repo.name}` : graph.repo.name;
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-lg px-xl py-3xl">
+    <main className="mx-auto flex min-h-dvh max-w-[42rem] flex-col justify-center gap-lg px-xl py-3xl">
       <Mono className="text-code-sm text-on-surface-muted">{repo}</Mono>
       <h1 className="text-headline-lg">We can&apos;t map this stack yet</h1>
       <p className="text-body-lg text-on-surface-muted">

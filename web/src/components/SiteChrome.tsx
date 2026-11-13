@@ -3,6 +3,7 @@ import { REPO_URL } from "@/lib/source";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
+  ["/#how", "How it works"],
   ["/gallery/", "Gallery"],
   ["/benchmarks/", "Benchmarks"],
   ["/stacks/", "Supported stacks"],

@@ -1,4 +1,5 @@
 // Generates src/styles/tokens.css from DESIGN.md front matter. `--check` fails if the file is stale.
+// Spacing tokens (xs…3xl) shadow Tailwind's named widths: write max-w-[42rem], never max-w-2xl.
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

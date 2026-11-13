@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Privacy" };
 export default function PrivacyPage() {
   return (
     <Page>
-      <article className="max-w-3xl pt-2xl text-body-md">
+      <article className="max-w-[48rem] pt-2xl text-body-md">
         <h1 className="text-headline-lg">Privacy</h1>
         <p className="mt-sm text-on-surface-muted">Last updated 2026-11-13.</p>
         <h2 className="mt-xl text-headline-md">What the hosted service stores</h2>

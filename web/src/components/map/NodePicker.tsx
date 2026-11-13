@@ -30,7 +30,7 @@ export function NodePicker({
   }, [idx, kind, q]);
 
   return (
-    <div className="mx-auto flex h-full max-w-xl flex-col px-xl pt-3xl">
+    <div className="mx-auto flex h-full max-w-[36rem] flex-col px-xl pt-3xl">
       <h2 className="text-headline-md">
         {kind === "trace" ? "Trace a request" : "Find the blast radius"}
       </h2>

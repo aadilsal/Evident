@@ -18,7 +18,7 @@ export default function StacksPage() {
   return (
     <Page>
       <h1 className="pt-2xl text-headline-lg">Supported stacks</h1>
-      <p className="mt-sm max-w-3xl text-body-lg text-on-surface-muted">
+      <p className="mt-sm max-w-[48rem] text-body-lg text-on-surface-muted">
         Imports, env vars, external SDKs and docker-compose services are found in any JS, TS or
         Python repo. Routes and models need an adapter for the framework or ORM. Scores are from the
         benchmark; an adapter without labelled repos yet says so.
@@ -76,7 +76,7 @@ export default function StacksPage() {
           </table>
         </section>
       ))}
-      <section className="mt-2xl max-w-3xl">
+      <section className="mt-2xl max-w-[48rem]">
         <h2 className="text-headline-md">Detected, not mapped yet</h2>
         <p className="mt-sm text-body-md text-on-surface-muted">
           These are recognised in manifests. You get a clear message instead of a guessed map:{" "}

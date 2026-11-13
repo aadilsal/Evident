@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Terms" };
 export default function TermsPage() {
   return (
     <Page>
-      <article className="max-w-3xl pt-2xl text-body-md">
+      <article className="max-w-[48rem] pt-2xl text-body-md">
         <h1 className="text-headline-lg">Terms</h1>
         <p className="mt-sm text-on-surface-muted">Last updated 2026-11-13.</p>
         <ul className="mt-xl list-disc space-y-md pl-xl">

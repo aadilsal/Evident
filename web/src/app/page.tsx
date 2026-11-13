@@ -1,93 +1,200 @@
 import Link from "next/link";
 import { HeroMap } from "@/components/HeroMap";
+import { CompareTable, Section, TraceExhibit, TransitSteps } from "@/components/landing";
 import { RepoInput } from "@/components/RepoInput";
 import { Page } from "@/components/SiteChrome";
-import { Mono } from "@/components/ui";
+import { ButtonLink, Mono, Severity } from "@/components/ui";
 import { benchmarkLatest, gallery, pct, STACKS } from "@/lib/data";
+import { showcase } from "@/lib/showcase";
 
-const STEPS = [
+const USES = [
   {
-    n: "01",
-    title: "Extract",
-    body: "tree-sitter parses every file as text. Framework and ORM adapters find routes, middleware, handlers, models, services and env vars. Nothing in the repo is installed or run.",
+    name: "On the web",
+    body: "Paste a public GitHub URL and get the map in under a minute. Every view has a link you can share, pinned to the commit.",
+    code: "github.com/owner/repo  →  Map this repo",
   },
   {
-    n: "02",
-    title: "Link",
-    body: "Imports, path aliases and re-exports are resolved so a route connects to the handler, the calls it makes and the tables it reads and writes.",
+    name: "In your terminal",
+    body: "The same engine runs offline on private code. It writes only inside .evident/ and opens this map on localhost.",
+    code: 'evident analyze .\nevident trace "POST /api/orders"\nevident impact Order\nevident open',
   },
   {
-    n: "03",
-    title: "Group",
-    body: "An LLM may only group and label nodes that already exist. Anything that references an unknown ID is dropped, and every group is marked inferred.",
+    name: "Inside Claude",
+    body: "A Claude skill checks the blast radius before an agent edits a model, and cites file:line instead of guessing.",
+    code: "skills/evident  →  evident impact User\n“3 routes write User: …”",
   },
 ];
 
 export default function Home() {
   const bench = benchmarkLatest();
   const featured = gallery();
-  const total = bench.repos.length;
-  const cats = ["routes", "models", "services", "edges"] as const;
+  const sample = featured[0] ? showcase(featured[0].slug) : null;
+  const totalRepos = bench.repos.length;
   const frameworks = STACKS.adapters.filter((a) => a.kind === "framework").map((a) => a.label);
   const orms = STACKS.adapters.filter((a) => a.kind === "orm").map((a) => a.label);
+  const routes = bench.categories.routes;
+  const edges = bench.categories.edges;
 
   return (
     <Page>
-      <section className="grid grid-cols-12 gap-xl pt-2xl pb-xl">
-        <div className="col-span-12 lg:col-span-10">
-          <h1 className="text-headline-lg sm:text-display">
-            An architecture map where every arrow has a receipt.
-          </h1>
-          <p className="mt-lg max-w-2xl text-body-lg text-on-surface-muted">
-            Paste a GitHub URL. Evident maps the routes, middleware, database models and external
-            services, and links each box and arrow to the exact line of code that proves it.
+      {/* 1. What it is, in one screen. */}
+      <section className="grid grid-cols-12 gap-x-xl gap-y-2xl pt-2xl pb-xl">
+        <div className="col-span-12 lg:col-span-7">
+          <p className="font-condensed text-label-sm uppercase text-on-surface-muted">
+            Architecture maps for JS/TS and Python web apps
           </p>
-          <div className="mt-xl max-w-2xl">
+          <h1 className="mt-md text-headline-lg sm:text-display">
+            Every arrow on this map has a receipt.
+          </h1>
+          <p className="mt-lg max-w-[36rem] text-body-lg text-on-surface-muted">
+            Evident reads a codebase and draws what talks to what: routes, middleware, database
+            tables and external services. Click anything and it shows the exact lines of code that
+            prove it.
+          </p>
+          <div className="mt-xl max-w-[36rem]">
             <RepoInput autoFocus />
+          </div>
+          <ul className="mt-lg flex flex-wrap gap-x-lg gap-y-xs text-body-sm text-on-surface-muted">
+            <li>
+              <Mono className="text-on-surface">{pct(routes.precision)}</Mono> route precision
+            </li>
+            <li>
+              <Mono className="text-on-surface">{pct(edges.recall)}</Mono> route→table recall
+            </li>
+            <li>
+              <Mono className="text-on-surface">{totalRepos}</Mono> benchmark repos
+            </li>
+            <li>
+              <Mono className="text-on-surface">0</Mono> lines of your code executed
+            </li>
+          </ul>
+        </div>
+        {sample && (
+          <div className="col-span-12 lg:col-span-5">
+            <TraceExhibit
+              route={sample.trace.route}
+              hops={sample.trace.hops}
+              repo={sample.repo}
+              sha={sample.sha}
+            />
             <p className="mt-sm text-body-sm text-on-surface-muted">
-              Public repos only. Code is parsed, never run. Supports {frameworks.join(", ")} with{" "}
-              {orms.join(", ")}.
+              A real trace from the gallery. Each hop cites the line that creates it.
             </p>
           </div>
-        </div>
+        )}
       </section>
 
+      {/* 2. The product itself, not a screenshot. */}
       {featured[0] && (
-        <section aria-label="Sample map">
+        <section aria-label="Live sample map" className="pb-2xl">
           <HeroMap slug={featured[0].slug} />
         </section>
       )}
 
-      <section className="mt-3xl grid grid-cols-12 gap-xl">
-        <div className="col-span-12 md:col-span-4">
-          <h2 className="text-headline-md">Measured, not promised</h2>
-          <p className="mt-sm text-body-md text-on-surface-muted">
-            A hand-labelled benchmark of {total} repos runs in CI on every change. A drop of more
-            than 2 points fails the build.
+      {/* 3. Why it exists. */}
+      <Section
+        id="why"
+        eyebrow="Why Evident"
+        title="Most architecture diagrams are guesses. This one shows its work."
+        lead="AI diagram tools ask a model to imagine your system from its folders. The result looks right until a box turns out not to exist. Evident extracts the facts first and lets the model do one small, checked job."
+      >
+        <CompareTable />
+      </Section>
+
+      {/* 4. How it works. */}
+      <Section
+        id="how"
+        eyebrow="How it works"
+        title="Five stops from repo to map"
+        lead="The same pipeline runs on the web, in the CLI and in the Claude skill. Only the last stop involves an LLM, and its output is validated against the graph."
+        className="mt-3xl"
+      >
+        <TransitSteps />
+      </Section>
+
+      {/* 5. What you can ask it, with real answers. */}
+      {sample && (
+        <Section
+          id="questions"
+          eyebrow="What it answers"
+          title="The questions you have on day one of a new codebase"
+          className="mt-3xl"
+        >
+          <div className="grid gap-2xl md:grid-cols-3">
+            <div className="border-t-[3px] border-layer-route pt-md">
+              <h3 className="text-headline-md">What does this request do?</h3>
+              <p className="mt-sm text-body-md text-on-surface-muted">
+                Pick a route. The path lights up through middleware, handlers and calls to every
+                table and service it touches, with the code for each hop.
+              </p>
+              <Mono className="mt-md block text-code-sm">
+                {sample.trace.route} → {sample.trace.hops.length - 1} hops
+              </Mono>
+            </div>
+            <div className="border-t-[3px] border-layer-model pt-md">
+              <h3 className="text-headline-md">What breaks if I change this?</h3>
+              <p className="mt-sm text-body-md text-on-surface-muted">
+                Select a table, file or env var and see everything that depends on it before you
+                edit it.
+              </p>
+              {sample.blast.model && (
+                <Mono className="mt-md block text-code-sm">
+                  {sample.blast.model}: {sample.blast.routes.length} routes, {sample.blast.total}{" "}
+                  dependents
+                </Mono>
+              )}
+            </div>
+            <div className="border-t-[3px] border-layer-middleware pt-md">
+              <h3 className="text-headline-md">Is this endpoint safe?</h3>
+              <p className="mt-sm text-body-md text-on-surface-muted">
+                Health checks flag writes with no auth guard, unvalidated request bodies, import
+                cycles, unused models and undocumented env vars.
+              </p>
+              {sample.finding && (
+                <p className="mt-md text-code-sm">
+                  <Severity severity={sample.finding.severity as "error" | "warning" | "info"} />{" "}
+                  <span className="text-body-sm">{sample.finding.message}</span>
+                </p>
+              )}
+            </div>
+          </div>
+          <p className="mt-xl text-body-sm text-on-surface-muted">
+            Examples from{" "}
+            <Link href={`/map/?gallery=${sample.slug}`} className="underline underline-offset-4">
+              {sample.repo}
+            </Link>
+            , {sample.counts.routes} routes, {sample.counts.models} models, {sample.counts.services}{" "}
+            services.
           </p>
-          <Link
-            href="/benchmarks/"
-            className="mt-md inline-block text-body-md underline underline-offset-4"
-          >
-            See the benchmark
-          </Link>
-        </div>
-        <div className="col-span-12 md:col-span-8">
-          <table className="w-full text-left">
+        </Section>
+      )}
+
+      {/* 6. Proof. */}
+      <Section
+        id="accuracy"
+        eyebrow="Accuracy"
+        title="Measured, not promised"
+        lead={`${totalRepos} repos, each pinned to a commit and labelled by hand. Every engine change is scored in CI, and the build fails if any number drops by more than 2 points.`}
+        className="mt-3xl"
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[32rem] text-left">
             <thead>
-              <tr className="border-b border-outline text-label-sm uppercase text-on-surface-muted">
-                <th className="py-sm font-condensed font-semibold">Category</th>
-                <th className="py-sm text-right font-condensed font-semibold">Precision</th>
-                <th className="py-sm text-right font-condensed font-semibold">Recall</th>
-                <th className="py-sm text-right font-condensed font-semibold">Items</th>
+              <tr className="border-b border-outline font-condensed text-label-sm uppercase text-on-surface-muted">
+                <th className="py-sm font-semibold">Category</th>
+                <th className="py-sm text-right font-semibold">Precision</th>
+                <th className="py-sm text-right font-semibold">Recall</th>
+                <th className="py-sm text-right font-semibold">Labelled items</th>
               </tr>
             </thead>
             <tbody>
-              {cats.map((c) => {
+              {(["routes", "models", "services", "edges"] as const).map((c) => {
                 const m = bench.categories[c];
                 return (
                   <tr key={c} className="border-b border-outline">
-                    <td className="py-sm capitalize">{c}</td>
+                    <td className="py-sm capitalize">
+                      {c === "edges" ? "route → table edges" : c}
+                    </td>
                     <td className="py-sm text-right">
                       <Mono>{pct(m.precision)}</Mono>
                     </td>
@@ -103,49 +210,45 @@ export default function Home() {
             </tbody>
           </table>
         </div>
-      </section>
-
-      <section className="mt-3xl">
-        <h2 className="text-headline-md">How it works</h2>
-        <ol className="mt-lg grid gap-xl md:grid-cols-3">
-          {STEPS.map((s) => (
-            <li key={s.n} className="border-t border-outline pt-md">
-              <Mono className="text-code-sm text-on-surface-muted">{s.n}</Mono>
-              <h3 className="mt-xs text-label-lg">{s.title}</h3>
-              <p className="mt-sm text-body-md text-on-surface-muted">{s.body}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="mt-3xl grid gap-xl md:grid-cols-2">
-        <div>
-          <h2 className="text-headline-md">On your machine, and in Claude</h2>
-          <p className="mt-sm text-body-md text-on-surface-muted">
-            The same engine runs locally as a CLI and as a Claude skill. It works offline, writes
-            only inside <Mono>.evident/</Mono>, and opens this map for a private repo without
-            uploading anything.
-          </p>
-        </div>
-        <pre className="overflow-x-auto rounded-md bg-surface-sunken p-lg font-mono text-code-md">
-          <code>
-            {`uv tool install "git+https://github.com/aadilsal/Evident#subdirectory=engine"
-evident analyze .
-evident trace "POST /api/users"
-evident impact User
-evident open`}
-          </code>
-        </pre>
-      </section>
-
-      <section className="mt-3xl">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-headline-md">Gallery</h2>
-          <Link href="/gallery/" className="text-body-sm underline underline-offset-4">
-            All maps
+        <p className="mt-md text-body-sm text-on-surface-muted">
+          <Link href="/benchmarks/" className="underline underline-offset-4">
+            Full results and history
+          </Link>{" "}
+          · Supports {frameworks.join(", ")} with {orms.join(", ")}.{" "}
+          <Link href="/stacks/" className="underline underline-offset-4">
+            Per-adapter scores
           </Link>
+        </p>
+      </Section>
+
+      {/* 7. Where to use it. */}
+      <Section
+        id="use"
+        eyebrow="Three ways to use it"
+        title="Same engine, wherever you work"
+        className="mt-3xl"
+      >
+        <div className="grid gap-2xl md:grid-cols-3">
+          {USES.map((u) => (
+            <div key={u.name}>
+              <h3 className="text-label-lg">{u.name}</h3>
+              <p className="mt-sm text-body-md text-on-surface-muted">{u.body}</p>
+              <pre className="mt-md overflow-x-auto rounded-md bg-surface-sunken p-md font-mono text-code-sm">
+                <code>{u.code}</code>
+              </pre>
+            </div>
+          ))}
         </div>
-        <ul className="mt-lg divide-y divide-outline border-y border-outline">
+      </Section>
+
+      {/* 8. Try it. */}
+      <Section
+        id="gallery"
+        eyebrow="Try it now"
+        title="Open a pre-analysed map, or map your own repo"
+        className="mt-3xl"
+      >
+        <ul className="divide-y divide-outline border-y border-outline">
           {featured.map((g) => (
             <li key={g.slug}>
               <Link
@@ -161,7 +264,13 @@ evident open`}
             </li>
           ))}
         </ul>
-      </section>
+        <div className="mt-2xl grid gap-lg md:grid-cols-[1fr_auto] md:items-center">
+          <div className="max-w-[36rem]">
+            <RepoInput />
+          </div>
+          <ButtonLink href="/gallery/">Browse the gallery</ButtonLink>
+        </div>
+      </Section>
     </Page>
   );
 }

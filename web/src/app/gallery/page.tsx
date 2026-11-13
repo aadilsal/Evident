@@ -11,7 +11,7 @@ export default function GalleryPage() {
   return (
     <Page>
       <h1 className="pt-2xl text-headline-lg">Gallery</h1>
-      <p className="mt-sm max-w-2xl text-body-lg text-on-surface-muted">
+      <p className="mt-sm max-w-[42rem] text-body-lg text-on-surface-muted">
         Pre-analysed maps, served as static files so they open instantly. Each is pinned to a commit
         and every snippet links to that commit on GitHub.
       </p>

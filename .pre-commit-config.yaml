@@ -1,6 +1,7 @@
 # Run before every commit: pre-commit run --all-files
 # Install: pre-commit install --hook-type pre-commit --hook-type commit-msg
-exclude: ^(engine/tests/fixtures/|benchmark/\.repos/)
+# Gallery graphs are minified on purpose (size limit); web/ formats its own TS with Prettier.
+exclude: ^(engine/tests/fixtures/|benchmark/\.repos/|web/public/data/)
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: cef0300fd0fc4d2a87a85fa2093c6b283ea36f4b # frozen: v5.0.0

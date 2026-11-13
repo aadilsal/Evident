@@ -1,6 +1,6 @@
 ---
 name: evident
-description: Answers questions about a JS/TS web app's routes and endpoints, request flow, middleware and auth, database models and tables, env vars and external services, with file:line evidence from the read-only `evident` CLI (Next.js, Express, NestJS, Fastify; Prisma, Drizzle, TypeORM, Mongoose). Use when the user asks which routes read or write a table, whether an endpoint is behind auth or validated, what a request does end to end, where an env var or SDK is used, what the full path of an endpoint is, or what breaks if a model, file or env var changes. Also use BEFORE editing a database model, shared module, middleware or route, to check the blast radius.
+description: Answers questions about a JS/TS or Python web app's routes and endpoints, request flow, middleware and auth, database models and tables, env vars and external services, with file:line evidence from the read-only `evident` CLI (Next.js, Express, NestJS, Fastify, FastAPI, Flask, Django; Prisma, Drizzle, TypeORM, Mongoose, Django ORM, SQLAlchemy). Use when the user asks which routes read or write a table, whether an endpoint is behind auth or validated, what a request does end to end, where an env var or SDK is used, what the full path of an endpoint is, or what breaks if a model, file or env var changes. Also use BEFORE editing a database model, shared module, middleware or route, to check the blast radius.
 ---
 
 # Evident: architecture map with receipts
@@ -12,7 +12,7 @@ description: Answers questions about a JS/TS web app's routes and endpoints, req
 1. Check the CLI: `evident --version`. If it's missing, tell the user and ask before running `scripts/ensure_installed.sh` (macOS/Linux) or `scripts/ensure_installed.ps1` (Windows) from this skill's folder.
 2. Build the map offline: `evident analyze . --no-llm`. It's incremental (cached in `.evident/`, which ignores itself), so later commands stay fast.
 3. Lead with a short summary from that output: stack, counts, the main routes, models and services, and the top findings with `file:line`. Five or six lines, not a dump.
-4. If `evident --help` lists `open`, offer once: "Want the interactive map? `evident open`". Don't offer again.
+4. Offer once: "Want the interactive map? `evident open` serves it on localhost; nothing is uploaded." Don't offer again, and run it only if the user says yes (it keeps running until stopped).
 
 ## Before you edit
 

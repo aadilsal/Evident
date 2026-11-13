@@ -6,26 +6,32 @@ import asyncio
 import hashlib
 import json
 import re
+import secrets
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
-from typing import Any
+from datetime import UTC, datetime, timedelta
+from typing import Any, Literal
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Header, HTTPException, Query, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from evident import ENGINE_VERSION, GRAPH_SCHEMA_VERSION
-from evident.models import AnalysisError
+from evident.contract import schema_errors
+from evident.models import AnalysisError, Graph
 from evident.repo import GitHubRepo, check_size, parse_github, remote_head
 from evident.service.broker import Broker, RedisBroker
 from evident.service.config import Settings
-from evident.service.store import Job, MemoryStore, PostgresStore, Store
+from evident.service.store import Job, MemoryStore, PostgresStore, Report, Share, Store
 
 JSON = dict[str, Any]
 Resolver = Callable[[GitHubRepo], str]
 _OWNER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]{0,38}$")
 _REPO = re.compile(r"^[A-Za-z0-9._-]{1,100}$")
 _SHA = re.compile(r"^[0-9a-f]{40}$")
+_SHARE_ID = re.compile(r"^[A-Za-z0-9_-]{8,64}$")
+MAX_SHARE_TTL_DAYS = 30
 HEARTBEAT_S = 15.0
 IMMUTABLE = {"Cache-Control": "public, max-age=31536000, immutable"}
 
@@ -34,6 +40,20 @@ class AnalysisRequest(BaseModel):
     url: str = Field(
         description="https://github.com/<owner>/<repo>, optionally /tree/<ref>", max_length=300
     )
+
+
+class ReportRequest(BaseModel):
+    owner: str = Field(pattern=_OWNER.pattern)
+    repo: str = Field(pattern=_REPO.pattern)
+    sha: str = Field(pattern=_SHA.pattern)
+    engineVersion: str = Field(max_length=40)  # noqa: N815 (wire format is camelCase)
+    elementId: str = Field(min_length=3, max_length=300)  # noqa: N815
+    kind: Literal["node", "edge"]
+    note: str = Field(default="", max_length=500)
+
+
+def _token_hash(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
 
 
 def resolve_github(repo: GitHubRepo) -> str:
@@ -69,6 +89,15 @@ def create_app(
         redoc_url=None,
         lifespan=lifespan,
     )
+    if settings.cors_origins:
+        # The frontend is a separate origin (Vercel, ADR-0008). No cookies, so no credentials.
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=list(settings.cors_origins),
+            allow_methods=["GET", "POST", "DELETE"],
+            allow_headers=["Content-Type", "X-Delete-Token"],
+            max_age=600,
+        )
 
     def client_id(request: Request) -> str:
         ip = request.client.host if request.client else "unknown"
@@ -167,6 +196,83 @@ def create_app(
         if not data:
             raise HTTPException(404, "No benchmark results published.")
         return data
+
+    @app.post(
+        "/api/shares",
+        status_code=201,
+        summary="Share a graph (metadata only, schema-validated, expiring)",
+    )
+    async def create_share(
+        request: Request,
+        ttl_days: int = Query(default=0, alias="ttlDays", ge=0, le=MAX_SHARE_TTL_DAYS),
+    ) -> JSONResponse:
+        client = client_id(request)
+        if not await broker.allow(f"share:{client}", settings.share_limit_per_hour):
+            raise HTTPException(
+                429, "Too many shares from this address; try again within the hour."
+            )
+        raw = await request.body()
+        if len(raw) > settings.share_max_bytes:
+            raise HTTPException(
+                413, f"Graphs over {settings.share_max_bytes} bytes can't be shared."
+            )
+        try:
+            data = json.loads(raw)
+        except ValueError as exc:
+            raise HTTPException(400, "Body must be graph JSON.") from exc
+        errors = await asyncio.to_thread(schema_errors, data)
+        if errors:
+            raise HTTPException(422, {"message": "Not a valid Evident graph.", "errors": errors})
+        graph = Graph.from_dict(data)
+        problems = graph.check_integrity()
+        if problems:
+            detail = {"message": "Graph failed integrity checks.", "errors": problems[:5]}
+            raise HTTPException(422, detail)
+        store.purge_shares()
+        share_id, token = secrets.token_urlsafe(12), secrets.token_urlsafe(24)
+        days = ttl_days or settings.share_ttl_days
+        expires = datetime.now(UTC) + timedelta(days=min(days, MAX_SHARE_TTL_DAYS))
+        # Re-serialised from the parsed graph: only schema fields are stored, never raw input.
+        store.create_share(Share(share_id, graph.to_dict(), _token_hash(token), expires, client))
+        url = f"{settings.public_url}/map/?share={share_id}" if settings.public_url else None
+        body = {"id": share_id, "url": url, "expiresAt": expires.isoformat(), "deleteToken": token}
+        return JSONResponse(body, status_code=201)
+
+    @app.get("/api/shares/{share_id}", summary="A shared graph, until it expires")
+    async def get_share(share_id: str) -> JSONResponse:
+        share = store.get_share(share_id) if _SHARE_ID.match(share_id) else None
+        if share is None:
+            raise HTTPException(404, "This share link has expired or never existed.")
+        return JSONResponse(share.graph, headers={"Cache-Control": "private, max-age=300"})
+
+    @app.delete("/api/shares/{share_id}", status_code=204, summary="Delete a share early")
+    async def delete_share(
+        share_id: str, x_delete_token: str = Header(default="", max_length=100)
+    ) -> Response:
+        if not (_SHARE_ID.match(share_id) and x_delete_token):
+            raise HTTPException(404, "No such share.")
+        if not store.delete_share(share_id, _token_hash(x_delete_token)):
+            raise HTTPException(404, "No such share, or the token doesn't match.")
+        return Response(status_code=204)
+
+    @app.post("/api/reports", status_code=202, summary="Flag a wrong node or edge")
+    async def report(body: ReportRequest, request: Request) -> JSONResponse:
+        client = client_id(request)
+        if not await broker.allow(f"report:{client}", settings.report_limit_per_hour):
+            raise HTTPException(429, "Too many reports from this address; try again later.")
+        store.add_report(
+            Report(
+                body.owner,
+                body.repo,
+                body.sha,
+                body.engineVersion,
+                body.elementId,
+                body.kind,
+                body.note,
+                client,
+            )
+        )
+        return JSONResponse({"ok": True}, status_code=202)
 
     @app.get("/api/health", summary="Liveness for the uptime monitor")
     async def health() -> JSONResponse:

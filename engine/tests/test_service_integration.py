@@ -68,3 +68,24 @@ def test_redis_broker_snapshot_pubsub_and_rate_limit() -> None:
         return seen
 
     assert asyncio.run(scenario()) == ["parse", "link", "done"]
+
+
+def test_postgres_shares_and_reports() -> None:
+    from datetime import UTC, datetime, timedelta
+
+    from evident.service.store import PostgresStore, Report, Share
+
+    assert DB
+    store = PostgresStore(DB)
+    store.setup()
+    sid = uuid.uuid4().hex[:16]
+    graph = {"schemaVersion": "1.2.0", "nodes": [], "edges": []}
+    store.create_share(Share(sid, graph, "hash", datetime.now(UTC) + timedelta(days=1), "ip"))
+    got = store.get_share(sid)
+    assert got is not None and got.graph == graph
+    assert not store.delete_share(sid, "wrong")
+    assert store.delete_share(sid, "hash") and store.get_share(sid) is None
+    old = uuid.uuid4().hex[:16]
+    store.create_share(Share(old, graph, "h", datetime.now(UTC) - timedelta(seconds=1)))
+    assert store.get_share(old) is None and store.purge_shares() >= 1
+    store.add_report(Report("acme", "shop", "a" * 40, "0.3.0", "model:User", "node", "note"))

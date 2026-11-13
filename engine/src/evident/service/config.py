@@ -27,6 +27,12 @@ class Settings:
     use_llm: bool
     gallery_path: Path | None
     benchmark_path: Path | None
+    cors_origins: tuple[str, ...] = ()
+    public_url: str = ""
+    share_ttl_days: int = 7
+    share_max_bytes: int = 2_000_000
+    share_limit_per_hour: int = 20
+    report_limit_per_hour: int = 30
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -46,4 +52,15 @@ class Settings:
             use_llm=os.environ.get("EVIDENT_LLM", "on") != "off",
             gallery_path=path("EVIDENT_GALLERY_PATH"),
             benchmark_path=path("EVIDENT_BENCHMARK_PATH"),
+            # The Vercel frontend's origin(s); exact matches only, never "*".
+            cors_origins=tuple(
+                o.strip().rstrip("/")
+                for o in os.environ.get("EVIDENT_CORS_ORIGINS", "").split(",")
+                if o.strip() and o.strip() != "*"
+            ),
+            public_url=os.environ.get("EVIDENT_PUBLIC_URL", "").rstrip("/"),
+            share_ttl_days=_int("EVIDENT_SHARE_TTL_DAYS", 7),
+            share_max_bytes=_int("EVIDENT_SHARE_MAX_BYTES", 2_000_000),
+            share_limit_per_hour=_int("EVIDENT_SHARE_LIMIT_PER_HOUR", 20),
+            report_limit_per_hour=_int("EVIDENT_REPORT_LIMIT_PER_HOUR", 30),
         )

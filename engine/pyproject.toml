@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "evident-map"
 version = "0.2.0"
-description = "Evidence-backed architecture maps for Next.js, Express and Prisma apps."
+description = "Evidence-backed architecture maps: routes, models and services, each linked to the line that proves it."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
@@ -36,6 +36,7 @@ Homepage = "https://github.com/aadilsal/Evident"
 service = [
     "arq>=0.26",
     "fastapi>=0.115",
+    "jsonschema>=4.23",
     "psycopg[binary]>=3.2",
     "redis>=5",
     "uvicorn[standard]>=0.30",
@@ -53,6 +54,9 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/evident"]
+# The map UI (web/ static export) is git-ignored but ships in wheels: `npm run build:bundle`.
+artifacts = ["src/evident/webui/**"]
+
 
 [tool.ruff]
 line-length = 100

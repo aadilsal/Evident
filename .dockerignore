@@ -1,0 +1,8 @@
+# Docker builds use the repo root as context; send only what the engine image needs.
+*
+!engine/Dockerfile
+!engine/pyproject.toml
+!engine/uv.lock
+!engine/README.md
+!engine/src/
+**/__pycache__

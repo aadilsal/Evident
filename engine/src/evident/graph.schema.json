@@ -1,0 +1,496 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/aadilsal/Evident/main/schema/graph.schema.json",
+  "title": "Evident architecture graph",
+  "description": "One graph per analysed commit. The contract between the Python engine and the frontend. Referential integrity (edge endpoints, group members and finding nodeIds exist; endLine >= startLine) is enforced by the engine's validator, not by this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "engineVersion", "repo", "nodes", "edges", "groups", "findings"],
+  "properties": {
+    "schemaVersion": {
+      "description": "Version of this schema. Major bump = breaking change for the frontend.",
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$"
+    },
+    "engineVersion": {
+      "description": "Version of the engine that produced the graph. Part of the cache key.",
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"
+    },
+    "repo": { "$ref": "#/$defs/repo" },
+    "stack": { "$ref": "#/$defs/stack" },
+    "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+    "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
+    "groups": { "type": "array", "items": { "$ref": "#/$defs/group" } },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+  },
+  "$defs": {
+    "stack": {
+      "description": "Since 1.1.0. Frameworks named in manifests, adapters that produced facts, and the graceful-fallback message for detected-but-unsupported stacks.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detected", "adapters"],
+      "properties": {
+        "detected": { "type": "array", "items": { "type": "string" } },
+        "adapters": { "type": "array", "items": { "type": "string" } },
+        "unsupported": { "type": "array", "items": { "type": "string" } },
+        "message": { "type": "string" }
+      }
+    },
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "source": {
+      "description": "extracted = found in code by a deterministic extractor; inferred = heuristic fallback or LLM output.",
+      "enum": ["extracted", "inferred"]
+    },
+    "nodeId": {
+      "description": "Deterministic, stable across runs on the same commit. Prefix is the node type.",
+      "type": "string",
+      "pattern": "^(route|handler|function|middleware|model|service|module|envVar|container):.+$"
+    },
+    "repoPath": {
+      "description": "Repo-relative POSIX path. No leading slash, no backslashes, no '..' segments.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!(.*/)?\\.\\.(/|$))[^\\\\]+$"
+    },
+
+    "repo": {
+      "description": "host=local is a folder on disk; its absolute path is never stored.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "name", "sha", "analyzedAt"],
+      "properties": {
+        "host": { "enum": ["github.com", "local"] },
+        "owner": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "sha": {
+          "description": "HEAD commit, or for a folder without git, a hash of its file hashes.",
+          "$ref": "#/$defs/sha"
+        },
+        "ref": { "description": "Branch or tag the user asked for, if any.", "type": "string" },
+        "dirty": {
+          "description": "Working tree had uncommitted changes; line numbers refer to the working tree.",
+          "type": "boolean"
+        },
+        "worktreeHash": {
+          "description": "Hash of all analysed file hashes. Changes whenever any analysed file changes.",
+          "$ref": "#/$defs/sha"
+        },
+        "analyzedAt": { "type": "string", "format": "date-time" }
+      },
+      "if": { "properties": { "host": { "const": "github.com" } } },
+      "then": {
+        "required": ["owner"],
+        "properties": { "name": { "pattern": "^[A-Za-z0-9._-]{1,100}$" } }
+      }
+    },
+
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "startLine", "endLine", "sha"],
+      "properties": {
+        "file": { "$ref": "#/$defs/repoPath" },
+        "startLine": { "type": "integer", "minimum": 1 },
+        "endLine": { "type": "integer", "minimum": 1 },
+        "sha": { "$ref": "#/$defs/sha" }
+      }
+    },
+    "evidenceList": {
+      "description": "Every node and edge has at least one receipt.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "label", "source", "confidence", "evidence", "attrs"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nodeId" },
+        "type": {
+          "enum": [
+            "route",
+            "handler",
+            "function",
+            "middleware",
+            "model",
+            "service",
+            "module",
+            "envVar",
+            "container"
+          ]
+        },
+        "label": { "type": "string", "minLength": 1 },
+        "source": { "$ref": "#/$defs/source" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "evidence": { "$ref": "#/$defs/evidenceList" },
+        "attrs": { "type": "object" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "route" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^route:" },
+              "attrs": { "$ref": "#/$defs/routeAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "handler" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^handler:" },
+              "attrs": { "$ref": "#/$defs/functionAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "function" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^function:" },
+              "attrs": { "$ref": "#/$defs/functionAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "middleware" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^middleware:" },
+              "attrs": { "$ref": "#/$defs/middlewareAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "model" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^model:" },
+              "attrs": { "$ref": "#/$defs/modelAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "service" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^service:" },
+              "attrs": { "$ref": "#/$defs/serviceAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "module" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^module:" },
+              "attrs": { "$ref": "#/$defs/moduleAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "envVar" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^envVar:" },
+              "attrs": { "$ref": "#/$defs/envVarAttrs" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "container" } } },
+          "then": {
+            "properties": {
+              "id": { "pattern": "^container:" },
+              "attrs": { "$ref": "#/$defs/containerAttrs" }
+            }
+          }
+        }
+      ]
+    },
+
+    "routeAttrs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "path", "framework", "kind"],
+      "properties": {
+        "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"] },
+        "path": {
+          "description": "Normalised path, see docs/labelling-guide.md. Server actions use action:<file>#<export> (since 1.1.0).",
+          "type": "string",
+          "pattern": "^(/|action:)"
+        },
+        "framework": {
+          "enum": ["next-app-router", "express", "nestjs", "fastify", "fastapi", "flask", "django"]
+        },
+        "kind": { "enum": ["api", "page", "layout", "serverAction"] },
+        "handlerRef": { "$ref": "#/$defs/nodeId" },
+        "dynamic": {
+          "description": "Registered with a computed path; low confidence.",
+          "type": "boolean"
+        }
+      }
+    },
+    "functionAttrs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file"],
+      "properties": {
+        "file": { "$ref": "#/$defs/repoPath" },
+        "exportName": { "type": ["string", "null"] },
+        "checksAuth": {
+          "description": "Since 1.1.0. Handler calls or is wrapped by something auth-like (heuristic).",
+          "type": "boolean"
+        },
+        "bodyLine": {
+          "description": "Since 1.1.0. First line that reads the request body.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "validatesBody": {
+          "description": "Since 1.1.0. Calls a schema/validator (zod, joi, yup, class-validator, express-validator...).",
+          "type": "boolean"
+        }
+      }
+    },
+    "middlewareAttrs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "framework"],
+      "properties": {
+        "file": { "$ref": "#/$defs/repoPath" },
+        "framework": {
+          "enum": ["next-app-router", "express", "nestjs", "fastify", "fastapi", "flask", "django"]
+        },
+        "name": { "type": ["string", "null"] },
+        "matchers": {
+          "description": "Next.js middleware matcher patterns, as written.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "checksAuth": {
+          "description": "Since 1.1.0. Body calls or references something auth-like (heuristic).",
+          "type": "boolean"
+        }
+      }
+    },
+    "modelAttrs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tableName", "fields"],
+      "properties": {
+        "tableName": { "description": "@@map value, or the model name.", "type": "string" },
+        "orm": {
+          "description": "Since 1.1.0. Adapter that found the model.",
+          "enum": ["prisma", "drizzle", "typeorm", "mongoose", "django-orm", "sqlalchemy"]
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "type"],
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "description": "Prisma scalar or related model name.", "type": "string" },
+              "isOptional": { "type": "boolean" },
+              "isList": { "type": "boolean" },
+              "isId": { "type": "boolean" },
+              "isRelation": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "serviceAttrs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "packages"],
+      "properties": {
+        "provider": {
+          "description": "Slug from the engine's service catalogue, e.g. stripe, aws-s3.",
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "packages": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+      }
+    },
+    "moduleAttrs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "$ref": "#/$defs/repoPath" },
+        "workspace": { "description": "Monorepo package name, if any.", "type": ["string", "null"] }
+      }
+    },
+    "containerAttrs": {
+      "description": "Since 1.1.0. A service in docker-compose. Environment values are never read.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "name"],
+      "properties": {
+        "file": { "$ref": "#/$defs/repoPath" },
+        "name": { "type": "string", "minLength": 1 },
+        "image": { "type": "string" },
+        "build": { "type": "string" },
+        "ports": { "type": "array", "items": { "type": "string" } },
+        "dependsOn": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "envVarAttrs": {
+      "description": "Names only. Values are never read or stored.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "documented"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
+        "documented": { "description": "Listed in .env.example (or similar).", "type": "boolean" }
+      }
+    },
+
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "from", "to", "source", "confidence", "evidence"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": {
+          "enum": ["handles", "guards", "calls", "imports", "reads", "writes", "relates", "uses"]
+        },
+        "from": { "$ref": "#/$defs/nodeId" },
+        "to": { "$ref": "#/$defs/nodeId" },
+        "source": { "$ref": "#/$defs/source" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "evidence": { "$ref": "#/$defs/evidenceList" },
+        "attrs": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "description": "Prisma op name (findMany, create, ...) for reads/writes.",
+              "type": "string"
+            },
+            "relationField": {
+              "description": "Prisma relation field for relates edges.",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "handles" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^route:" },
+              "to": { "pattern": "^(handler|function):" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "guards" } } },
+          "then": {
+            "properties": { "from": { "pattern": "^middleware:" }, "to": { "pattern": "^route:" } }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "calls" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^(handler|function|middleware):" },
+              "to": { "pattern": "^(handler|function|middleware):" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "imports" } } },
+          "then": {
+            "properties": { "from": { "pattern": "^module:" }, "to": { "pattern": "^module:" } }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "reads" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^(handler|function|middleware):" },
+              "to": { "pattern": "^(model|envVar):" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "writes" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^(handler|function|middleware):" },
+              "to": { "pattern": "^model:" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "relates" } } },
+          "then": {
+            "properties": { "from": { "pattern": "^model:" }, "to": { "pattern": "^model:" } }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "uses" } } },
+          "then": {
+            "properties": {
+              "from": { "pattern": "^(handler|function|middleware|module):" },
+              "to": { "pattern": "^service:" }
+            }
+          }
+        }
+      ]
+    },
+
+    "group": {
+      "description": "LLM output. May only reference existing node IDs; the engine rejects anything else.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "summary", "members", "source", "confidence"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^group:[a-z0-9-]+$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "summary": { "type": "string", "maxLength": 400 },
+        "members": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nodeId" }
+        },
+        "source": { "const": "inferred" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    },
+
+    "finding": {
+      "description": "Deterministic health check result.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "rule", "severity", "message", "nodeIds", "evidence"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "rule": {
+          "enum": [
+            "unguarded-write",
+            "unvalidated-body",
+            "circular-import",
+            "unused-model",
+            "undocumented-env"
+          ]
+        },
+        "severity": { "enum": ["info", "warning", "error"] },
+        "message": { "type": "string", "minLength": 1 },
+        "nodeIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nodeId" } },
+        "evidence": { "$ref": "#/$defs/evidenceList" }
+      }
+    }
+  }
+}

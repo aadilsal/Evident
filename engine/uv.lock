@@ -185,6 +185,7 @@ dependencies = [
 service = [
     { name = "arq" },
     { name = "fastapi" },
+    { name = "jsonschema" },
     { name = "psycopg", extra = ["binary"] },
     { name = "redis" },
     { name = "uvicorn", extra = ["standard"] },
@@ -205,6 +206,7 @@ requires-dist = [
     { name = "arq", marker = "extra == 'service'", specifier = ">=0.26" },
     { name = "fastapi", marker = "extra == 'service'", specifier = ">=0.115" },
     { name = "httpx", specifier = ">=0.27" },
+    { name = "jsonschema", marker = "extra == 'service'", specifier = ">=4.23" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'service'", specifier = ">=3.2" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "redis", marker = "extra == 'service'", specifier = ">=5" },

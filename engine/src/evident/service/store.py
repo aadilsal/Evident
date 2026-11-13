@@ -55,6 +55,27 @@ create table if not exists findings (
   message text not null,
   primary key (owner, repo, sha, engine_version, finding_id)
 );
+create table if not exists shares (
+  id text primary key,
+  graph jsonb not null,
+  delete_token_hash text not null,
+  ip_hash text,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null
+);
+create index if not exists shares_expiry on shares (expires_at);
+create table if not exists reports (
+  id bigserial primary key,
+  owner text not null,
+  repo text not null,
+  sha text not null,
+  engine_version text not null,
+  element_id text not null,
+  kind text not null,
+  note text,
+  ip_hash text,
+  created_at timestamptz not null default now()
+);
 create table if not exists benchmark_runs (
   id bigserial primary key,
   created_at timestamptz not null default now(),
@@ -105,6 +126,33 @@ class Job:
         return d
 
 
+@dataclass
+class Share:
+    """An opt-in `evident share` upload: graph metadata only, expiring (security.md)."""
+
+    id: str
+    graph: JSON
+    delete_token_hash: str
+    expires_at: datetime
+    ip_hash: str | None = None
+    created_at: datetime = field(default_factory=_now)
+
+
+@dataclass
+class Report:
+    """A "wrong node/edge" flag from the map; feeds new benchmark cases."""
+
+    owner: str
+    repo: str
+    sha: str
+    engine_version: str
+    element_id: str
+    kind: Literal["node", "edge"]
+    note: str = ""
+    ip_hash: str | None = None
+    created_at: datetime = field(default_factory=_now)
+
+
 class Store(Protocol):
     def setup(self) -> None: ...
     def create_job(self, job: Job) -> Job: ...
@@ -115,6 +163,11 @@ class Store(Protocol):
     def get_graph(self, owner: str, repo: str, sha: str, engine_version: str) -> JSON | None: ...
     def latest_graph(self, owner: str, repo: str, sha: str) -> JSON | None: ...
     def save_graph(self, graph: JSON) -> None: ...
+    def create_share(self, share: Share) -> None: ...
+    def get_share(self, share_id: str) -> Share | None: ...
+    def delete_share(self, share_id: str, token_hash: str) -> bool: ...
+    def purge_shares(self) -> int: ...
+    def add_report(self, report: Report) -> None: ...
     def ping(self) -> bool: ...
 
 
@@ -124,6 +177,8 @@ class MemoryStore:
     def __init__(self) -> None:
         self.jobs: dict[str, Job] = {}
         self.graphs: dict[tuple[str, str, str, str], JSON] = {}
+        self.shares: dict[str, Share] = {}
+        self.reports: list[Report] = []
         self._lock = threading.Lock()
 
     def setup(self) -> None:
@@ -168,6 +223,33 @@ class MemoryStore:
         repo = graph["repo"]
         key = (repo.get("owner", ""), repo["name"], repo["sha"], graph["engineVersion"])
         self.graphs[key] = graph
+
+    def create_share(self, share: Share) -> None:
+        with self._lock:
+            self.shares[share.id] = share
+
+    def get_share(self, share_id: str) -> Share | None:
+        share = self.shares.get(share_id)
+        return share if share and share.expires_at > _now() else None
+
+    def delete_share(self, share_id: str, token_hash: str) -> bool:
+        with self._lock:
+            share = self.shares.get(share_id)
+            if share is None or share.delete_token_hash != token_hash:
+                return False
+            del self.shares[share_id]
+            return True
+
+    def purge_shares(self) -> int:
+        with self._lock:
+            dead = [k for k, v in self.shares.items() if v.expires_at <= _now()]
+            for k in dead:
+                del self.shares[k]
+            return len(dead)
+
+    def add_report(self, report: Report) -> None:
+        with self._lock:
+            self.reports.append(report)
 
     def ping(self) -> bool:
         return True
@@ -328,6 +410,61 @@ class PostgresStore:
                     " message) values (%s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing",
                     (*key, f["id"], f["rule"], f["severity"], f["message"]),
                 )
+
+    def create_share(self, share: Share) -> None:
+        with self._conn() as conn:
+            conn.execute(
+                "insert into shares (id, graph, delete_token_hash, ip_hash, created_at, expires_at)"
+                " values (%s, %s, %s, %s, %s, %s)",
+                (
+                    share.id,
+                    json.dumps(share.graph),
+                    share.delete_token_hash,
+                    share.ip_hash,
+                    share.created_at,
+                    share.expires_at,
+                ),
+            )
+
+    def get_share(self, share_id: str) -> Share | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "select id, graph, delete_token_hash, expires_at, ip_hash, created_at from shares"
+                " where id = %s and expires_at > now()",
+                (share_id,),
+            ).fetchone()
+        return Share(row[0], dict(row[1]), row[2], row[3], row[4], row[5]) if row else None
+
+    def delete_share(self, share_id: str, token_hash: str) -> bool:
+        with self._conn() as conn:
+            cur = conn.execute(
+                "delete from shares where id = %s and delete_token_hash = %s",
+                (share_id, token_hash),
+            )
+            return bool(cur.rowcount)
+
+    def purge_shares(self) -> int:
+        with self._conn() as conn:
+            cur = conn.execute("delete from shares where expires_at <= now()")
+            return int(cur.rowcount or 0)
+
+    def add_report(self, report: Report) -> None:
+        with self._conn() as conn:
+            conn.execute(
+                "insert into reports (owner, repo, sha, engine_version, element_id, kind, note,"
+                " ip_hash, created_at) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (
+                    report.owner,
+                    report.repo,
+                    report.sha,
+                    report.engine_version,
+                    report.element_id,
+                    report.kind,
+                    report.note,
+                    report.ip_hash,
+                    report.created_at,
+                ),
+            )
 
     def ping(self) -> bool:
         try:

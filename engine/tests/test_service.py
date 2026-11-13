@@ -165,3 +165,99 @@ def test_health_gallery_and_openapi(
         MemoryStore(), MemoryBroker(), replace(SETTINGS, benchmark_path=bench), resolve=_resolve
     )
     assert TestClient(app).get("/api/benchmarks").json() == {"categories": {}}
+
+
+# --- shares and reports (Interface phase) -------------------------------------------------------
+
+EXAMPLE = Path(__file__).resolve().parents[2] / "schema" / "examples" / "minimal.graph.json"
+
+
+def _example() -> dict[str, object]:
+    data: dict[str, object] = json.loads(EXAMPLE.read_text(encoding="utf-8"))
+    return data
+
+
+def test_share_round_trip_and_delete_with_token(
+    svc: tuple[TestClient, MemoryStore, MemoryBroker],
+) -> None:
+    client, store, _ = svc
+    resp = client.post("/api/shares", json=_example())
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["url"] is None  # no EVIDENT_PUBLIC_URL configured
+    share_id, token = body["id"], body["deleteToken"]
+    assert token not in json.dumps([vars(s) for s in store.shares.values()], default=str)
+    got = client.get(f"/api/shares/{share_id}")
+    assert got.status_code == 200 and got.json()["nodes"] == _example()["nodes"]
+    assert (
+        client.delete(f"/api/shares/{share_id}", headers={"X-Delete-Token": "nope"}).status_code
+        == 404
+    )
+    assert (
+        client.delete(f"/api/shares/{share_id}", headers={"X-Delete-Token": token}).status_code
+        == 204
+    )
+    assert client.get(f"/api/shares/{share_id}").status_code == 404
+
+
+def test_share_rejects_code_smuggled_into_attrs_and_bad_graphs(
+    svc: tuple[TestClient, MemoryStore, MemoryBroker],
+) -> None:
+    client, _, _ = svc
+    smuggled = _example()
+    nodes = smuggled["nodes"]
+    assert isinstance(nodes, list)
+    nodes[1]["attrs"]["source"] = "export async function POST() { ... }"
+    resp = client.post("/api/shares", json=smuggled)
+    assert resp.status_code == 422 and "Not a valid" in json.dumps(resp.json())
+    dangling = _example()
+    edges = dangling["edges"]
+    assert isinstance(edges, list)
+    edges[0]["to"] = "handler:nowhere.ts#X"
+    assert client.post("/api/shares", json=dangling).status_code == 422
+    assert client.post("/api/shares", content=b"not json").status_code == 400
+
+
+def test_share_size_cap_expiry_and_rate_limit(tmp_path: Path) -> None:
+    store, broker = MemoryStore(), MemoryBroker()
+    settings = replace(SETTINGS, share_max_bytes=100, share_limit_per_hour=2)
+    client = TestClient(create_app(store, broker, settings, resolve=_resolve))
+    assert client.post("/api/shares", json=_example()).status_code == 413
+    settings = replace(SETTINGS, share_limit_per_hour=2, public_url="https://evident.example")
+    client = TestClient(create_app(store, broker, settings, resolve=_resolve))
+    first = client.post("/api/shares?ttlDays=1", json=_example()).json()
+    assert first["url"] == f"https://evident.example/map/?share={first['id']}"
+    share = store.shares[first["id"]]
+    share.expires_at = share.created_at  # expired
+    assert client.get(f"/api/shares/{first['id']}").status_code == 404
+    client.post("/api/shares", json=_example())
+    assert client.post("/api/shares", json=_example()).status_code == 429
+    assert client.post("/api/shares?ttlDays=99", json=_example()).status_code in (422, 429)
+
+
+def test_reports_are_validated_and_stored(
+    svc: tuple[TestClient, MemoryStore, MemoryBroker],
+) -> None:
+    client, store, _ = svc
+    report = {
+        "owner": "acme",
+        "repo": "shop",
+        "sha": SHA,
+        "engineVersion": ENGINE_VERSION,
+        "elementId": "writes:handler:a.ts#POST->model:User",
+        "kind": "edge",
+        "note": "phantom edge",
+    }
+    assert client.post("/api/reports", json=report).status_code == 202
+    assert store.reports[0].element_id == report["elementId"] and store.reports[0].ip_hash
+    assert client.post("/api/reports", json={**report, "sha": "main"}).status_code == 422
+    assert client.post("/api/reports", json={**report, "kind": "group"}).status_code == 422
+
+
+def test_cors_allows_only_configured_origins() -> None:
+    settings = replace(SETTINGS, cors_origins=("https://evident.example",))
+    client = TestClient(create_app(MemoryStore(), MemoryBroker(), settings, resolve=_resolve))
+    ok = client.get("/api/gallery", headers={"Origin": "https://evident.example"})
+    assert ok.headers.get("access-control-allow-origin") == "https://evident.example"
+    other = client.get("/api/gallery", headers={"Origin": "https://evil.example"})
+    assert "access-control-allow-origin" not in other.headers

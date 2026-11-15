@@ -1,66 +1,20 @@
 "use client";
 
-import { animate } from "animejs";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { API_URL } from "@/lib/source";
 import { parseGithubUrl } from "@/lib/url";
-import { ButtonLink, Mono, cx } from "./ui";
+import { AssemblingMap, DeparturesBoard, STOPS, TransitLine, type StopId } from "./TransitProgress";
+import { ButtonLink, Mono } from "./ui";
+import { BackButton } from "./BackButton";
 
-/** Six-stop transit line (DESIGN.md: Pipeline progress). Stage names match the worker's events. */
-const STOPS = [
-  ["fetch", "Fetch"],
-  ["parse", "Parse"],
-  ["extract", "Extract"],
-  ["link", "Link"],
-  ["analyse", "Analyse"],
-  ["group", "Group"],
-] as const;
-type Stage = (typeof STOPS)[number][0] | "queued" | "done" | "failed";
+/** DESIGN.md: Pipeline progress. Stage names match the worker's events. */
+type Stage = StopId | "queued" | "done" | "failed";
 
 interface Progress {
   stage: Stage;
   counts: Record<string, number>;
   error?: string;
-}
-
-const COUNT_LABEL: Record<string, string> = {
-  files: "files",
-  parsed: "parsed",
-  nodes: "nodes",
-  edges: "edges",
-  routes: "routes",
-  findings: "findings",
-  groups: "groups",
-};
-
-function Count({ value, label }: { value: number; label: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      el.textContent = String(value);
-      return;
-    }
-    const state = { n: Number(el.textContent) || 0 };
-    const a = animate(state, {
-      n: value,
-      duration: 600,
-      ease: "outQuad",
-      onUpdate: () => {
-        el.textContent = String(Math.round(state.n));
-      },
-    });
-    return () => {
-      a.pause();
-    };
-  }, [value]);
-  return (
-    <Mono className="text-code-sm text-on-surface-muted">
-      <span ref={ref}>0</span> {label}
-    </Mono>
-  );
 }
 
 export function AnalyzeProgress() {
@@ -71,6 +25,7 @@ export function AnalyzeProgress() {
   const [progress, setProgress] = useState<Progress>({ stage: "queued", counts: {} });
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
+  const [times, setTimes] = useState<Partial<Record<StopId, number>>>({});
 
   useEffect(() => {
     if (!gh || !API_URL) return;
@@ -110,6 +65,9 @@ export function AnalyzeProgress() {
         const p = JSON.parse((e as MessageEvent<string>).data) as Progress;
         setProgress(p);
         setCounts((c) => ({ ...c, ...p.counts }));
+        const stop = p.stage as StopId;
+        if (STOPS.some(([s]) => s === stop))
+          setTimes((t) => (t[stop] ? t : { ...t, [stop]: Date.now() }));
         if (p.stage === "done") {
           source?.close();
           finish(sha);
@@ -162,51 +120,10 @@ export function AnalyzeProgress() {
       <h1 className="text-headline-md">
         {error ? "Analysis stopped" : progress.stage === "queued" ? "Queued" : "Mapping the repo"}
       </h1>
-      <ol
-        className="relative mt-lg flex w-full max-w-[48rem] justify-between"
-        aria-label="Pipeline progress"
-      >
-        <span aria-hidden className="absolute left-2 right-2 top-[7px] h-[3px] bg-outline" />
-        <span
-          aria-hidden
-          className="absolute left-2 top-[7px] h-[3px] bg-layer-route transition-[width] duration-[var(--ev-motion-panel)] ease-standard"
-          style={{
-            width: reached < 0 ? 0 : `calc(${(reached / (STOPS.length - 1)) * 100}% - 16px)`,
-          }}
-        />
-        {STOPS.map(([stage, label], i) => {
-          const state = i < reached ? "done" : i === reached ? "now" : "todo";
-          return (
-            <li
-              key={stage}
-              className="relative flex flex-col items-center gap-sm"
-              aria-current={state === "now" ? "step" : undefined}
-            >
-              <span
-                className={cx(
-                  "h-4 w-4 rounded-full border-[3px]",
-                  state === "todo" ? "border-outline bg-surface" : "border-layer-route",
-                  state === "done" ? "bg-layer-route" : "bg-surface",
-                )}
-              />
-              <span
-                className={cx(
-                  "text-label-md",
-                  state === "todo" ? "text-on-surface-muted" : "text-on-surface",
-                )}
-              >
-                {label}
-              </span>
-            </li>
-          );
-        })}
-      </ol>
-      <div className="mt-md flex flex-wrap justify-center gap-x-lg gap-y-xs" aria-live="polite">
-        {Object.entries(counts)
-          .filter(([k]) => COUNT_LABEL[k])
-          .map(([k, v]) => (
-            <Count key={k} value={v} label={COUNT_LABEL[k]} />
-          ))}
+      <TransitLine reached={reached} failed={Boolean(error)} />
+      <div className="mt-lg flex w-full flex-col items-center gap-xl">
+        <DeparturesBoard reached={reached} times={times} counts={counts} failed={Boolean(error)} />
+        <AssemblingMap counts={counts} />
       </div>
       {error && (
         <div className="mt-lg flex flex-col items-center gap-md">
@@ -222,7 +139,8 @@ export function AnalyzeProgress() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-4xl flex-col items-center justify-center gap-md px-lg text-center">
+    <main className="relative mx-auto flex min-h-dvh max-w-4xl flex-col items-center justify-center gap-md px-lg text-center">
+      <BackButton className="absolute left-lg top-lg" />
       {children}
     </main>
   );

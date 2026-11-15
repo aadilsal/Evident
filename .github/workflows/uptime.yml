@@ -1,0 +1,34 @@
+name: Uptime
+
+# A free uptime monitor: every 15 minutes, check the site and the API. A failed run emails the
+# repo owner (GitHub notifies on failed scheduled workflows). Change the URLs when the domain moves.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SITE: https://www.evident-pk.company
+      API: https://api.evident-pk.company
+    steps:
+      - name: API health (database and Redis)
+        run: |
+          for i in 1 2 3; do
+            body=$(curl -fsS --max-time 20 "$API/api/health") && echo "$body" | grep -q '"ok":true' && { echo "$body"; exit 0; }
+            sleep 20
+          done
+          echo "::error::API health failed: $API/api/health"; exit 1
+      - name: Site and a gallery map load
+        run: |
+          for path in / /map/?gallery=motorai /data/gallery/motorai.json; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$SITE$path")
+            [ "$code" = 200 ] || { echo "::error::$SITE$path returned $code"; exit 1; }
+            echo "$path $code"
+          done

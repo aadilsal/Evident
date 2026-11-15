@@ -1,5 +1,10 @@
 <div align="center">
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/evident-mark-dark.svg">
+  <img src="docs/assets/brand/evident-mark.svg" alt="" width="72" height="72">
+</picture>
+
 # Evident
 
 ### Architecture maps you can verify.

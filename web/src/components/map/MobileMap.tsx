@@ -7,6 +7,7 @@ import type { GraphSource } from "@/lib/url";
 import { layerOf, TYPE_TAG, type ViewModel } from "@/lib/views";
 import { LayerTag, Mono, Severity, cx, shortSha } from "../ui";
 import { EvidencePanel, type PanelActions } from "./EvidencePanel";
+import { Logo } from "../Logo";
 
 type Tab = "routes" | "models" | "findings";
 
@@ -55,8 +56,8 @@ export function MobileMap({
   return (
     <main className="flex min-h-dvh flex-col">
       <header className="border-b border-outline px-lg py-md">
-        <Link href="/" className="font-condensed text-label-lg tracking-wide">
-          EVIDENT
+        <Link href="/" aria-label="Evident home">
+          <Logo size={20} />
         </Link>
         <p className="mt-sm break-all font-mono text-code-md">
           {repo} <span className="text-on-surface-muted">@ {shortSha(graph.repo.sha)}</span>

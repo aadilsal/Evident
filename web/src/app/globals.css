@@ -142,3 +142,11 @@
 [data-exporting] .export-only {
   display: inline;
 }
+
+/* Logo station: on paper the yellow dot needs an ink ring to hold its shape (DESIGN.md Logo). */
+:root {
+  --ev-logo-ring: transparent;
+}
+[data-theme="light"] {
+  --ev-logo-ring: var(--color-ink);
+}

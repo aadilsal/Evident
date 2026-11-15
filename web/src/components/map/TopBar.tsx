@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Graph } from "@/lib/graph";
 import { Button, Mono, shortSha } from "../ui";
 import { ThemeToggle } from "../ThemeToggle";
+import { Logo } from "../Logo";
 
 interface Props {
   graph: Graph;
@@ -45,8 +46,8 @@ export function TopBar({ graph, reportHref, onSearch, onExport }: Props) {
 
   return (
     <header className="no-print flex h-14 shrink-0 items-center gap-md border-b border-outline bg-surface px-lg">
-      <Link href="/" className="font-condensed text-label-lg tracking-wide">
-        EVIDENT
+      <Link href="/" aria-label="Evident home">
+        <Logo size={20} />
       </Link>
       <span className="h-5 w-px bg-outline" aria-hidden />
       <div className="flex min-w-0 flex-1 items-baseline gap-sm">

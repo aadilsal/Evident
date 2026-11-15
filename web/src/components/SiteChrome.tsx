@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { REPO_URL } from "@/lib/source";
 import { ThemeToggle } from "./ThemeToggle";
+import { Logo } from "./Logo";
 
 const NAV = [
   ["/#how", "How it works"],
@@ -12,8 +13,8 @@ const NAV = [
 export function SiteHeader() {
   return (
     <header className="mx-auto flex h-16 w-full max-w-[1120px] items-center gap-lg px-lg">
-      <Link href="/" className="font-condensed text-label-lg tracking-wide">
-        EVIDENT
+      <Link href="/" aria-label="Evident home">
+        <Logo size={24} />
       </Link>
       <nav
         aria-label="Site"

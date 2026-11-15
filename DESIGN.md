@@ -283,6 +283,16 @@ The world is flat, like a printed diagram. Depth comes from surface steps (sunke
 - **Pipeline progress** is a horizontal six-stop transit line (Fetch · Parse · Extract · Link · Analyse · Group). Stops fill as stages complete, and live counts tick beside them in mono (`412 files`, `38 routes`).
 - **Benchmarks page** uses tables first and charts second. Precision and recall per category go in a plain table; the history chart is one line per category in layer colours, with the target drawn as a dashed rule.
 
+## Logo
+
+The mark is the **route e**: a lowercase *e* drawn as one transit line with 6px-style rounded corners, ending at a station in `{colors.primary}`. It is the map in miniature: a route, followed to where it lands, with the proof highlighted.
+
+- **Source:** `web/src/components/Logo.tsx` (`LogoMark`, `Logo`), plus SVG files in `docs/assets/brand/` and the favicon in `web/src/app/icon.svg`. Never redraw it by hand.
+- **Colour:** the line is `{colors.on-surface}` (ink on paper); the station is always `{colors.primary}`. On paper the station gets a 2px ink ring. This is the logo's one use of yellow, and it counts as "the proof".
+- **Lockup:** mark + `evident` in lowercase Plex Sans 600, tracking −0.02em, the word at 0.9× the mark's height, gap `{spacing.sm}`. The product name in running text is still "Evident".
+- **Small sizes:** at 24px and below, use the thicker small variant (`LogoMark` switches automatically). The favicon sits on `{colors.surface-raised}` with a 10px radius.
+- **Don't** recolour the line, outline the mark, add a glow or gradient, rotate it, or put the station on any other letter.
+
 ## Motion
 
 Motion explains causality. It never decorates. When something moves, it is showing you *where a request goes* or *what just finished*.

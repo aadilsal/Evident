@@ -36,7 +36,9 @@ export default function PrivacyPage() {
           <li>Private repositories. Only public GitHub URLs are accepted.</li>
           <li>
             Cookies or tracking identifiers. The theme choice stays in your browser&apos;s local
-            storage.
+            storage. Page-view counts use Vercel Web Analytics, which sets no cookies and keeps no
+            personal data; the local viewer from <code className="font-mono">evident open</code>{" "}
+            doesn&apos;t include it.
           </li>
         </ul>
         <h2 className="mt-xl text-headline-md">Third parties</h2>

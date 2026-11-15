@@ -80,6 +80,8 @@ def _git(args: list[str], *, cwd: Path | None = None, timeout: int = GIT_TIMEOUT
 
 
 def local_head(root: Path) -> str | None:
+    if not root.is_dir():  # git can't run in it; Windows raises NotADirectoryError
+        return None
     try:
         return _git(["rev-parse", "HEAD"], cwd=root).strip() or None
     except AnalysisError:
@@ -87,6 +89,8 @@ def local_head(root: Path) -> str | None:
 
 
 def local_dirty(root: Path) -> bool | None:
+    if not root.is_dir():
+        return None
     try:
         out = _git(["status", "--porcelain", "--", ".", ":(exclude).evident"], cwd=root)
     except AnalysisError:

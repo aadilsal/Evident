@@ -8,6 +8,7 @@ marked inferred.
 from __future__ import annotations
 
 import posixpath
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -23,6 +24,7 @@ METHODS = frozenset({"get", "post", "put", "patch", "delete", "del", "all", "hea
 CAPTURED = METHODS | {"use", "route", "register", "addHook"}  # route/register/addHook: Fastify
 UNMOUNTED_CONFIDENCE = 0.5
 DYNAMIC_CONFIDENCE = 0.4
+PARAM_REGEX = re.compile(r"(:[A-Za-z0-9_]+)\([^)]*\)")  # /:id([0-9]+) -> /:id
 
 
 def extract(rel_path: str, tree: ts.Tree, fn_keys: FnKeys) -> JSON | None:
@@ -111,6 +113,36 @@ def _router_kind(project: Project, file: str, callee: list[str] | None) -> str |
     if len(callee) == 2 and callee[1] == "Router" and head.imported in ("default", "*"):
         return "router"
     return None
+
+
+def _callback_factory(project: Project, fn: FnKey, routers: dict[RKey, _Router]) -> bool:
+    """`createRouter(cb)` that makes a router, hands it to its callback param and returns it."""
+    info = project.js[fn[0]]["scopes"].get(fn[1], {})
+    params = set(info.get("params", []))
+    if not any(len(c["c"]) == 1 and c["c"][0] in params for c in info.get("calls", [])):
+        return False
+    return any((fn[0], fn[1], r) in routers for r in info.get("returns", []))
+
+
+def _factory_routers(project: Project, routers: dict[RKey, _Router]) -> None:
+    """`const users = createRouter((router) => { router.get(...) })`: one router per call site,
+    and the callback's first parameter is that router."""
+    for file, s in project.js.items():
+        scopes = s["scopes"]
+        for name, var in s["vars"].items():
+            callee = var.get("callee")
+            if not callee or len(callee) != 1 or (file, MODULE, name) in routers:
+                continue
+            fn = project.scope_of(project.resolve(file, callee[0]))
+            if fn is None or not _callback_factory(project, fn, routers):
+                continue
+            for cb in var.get("fns", []):
+                info = scopes.get(cb, {})
+                if info.get("parent") not in (None, MODULE) or not info.get("params"):
+                    continue
+                key = (file, MODULE, name)
+                routers.setdefault(key, _Router("router"))
+                routers[(file, cb, info["params"][0])] = routers[key]  # same object: an alias
 
 
 def _flatten(args: list[JSON]) -> list[JSON]:
@@ -254,6 +286,7 @@ def link(ctx: LinkContext) -> None:
                     routers[(file, scope, name)] = _Router(kind)
     if not routers:
         return
+    _factory_routers(project, routers)
     ctx.adapters.append("express")
 
     for file, raw in project.raw.items():
@@ -334,8 +367,10 @@ def link(ctx: LinkContext) -> None:
     for sym, r in sorted(routers.items()):
         if r.kind == "app":
             walk(sym, "", [], frozenset({sym}), False)
+    walked = {id(routers[k]) for k in reached}
     for sym, r in sorted(routers.items()):
-        if sym not in reached and (r.routes or r.mounts):
+        if id(r) not in walked and (r.routes or r.mounts):
+            walked.add(id(r))
             walk(sym, "", [], frozenset({sym}), True)
 
 
@@ -350,7 +385,7 @@ def emit_route(
 ) -> None:
     method = "DELETE" if route.method.lower() in ("delete", "del") else route.method.upper()
     dynamic = local is None
-    path = _join(base, "/*" if dynamic else local or "")
+    path = PARAM_REGEX.sub(r"\1", _join(base, "/*" if dynamic else local or ""))
     route_id = f"route:{method} {path}"
     confidence = DYNAMIC_CONFIDENCE if dynamic else UNMOUNTED_CONFIDENCE if inferred else 1.0
     source = "inferred" if dynamic or inferred else "extracted"

@@ -161,3 +161,17 @@ def test_router_factories_local_services_and_esm_js_specifiers(
     assert edges(g, "calls") == {f"calls:{handler}->{create}": ["src/users.routes.ts:10"]}
     assert edges(g, "writes") == {f"writes:{create}->model:User": ["src/users.service.ts:5"]}
     assert [f for f in run_health(g) if f.rule == "unguarded-write"] == []
+
+
+def test_regex_params_and_router_factories(
+    copy_fixture: Callable[[str], Path], graph_validator: Draft202012Validator
+) -> None:
+    """Regression (public benchmark repos): ':id([0-9]+)' kept its regex, and routers built by a
+    createRouter(callback) factory were missed."""
+    g = analyse_fixture(copy_fixture("express-patterns"), graph_validator)
+    assert node_ids(g, "route") == {
+        "route:GET /api/users/:id",
+        "route:POST /api/users",
+        "route:GET /*",
+    }
+    assert node(g, "route:GET /api/users/:id")["evidence"][0]["file"] == "src/users.ts"  # type: ignore[index]

@@ -25,6 +25,7 @@ import { NodePicker } from "./NodePicker";
 import { Rail } from "./Rail";
 import { TopBar } from "./TopBar";
 import { Unsupported } from "./Unsupported";
+import { BackButton } from "../BackButton";
 
 const VIEW_LABEL: Record<ViewKind, string> = {
   overview: "System overview",
@@ -117,7 +118,8 @@ export function MapApp() {
 
 function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-lg p-xl text-on-surface-muted">
+    <main className="relative flex min-h-dvh flex-col items-center justify-center gap-lg p-xl text-on-surface-muted">
+      <BackButton className="absolute left-lg top-lg" />
       {children}
     </main>
   );

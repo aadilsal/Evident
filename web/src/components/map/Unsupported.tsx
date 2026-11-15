@@ -1,12 +1,14 @@
 import type { Graph } from "@/lib/graph";
 import { ButtonLink, Mono } from "../ui";
+import { BackButton } from "../BackButton";
 
 /** Graceful fallback when the stack is detected but no adapter covers it yet. */
 export function Unsupported({ graph }: { graph: Graph }) {
   const stack = graph.stack;
   const repo = graph.repo.owner ? `${graph.repo.owner}/${graph.repo.name}` : graph.repo.name;
   return (
-    <main className="mx-auto flex min-h-dvh max-w-[42rem] flex-col justify-center gap-lg px-xl py-3xl">
+    <main className="relative mx-auto flex min-h-dvh max-w-[42rem] flex-col justify-center gap-lg px-xl py-3xl">
+      <BackButton className="absolute left-lg top-lg" />
       <Mono className="text-code-sm text-on-surface-muted">{repo}</Mono>
       <h1 className="text-headline-lg">We can&apos;t map this stack yet</h1>
       <p className="text-body-lg text-on-surface-muted">

@@ -7,6 +7,7 @@ import type { Graph } from "@/lib/graph";
 import { Button, Mono, shortSha } from "../ui";
 import { ThemeToggle } from "../ThemeToggle";
 import { Logo } from "../Logo";
+import { BackButton } from "../BackButton";
 
 interface Props {
   graph: Graph;
@@ -46,6 +47,7 @@ export function TopBar({ graph, reportHref, onSearch, onExport }: Props) {
 
   return (
     <header className="no-print flex h-14 shrink-0 items-center gap-md border-b border-outline bg-surface px-lg">
+      <BackButton className="-ml-sm" />
       <Link href="/" aria-label="Evident home">
         <Logo size={20} />
       </Link>

@@ -1,16 +1,16 @@
 {
   "categories": {
     "routes": {
-      "tp": 460,
+      "tp": 527,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "hallucinationRate": 0.0043
+      "hallucinationRate": 0.0056
     },
     "models": {
-      "tp": 26,
+      "tp": 40,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
@@ -19,7 +19,7 @@
       "hallucinationRate": 0.0
     },
     "services": {
-      "tp": 16,
+      "tp": 19,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
@@ -28,7 +28,7 @@
       "hallucinationRate": 0.0
     },
     "edges": {
-      "tp": 168,
+      "tp": 215,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
@@ -69,20 +69,73 @@
         "hallucinationRate": 0.0
       }
     },
-    "express": {
-      "routes": {
-        "tp": 184,
+    "drizzle": {
+      "models": {
+        "tp": 1,
         "fp": 0,
         "fn": 0,
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0,
-        "hallucinationRate": 0.0054
+        "hallucinationRate": 0.0
+      },
+      "edges": {
+        "tp": 12,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    },
+    "express": {
+      "routes": {
+        "tp": 226,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0087
       }
     },
     "fastapi": {
       "routes": {
         "tp": 62,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    },
+    "fastify": {
+      "routes": {
+        "tp": 10,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    },
+    "flask": {
+      "routes": {
+        "tp": 15,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    },
+    "mongoose": {
+      "models": {
+        "tp": 7,
         "fp": 0,
         "fn": 0,
         "precision": 1.0,
@@ -115,7 +168,7 @@
     },
     "prisma": {
       "models": {
-        "tp": 20,
+        "tp": 22,
         "fp": 0,
         "fn": 0,
         "precision": 1.0,
@@ -124,7 +177,47 @@
         "hallucinationRate": 0.0
       },
       "edges": {
-        "tp": 161,
+        "tp": 171,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    },
+    "sqlalchemy": {
+      "models": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      },
+      "edges": {
+        "tp": 14,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      }
+    },
+    "typeorm": {
+      "models": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "hallucinationRate": 0.0
+      },
+      "edges": {
+        "tp": 11,
         "fp": 0,
         "fn": 0,
         "precision": 1.0,
@@ -138,7 +231,7 @@
     {
       "repo": "aadilsal/Munshi",
       "sha": "40ad91b6e58e2d20cc60f29ddc035688c8eb7ae6",
-      "seconds": 10.23,
+      "seconds": 0.12,
       "categories": {
         "routes": {
           "tp": 55,
@@ -227,7 +320,7 @@
     {
       "repo": "aadilsal/MotorAi",
       "sha": "c10fa5d77f0daa0d40a26ab681e795d5fc589a55",
-      "seconds": 6.36,
+      "seconds": 0.12,
       "categories": {
         "routes": {
           "tp": 39,
@@ -305,7 +398,7 @@
     {
       "repo": "aadilsal/AjaiConsultancyAssignment",
       "sha": "df83d726c11513d2076fdb2a764b2a7d6cdde9ef",
-      "seconds": 10.53,
+      "seconds": 0.13,
       "categories": {
         "routes": {
           "tp": 24,
@@ -394,7 +487,7 @@
     {
       "repo": "aadilsal/TournamentMatchMaker",
       "sha": "973998e38d0906dfe661505e78e77f46cdc4d42a",
-      "seconds": 15.55,
+      "seconds": 0.29,
       "categories": {
         "routes": {
           "tp": 146,
@@ -452,7 +545,7 @@
     {
       "repo": "aadilsal/MdcatExpert",
       "sha": "34c226da59c2da8989b7053cf4a41bbce4e578e3",
-      "seconds": 12.85,
+      "seconds": 0.2,
       "categories": {
         "routes": {
           "tp": 102,
@@ -510,7 +603,7 @@
     {
       "repo": "aadilsal/Insight-OS",
       "sha": "38ded8337547f5705d58943f481e17457ff3b841",
-      "seconds": 2.6,
+      "seconds": 0.1,
       "categories": {
         "routes": {
           "tp": 24,
@@ -579,7 +672,7 @@
     {
       "repo": "aadilsal/SpotterTruckLogging",
       "sha": "3cded29a1e127af7b772160ca1de12cb31d700f0",
-      "seconds": 4.23,
+      "seconds": 0.12,
       "categories": {
         "routes": {
           "tp": 23,
@@ -657,7 +750,7 @@
     {
       "repo": "aadilsal/JobFinder",
       "sha": "13d8d0d6358f49e22307c2f055f5460838d6253f",
-      "seconds": 2.89,
+      "seconds": 0.1,
       "categories": {
         "routes": {
           "tp": 47,
@@ -678,7 +771,7 @@
           "hallucinationRate": 0.0
         },
         "services": {
-          "tp": 0,
+          "tp": 1,
           "fp": 0,
           "fn": 0,
           "precision": 1.0,
@@ -702,6 +795,379 @@
         "fastapi": {
           "routes": {
             "tp": 47,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "mkosir/typeorm-express-typescript",
+      "sha": "117f6647c5aabf97b5d40af060106230a103c714",
+      "seconds": 0.1,
+      "categories": {
+        "routes": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 11,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "express": {
+          "routes": {
+            "tp": 8,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        },
+        "typeorm": {
+          "models": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          },
+          "edges": {
+            "tp": 11,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "danielm/fastify-prisma-swagger-rest-boilerplate",
+      "sha": "f4e1cedcb6653fc9cbfcac05fbe50f30df1eaae0",
+      "seconds": 0.09,
+      "categories": {
+        "routes": {
+          "tp": 10,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 10,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "fastify": {
+          "routes": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        },
+        "prisma": {
+          "models": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          },
+          "edges": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "jatindotdev/express-drizzle-postgres-starter",
+      "sha": "58bfd065f15b18d11f85c8988e94b94aadf8160b",
+      "seconds": 0.08,
+      "categories": {
+        "routes": {
+          "tp": 11,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "drizzle": {
+          "models": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          },
+          "edges": {
+            "tp": 12,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        },
+        "express": {
+          "routes": {
+            "tp": 11,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "arsalasif/flask-rest-api",
+      "sha": "ed458830451d94c325e149a6b6956031cfa9a5b7",
+      "seconds": 0.12,
+      "categories": {
+        "routes": {
+          "tp": 15,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "models": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "tp": 14,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "flask": {
+          "routes": {
+            "tp": 15,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        },
+        "sqlalchemy": {
+          "models": {
+            "tp": 3,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          },
+          "edges": {
+            "tp": 14,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "repo": "watscho/express-mongodb-rest-api-boilerplate",
+      "sha": "0ed1f89bc3e2f1a86b1b3f57f8569fa0405aa3d7",
+      "seconds": 0.22,
+      "unlabelled": ["edges"],
+      "categories": {
+        "routes": {
+          "tp": 23,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0417
+        },
+        "models": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      },
+      "misses": {},
+      "extras": {},
+      "byAdapter": {
+        "express": {
+          "routes": {
+            "tp": 23,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hallucinationRate": 0.0417
+          }
+        },
+        "mongoose": {
+          "models": {
+            "tp": 7,
             "fp": 0,
             "fn": 0,
             "precision": 1.0,

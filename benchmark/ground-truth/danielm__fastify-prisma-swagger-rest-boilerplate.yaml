@@ -1,0 +1,182 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo:
+  {
+    owner: danielm,
+    name: fastify-prisma-swagger-rest-boilerplate,
+    sha: f4e1cedcb6653fc9cbfcac05fbe50f30df1eaae0,
+  }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-15',
+    minutes: 15,
+  }
+routes:
+  # Plugins registered with prefix /categories and /products inside a plugin with prefix /api/v1.
+  - {
+      method: GET,
+      path: /api/v1/categories,
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/categories.routes.ts:8',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/categories/:id',
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/categories.routes.ts:11',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/categories/:id',
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/categories.routes.ts:14',
+    }
+  - {
+      method: POST,
+      path: /api/v1/categories,
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/categories.routes.ts:17',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/categories/:id',
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/categories.routes.ts:20',
+    }
+  - {
+      method: GET,
+      path: /api/v1/products,
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/products.routes.ts:8',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/products/:id',
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/products.routes.ts:11',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/products/:id',
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/products.routes.ts:14',
+    }
+  - {
+      method: POST,
+      path: /api/v1/products,
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/products.routes.ts:17',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/products/:id',
+      kind: api,
+      framework: fastify,
+      evidence: 'src/routes/products.routes.ts:20',
+    }
+models:
+  - { name: Category, table: Category, orm: prisma, evidence: 'prisma/schema.prisma:14' }
+  - { name: Product, table: Product, orm: prisma, evidence: 'prisma/schema.prisma:22' }
+services: []
+edges:
+  # The client is a Fastify decorator: fastify.decorate('prisma', new PrismaClient()) in
+  # src/plugins/prisma.plugin.ts:8, used as request.server.prisma.<model>.<op>().
+  - {
+      route: GET /api/v1/categories,
+      model: Category,
+      op: read,
+      orm: prisma,
+      evidence: 'src/controllers/categories.controller.ts:6',
+    }
+  - {
+      route: 'GET /api/v1/categories/:id',
+      model: Category,
+      op: read,
+      orm: prisma,
+      evidence: 'src/controllers/categories.controller.ts:23',
+    }
+  - {
+      route: 'DELETE /api/v1/categories/:id',
+      model: Category,
+      op: write,
+      orm: prisma,
+      evidence: 'src/controllers/categories.controller.ts:37',
+    }
+  - {
+      route: POST /api/v1/categories,
+      model: Category,
+      op: write,
+      orm: prisma,
+      evidence: 'src/controllers/categories.controller.ts:47',
+    }
+  - {
+      route: 'PUT /api/v1/categories/:id',
+      model: Category,
+      op: write,
+      orm: prisma,
+      evidence: 'src/controllers/categories.controller.ts:60',
+    }
+  - {
+      route: GET /api/v1/products,
+      model: Product,
+      op: read,
+      orm: prisma,
+      evidence: 'src/controllers/products.controller.ts:6',
+    }
+  - {
+      route: GET /api/v1/products,
+      model: Category,
+      op: read,
+      orm: prisma,
+      evidence: 'src/controllers/products.controller.ts:11',
+      optional: true,
+    }
+  - {
+      route: 'GET /api/v1/products/:id',
+      model: Product,
+      op: read,
+      orm: prisma,
+      evidence: 'src/controllers/products.controller.ts:24',
+    }
+  - {
+      route: 'GET /api/v1/products/:id',
+      model: Category,
+      op: read,
+      orm: prisma,
+      evidence: 'src/controllers/products.controller.ts:26',
+      optional: true,
+    }
+  - {
+      route: 'DELETE /api/v1/products/:id',
+      model: Product,
+      op: write,
+      orm: prisma,
+      evidence: 'src/controllers/products.controller.ts:39',
+    }
+  - {
+      route: POST /api/v1/products,
+      model: Product,
+      op: write,
+      orm: prisma,
+      evidence: 'src/controllers/products.controller.ts:49',
+    }
+  - {
+      route: 'PUT /api/v1/products/:id',
+      model: Product,
+      op: write,
+      orm: prisma,
+      evidence: 'src/controllers/products.controller.ts:69',
+    }
+out_of_scope:
+  - '/docs (from the third-party @fastify/swagger-ui plugin, and only when ENABLE_SWAGGER is set)'
+notes: |
+  - category: { connect: { id } } only links a product to an existing category; it is not a write on Category.

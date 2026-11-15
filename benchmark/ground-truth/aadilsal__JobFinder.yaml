@@ -241,7 +241,9 @@ routes:
     }
   - { method: GET, path: /sw.js, kind: api, framework: fastapi, evidence: 'server.py:630' }
 models: []
-services: []
+services:
+  # A function-local import in _ask(); the client is called on the next lines.
+  - { provider: anthropic, evidence: 'generator.py:85' }
 edges: []
 out_of_scope:
   - app.mount('/', StaticFiles) at server.py:635 (static files, not a route)

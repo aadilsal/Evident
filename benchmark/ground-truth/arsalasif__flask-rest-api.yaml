@@ -1,0 +1,349 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo: { owner: arsalasif, name: flask-rest-api, sha: ed458830451d94c325e149a6b6956031cfa9a5b7 }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-15',
+    minutes: 35,
+  }
+# All blueprints are registered in a loop over literal lists with url_prefix='/v1'
+# (services/web/project/__init__.py:33-35); code lives under services/web/project/.
+routes:
+  - {
+      method: POST,
+      path: /v1/auth/register,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/core.py:18',
+    }
+  - {
+      method: POST,
+      path: /v1/auth/login,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/core.py:56',
+    }
+  - {
+      method: GET,
+      path: /v1/auth/logout,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/core.py:82',
+    }
+  - {
+      method: GET,
+      path: /v1/auth/status,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/core.py:92',
+    }
+  - {
+      method: PUT,
+      path: /v1/auth/password_change,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/core.py:104',
+    }
+  - {
+      method: PUT,
+      path: /v1/auth/password_reset,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/core.py:127',
+    }
+  - {
+      method: POST,
+      path: /v1/auth/password_recovery,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/core.py:150',
+    }
+  - {
+      method: GET,
+      path: /v1/email_verification,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/email_verification.py:14',
+    }
+  - {
+      method: GET,
+      path: '/v1/email_verification/:token',
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/email_verification.py:33',
+    }
+  - {
+      method: GET,
+      path: /v1/email_verification/resend,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/email_verification.py:55',
+    }
+  - {
+      method: GET,
+      path: /v1/auth/github/login,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/social.py:17',
+    }
+  - {
+      method: GET,
+      path: /v1/auth/github/login/callback,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/social.py:31',
+    }
+  - {
+      method: GET,
+      path: /v1/auth/facebook/login,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/social.py:86',
+    }
+  - {
+      method: GET,
+      path: /v1/auth/facebook/login/callback,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/social.py:101',
+    }
+  - {
+      method: PUT,
+      path: /v1/auth/social/set_standalone_user,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/auth/social.py:184',
+    }
+  # register_api() builds these URLs from its arguments (api/common/utils/helpers.py:51-60):
+  # a path assembled inside a helper is optional + dynamic (labelling guide, routes).
+  - {
+      method: GET,
+      path: /v1/users,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/admin/users.py:33',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: POST,
+      path: /v1/users,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/admin/users.py:33',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: GET,
+      path: '/v1/users/:user_id',
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/admin/users.py:33',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: PUT,
+      path: '/v1/users/:user_id',
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/admin/users.py:33',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: DELETE,
+      path: '/v1/users/:user_id',
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/admin/users.py:33',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: GET,
+      path: /v1/user,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/user/user.py:35',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: POST,
+      path: /v1/user,
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/user/user.py:35',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: GET,
+      path: '/v1/user/:user_id',
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/user/user.py:35',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: PUT,
+      path: '/v1/user/:user_id',
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/user/user.py:35',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: DELETE,
+      path: '/v1/user/:user_id',
+      kind: api,
+      framework: flask,
+      evidence: 'services/web/project/api/v1/user/user.py:35',
+      optional: true,
+      dynamic: true,
+    }
+models:
+  # Base (models/base.py:9) is __abstract__ = True, so it is not a model.
+  - { name: User, table: user, orm: sqlalchemy, evidence: 'services/web/project/models/user.py:30' }
+  - {
+      name: Group,
+      table: group,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/models/group.py:8',
+    }
+  - {
+      name: UserGroupAssociation,
+      table: user_group_associations,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/models/user_group_association.py:9',
+    }
+services:
+  - {
+      provider: 'http:github.com',
+      evidence: 'services/web/project/api/v1/auth/social.py:47',
+      optional: true,
+    }
+  - {
+      provider: 'http:api.github.com',
+      evidence: 'services/web/project/api/v1/auth/social.py:59',
+      optional: true,
+    }
+  - {
+      provider: 'http:graph.facebook.com',
+      evidence: 'services/web/project/api/v1/auth/social.py:117',
+      optional: true,
+    }
+edges:
+  # Reads go through Base classmethods (first_by/first/get -> cls.query..., models/base.py:25-51):
+  # a wrapper that ends in a query counts (labelling guide, edges).
+  - {
+      route: POST /v1/auth/register,
+      model: User,
+      op: write,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/core.py:37',
+    }
+  - {
+      route: POST /v1/auth/login,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/core.py:71',
+    }
+  - {
+      route: GET /v1/auth/status,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/core.py:99',
+    }
+  - {
+      route: PUT /v1/auth/password_change,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/core.py:114',
+    }
+  - {
+      route: PUT /v1/auth/password_reset,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/core.py:139',
+    }
+  - {
+      route: POST /v1/auth/password_recovery,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/core.py:165',
+    }
+  - {
+      route: GET /v1/email_verification,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/email_verification.py:22',
+    }
+  - {
+      route: 'GET /v1/email_verification/:token',
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/email_verification.py:39',
+    }
+  - {
+      route: GET /v1/email_verification/resend,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/email_verification.py:62',
+    }
+  - {
+      route: GET /v1/auth/github/login/callback,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/social.py:151',
+    }
+  - {
+      route: GET /v1/auth/github/login/callback,
+      model: User,
+      op: write,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/social.py:169',
+    }
+  - {
+      route: GET /v1/auth/facebook/login/callback,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/social.py:151',
+    }
+  - {
+      route: GET /v1/auth/facebook/login/callback,
+      model: User,
+      op: write,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/social.py:169',
+    }
+  - {
+      route: PUT /v1/auth/social/set_standalone_user,
+      model: User,
+      op: read,
+      orm: sqlalchemy,
+      evidence: 'services/web/project/api/v1/auth/social.py:201',
+    }
+out_of_scope:
+  - 'services/web/manage.py CLI commands, Celery tasks in project/tasks/ (not routes)'
+  - 'tests under services/web/project/tests/'
+notes: |
+  - Attribute updates followed by session commit (password_change, verify_email, set_standalone_user) are not
+    in the guide's SQLAlchemy write shapes, so they count only as reads.
+  - The register_api() CRUD views use a generic BaseAPI with the model passed as an argument; their edges are not
+    labelled because the routes themselves are optional/dynamic.
+  - Flask-Mail and Celery are not in the service catalogue.

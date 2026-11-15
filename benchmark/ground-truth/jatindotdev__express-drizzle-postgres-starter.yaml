@@ -1,0 +1,185 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo:
+  {
+    owner: jatindotdev,
+    name: express-drizzle-postgres-starter,
+    sha: 58bfd065f15b18d11f85c8988e94b94aadf8160b,
+  }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-15',
+    minutes: 20,
+  }
+routes:
+  - { method: GET, path: /, kind: api, framework: express, evidence: 'src/server.ts:34' }
+  - { method: GET, path: /healthcheck, kind: api, framework: express, evidence: 'src/server.ts:40' }
+  # app.all('*') 404 fallback, not an endpoint clients call on purpose.
+  - {
+      method: ALL,
+      path: '/*',
+      kind: api,
+      framework: express,
+      evidence: 'src/server.ts:50',
+      optional: true,
+    }
+  # Routers come from a createRouter(callback) factory (src/utils/create.ts:4) mounted at /api.
+  - {
+      method: GET,
+      path: /api/user,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/user-routes.ts:14',
+    }
+  - {
+      method: GET,
+      path: /api/user/verify,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/user-routes.ts:15',
+    }
+  - {
+      method: POST,
+      path: /api/user/create,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/user-routes.ts:16',
+    }
+  - {
+      method: POST,
+      path: /api/user/login,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/user-routes.ts:17',
+    }
+  - {
+      method: POST,
+      path: /api/user/remove,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/user-routes.ts:18',
+    }
+  - {
+      method: PUT,
+      path: /api/user/update,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/user-routes.ts:19',
+    }
+  - {
+      method: GET,
+      path: /api/admin/all-users,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/admin-routes.ts:17',
+    }
+  - {
+      method: GET,
+      path: /api/admin/all-verfied-users,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/admin-routes.ts:18',
+    }
+  - {
+      method: DELETE,
+      path: /api/admin/remove-unverified-users,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/admin-routes.ts:19',
+    }
+models:
+  - { name: users, table: users, orm: drizzle, evidence: 'src/schema/user.ts:6' }
+services:
+  - { provider: aws-ses, evidence: 'src/utils/email.ts:2' }
+edges:
+  - {
+      route: GET /api/user/verify,
+      model: users,
+      op: read,
+      orm: drizzle,
+      evidence: 'src/services/user-services.ts:57',
+    }
+  - {
+      route: GET /api/user/verify,
+      model: users,
+      op: write,
+      orm: drizzle,
+      evidence: 'src/services/user-services.ts:77',
+    }
+  - {
+      route: POST /api/user/create,
+      model: users,
+      op: read,
+      orm: drizzle,
+      evidence: 'src/services/user-services.ts:17',
+    }
+  - {
+      route: POST /api/user/create,
+      model: users,
+      op: write,
+      orm: drizzle,
+      evidence: 'src/services/user-services.ts:31',
+    }
+  - {
+      route: POST /api/user/login,
+      model: users,
+      op: read,
+      orm: drizzle,
+      evidence: 'src/services/user-services.ts:17',
+    }
+  # deleteUser looks the user up first (getUserByEmail) before deleting.
+  - {
+      route: POST /api/user/remove,
+      model: users,
+      op: read,
+      orm: drizzle,
+      evidence: 'src/services/user-services.ts:17',
+    }
+  - {
+      route: POST /api/user/remove,
+      model: users,
+      op: write,
+      orm: drizzle,
+      evidence: 'src/services/user-services.ts:95',
+    }
+  - {
+      route: PUT /api/user/update,
+      model: users,
+      op: read,
+      orm: drizzle,
+      evidence: 'src/services/user-services.ts:17',
+    }
+  - {
+      route: PUT /api/user/update,
+      model: users,
+      op: write,
+      orm: drizzle,
+      evidence: 'src/services/user-services.ts:123',
+    }
+  - {
+      route: GET /api/admin/all-users,
+      model: users,
+      op: read,
+      orm: drizzle,
+      evidence: 'src/services/admin-services.ts:29',
+    }
+  - {
+      route: GET /api/admin/all-verfied-users,
+      model: users,
+      op: read,
+      orm: drizzle,
+      evidence: 'src/services/admin-services.ts:15',
+    }
+  - {
+      route: DELETE /api/admin/remove-unverified-users,
+      model: users,
+      op: write,
+      orm: drizzle,
+      evidence: 'src/services/admin-services.ts:34',
+    }
+out_of_scope:
+  - 'src/migrate.ts (a script, not a route)'
+notes: |
+  - GET /api/user only returns res.locals.user set by the authenticate() middleware; middleware is excluded from edges, so it has none.
+  - GET /api/user/verify calls handleVerifyUser through an inline arrow (user-routes.ts:15).
+  - The path segment "all-verfied-users" is spelled that way in the source.

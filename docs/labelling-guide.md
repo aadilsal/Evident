@@ -39,6 +39,8 @@ A route is one **(method, normalised path)** pair that a client can call.
 | Express `router.get('/:id', h)` mounted with `app.use('/api/users', router)` | `GET /api/users/:id` (full resolved path) |
 | Express `app.all('/x')` | 1 route with method `ALL` |
 | Express `router.route('/x').get(a).post(b)` | 2 routes |
+| Express inline param pattern `/:id([0-9]+)` | `/:id` (the pattern is dropped) |
+| Express router from a factory: `createRouter((router) => { router.get(...) })` | Routes on the callback's router, mounted wherever the factory's result is mounted |
 | Same method and path registered twice | 1 route (note the duplicate) |
 | Path built from a variable or a loop | `optional: true`, path as best understood, `dynamic: true` |
 | Pages Router (`pages/api/*`) | **Not counted** in v1 (out of scope); list under `out_of_scope:` |
@@ -64,6 +66,7 @@ Trailing slashes are removed (`/api/users/` → `/api/users`). The root page is 
 | `app.get('/x', [opts], handler)` | 1 route |
 | `app.route({ method: ['GET', 'PUT'], url: '/x', handler })` | 1 route per method |
 | `app.register(plugin, { prefix: '/api' })` | Routes inside the plugin get the prefix, nested registrations stack |
+| Inline plugin `app.register(async (api) => { api.register(r, { prefix: '/b' }) }, { prefix: '/a' })` | Routes in `r` get `/a/b` |
 | A plugin that is never registered | Its local paths, `optional: true` |
 
 ### FastAPI
@@ -84,6 +87,8 @@ Trailing slashes are removed (`/api/users/` → `/api/users`). The root page is 
 | `Blueprint(..., url_prefix="/a")` registered with `register_blueprint(bp, url_prefix="/b")` | Blueprint prefix and registration prefix stack |
 | `<int:id>` / `<path:p>` | `:id` / `:p*` |
 | `app.add_url_rule("/x", view_func=f, methods=[...])` | 1 route per method |
+| `for bp in [*auth_bps, *user_bps]: app.register_blueprint(bp, url_prefix="/v1")` over literal lists | Each listed blueprint gets the prefix (not optional: the lists are in the source) |
+| A `Flask` subclass (`class BaseFlask(Flask)`, `app = BaseFlask(__name__)`) | The app, same as `Flask(...)` |
 
 ### Django (and Django REST Framework)
 
@@ -112,7 +117,7 @@ One entry per model the app defines, by ORM:
 | TypeORM | `@Entity()` class | Class name; table from `@Entity('name')` |
 | Mongoose | `model('Name', schema)` call | The string name |
 | Django ORM | Concrete `models.Model` subclass (not `abstract = True`); table from `Meta.db_table` or `<app>_<model>` | Class name |
-| SQLAlchemy | Declarative class with `__tablename__` (or SQLModel with `table=True`, Flask-SQLAlchemy `db.Model`) | Class name |
+| SQLAlchemy | Declarative class with `__tablename__` (or SQLModel with `table=True`, Flask-SQLAlchemy `db.Model`); not a base with `__abstract__ = True` | Class name |
 
 Models from libraries (Django's `User`) are not counted.
 
@@ -146,7 +151,7 @@ One entry per **provider** the app talks to, identified by an SDK import from fi
 | Python: `stripe`, `openai`, `anthropic`, `redis`, `resend`, `twilio`, `groq`, `supabase`, `cloudinary`, `sendgrid` | Same slugs |
 | Python: `sentry_sdk` / `boto3` / `google.generativeai`, `google.genai` | `sentry` / `aws-s3` / `google-gemini` |
 
-Hosted backends (Supabase, Convex) count as services even when they hold the app's data: the app reaches them over the network through a vendor SDK. A package declared in `package.json` but never imported is not a service. A dynamic `import('stripe')` counts.
+Hosted backends (Supabase, Convex) count as services even when they hold the app's data: the app reaches them over the network through a vendor SDK. A package declared in `package.json` but never imported is not a service. A dynamic `import('stripe')` counts, and so does a Python import inside a function (`def ask(): import anthropic`).
 
 Not services: Prisma itself, the app's own database, UI and utility libraries, auth helpers that make no network call of their own. A plain `fetch('https://api.x.com')` with a literal host counts as `http:<host>` and is `optional: true`.
 
@@ -181,7 +186,7 @@ The same reachability rule applies to the other ORMs; only the call shapes diffe
 | Drizzle | `select().from(t)`, joins on `t`, `db.query.t.findMany/findFirst` | `insert(t)`, `update(t)`, `delete(t)` |
 | TypeORM (repository from `getRepository(E)`, `@InjectRepository(E)` or a `Repository<E>` field) | `find*`, `count*`, `exist*`, `sum`/`average`/`minimum`/`maximum` | `save`, `insert`, `update`, `upsert`, `delete`, `remove`, `softDelete`, `softRemove`, `restore`, `increment`, `decrement`, `clear` |
 | Django ORM | `Model.objects.<all/filter/get/exclude/first/last/count/exists/aggregate/annotate/values/...>`, `get_object_or_404(Model)` | `Model.objects.<create/bulk_create/update/delete/get_or_create/update_or_create/bulk_update>`, `.save()`/`.delete()` on an instance built as `Model(...)` or loaded with `Model.objects.get(...)` |
-| SQLAlchemy | `session.query(M)`, `select(M)`, `session.get(M, id)`, Flask-SQLAlchemy `M.query.<op>()` | `insert(M)`, `update(M)`, `delete(M)`, `session.add/merge/delete(x)` where `x = M(...)` or `x = M.query.<op>()` |
+| SQLAlchemy | `session.query(M)`, `select(M)`, `session.get(M, id)`, Flask-SQLAlchemy `M.query.<op>()`, and `M.first_by(...)` where an inherited classmethod runs `cls.query` | `insert(M)`, `update(M)`, `delete(M)`, `session.add/merge/delete(x)` where `x = M(...)` or `x = M.query.<op>()` |
 | Mongoose (model binding, or `@InjectModel` field typed `Model<E>`) | `find*`, `countDocuments`, `estimatedDocumentCount`, `exists`, `aggregate`, `distinct` | `create`, `insertMany`, `update*`, `delete*`, `replaceOne`, `bulkWrite`, `findOneAnd*`/`findByIdAnd*`, `new Model().save()` |
 
 A route with both a read and a write to the same model gets two edges. Multiple calls of the same op count once.
@@ -202,6 +207,8 @@ Per category (routes, models, services, route-model edges), and per adapter:
 Report per repo and micro-averaged across repos. Also record analysis time and LLM cost per repo.
 
 ## YAML format
+
+A repo may leave a whole category unlabelled with `unlabelled: [edges]` (for example when edges need more time than one pass). The engine's predictions for that category are then left out of that repo's score, and the category doesn't count towards the totals for it. Say why in a comment.
 
 ```yaml
 repo: { owner: calcom, name: cal.com, sha: 0123456789abcdef0123456789abcdef01234567 }

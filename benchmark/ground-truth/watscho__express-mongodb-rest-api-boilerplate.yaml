@@ -1,0 +1,241 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo:
+  {
+    owner: watscho,
+    name: express-mongodb-rest-api-boilerplate,
+    sha: 0ed1f89bc3e2f1a86b1b3f57f8569fa0405aa3d7,
+  }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-15',
+    minutes: 40,
+  }
+# Edges are left for a later pass: every handler runs controller -> service -> repository object ->
+# model, often inside one transaction that also writes the email outbox, so hand-tracing them
+# reliably needs more time than this pass had. Routes, models and services are complete.
+unlabelled: [edges]
+routes:
+  - {
+      method: GET,
+      path: /health/live,
+      kind: api,
+      framework: express,
+      evidence: 'src/app/http/app.ts:38',
+    }
+  - {
+      method: GET,
+      path: /health/ready,
+      kind: api,
+      framework: express,
+      evidence: 'src/app/http/app.ts:42',
+    }
+  # Documentation router (src/app/http/documentation/routes.ts), mounted at the root.
+  - {
+      method: GET,
+      path: /openapi.json,
+      kind: api,
+      framework: express,
+      evidence: 'src/app/http/documentation/routes.ts:57',
+    }
+  - {
+      method: GET,
+      path: /docs,
+      kind: api,
+      framework: express,
+      evidence: 'src/app/http/documentation/routes.ts:58',
+    }
+  - {
+      method: GET,
+      path: /docs/initializer.js,
+      kind: api,
+      framework: express,
+      evidence: 'src/app/http/documentation/routes.ts:79',
+    }
+  - {
+      method: GET,
+      path: /docs/config.json,
+      kind: api,
+      framework: express,
+      evidence: 'src/app/http/documentation/routes.ts:82',
+    }
+  - {
+      method: GET,
+      path: /docs/openapi.json,
+      kind: api,
+      framework: express,
+      evidence: 'src/app/http/documentation/routes.ts:99',
+    }
+  # Registered in a loop over two literal filenames: optional + dynamic.
+  - {
+      method: GET,
+      path: /docs/swagger-ui.css,
+      kind: api,
+      framework: express,
+      evidence: 'src/app/http/documentation/routes.ts:101',
+      optional: true,
+      dynamic: true,
+    }
+  - {
+      method: GET,
+      path: /docs/swagger-ui-bundle.js,
+      kind: api,
+      framework: express,
+      evidence: 'src/app/http/documentation/routes.ts:101',
+      optional: true,
+      dynamic: true,
+    }
+  # Domain routers from factory functions, combined in src/app/http/router.ts:10 with no prefix.
+  - {
+      method: POST,
+      path: /auth/sign-in,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/routes.ts:20',
+    }
+  - {
+      method: POST,
+      path: /auth/sign-up,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/routes.ts:26',
+    }
+  - {
+      method: POST,
+      path: /auth/sign-out,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/routes.ts:35',
+    }
+  - {
+      method: GET,
+      path: /auth/sign-out,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/routes.ts:36',
+    }
+  - {
+      method: POST,
+      path: /auth/password/reset,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/routes.ts:37',
+    }
+  - {
+      method: POST,
+      path: '/auth/password/new/:accessToken',
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/routes.ts:43',
+    }
+  - {
+      method: POST,
+      path: /user/update/email,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/routes.ts:50',
+    }
+  - {
+      method: POST,
+      path: /user/update/password,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/routes.ts:57',
+    }
+  - {
+      method: POST,
+      path: /user/delete,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/routes.ts:64',
+    }
+  - {
+      method: POST,
+      path: /user/verification/request,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/verification/routes.ts:10',
+    }
+  - {
+      method: GET,
+      path: '/user/verification/:accessToken',
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/auth/verification/routes.ts:17',
+    }
+  - {
+      method: GET,
+      path: /me,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/users/routes.ts:9',
+    }
+  - {
+      method: POST,
+      path: /user/update,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/users/routes.ts:10',
+    }
+  - {
+      method: POST,
+      path: /media/image/upload,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/media/routes.ts:10',
+    }
+  - {
+      method: POST,
+      path: /user/update/avatar,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/media/routes.ts:16',
+    }
+  - {
+      method: GET,
+      path: /notifications/templates,
+      kind: api,
+      framework: express,
+      evidence: 'src/domains/notifications/routes.ts:10',
+    }
+models:
+  - {
+      name: ResetPassword,
+      table: ResetPassword,
+      orm: mongoose,
+      evidence: 'src/domains/auth/model.ts:30',
+    }
+  - {
+      name: Verification,
+      table: Verification,
+      orm: mongoose,
+      evidence: 'src/domains/auth/verification/model.ts:37',
+    }
+  - { name: Media, table: Media, orm: mongoose, evidence: 'src/domains/media/model.ts:42' }
+  - {
+      name: EmailBudget,
+      table: EmailBudget,
+      orm: mongoose,
+      evidence: 'src/domains/notifications/delivery/budget-model.ts:14',
+    }
+  - {
+      name: EmailOutbox,
+      table: EmailOutbox,
+      orm: mongoose,
+      evidence: 'src/domains/notifications/delivery/model.ts:73',
+    }
+  - {
+      name: EmailWorker,
+      table: EmailWorker,
+      orm: mongoose,
+      evidence: 'src/domains/notifications/delivery/model.ts:94',
+    }
+  - { name: User, table: User, orm: mongoose, evidence: 'src/domains/users/model.ts:54' }
+services:
+  - { provider: redis, evidence: 'src/app/database/redis.ts:1' }
+edges: []
+out_of_scope:
+  - 'scripts/ (CLI scripts), __tests__/ folders, the static /conversions mount (express.static)'
+notes: |
+  - docs.get('/') under router.use('/docs/') resolves to /docs, the same route as router.get('/docs').
+  - nodemailer and sharp are libraries, not catalogue services.

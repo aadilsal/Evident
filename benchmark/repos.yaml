@@ -62,5 +62,36 @@ launch_set: # Gate B: 15-20 repos covering every v1 adapter
     sha: 13d8d0d6358f49e22307c2f055f5460838d6253f
     adapters: [fastapi]
     status: labelled
-# Gaps: no owned repo yet uses fastify, drizzle, typeorm or flask.
-# Add public OSS repos for those before launch.
+# Gaps for owned repos are covered by public_oss below.
+
+public_oss: # Gate B: public open-source apps for adapters with no owned repo (labelled 2026-11-15)
+  - owner: mkosir
+    name: typeorm-express-typescript
+    sha: 117f6647c5aabf97b5d40af060106230a103c714
+    adapters: [express, typeorm]
+    license: MIT
+    status: labelled
+  - owner: danielm
+    name: fastify-prisma-swagger-rest-boilerplate
+    sha: f4e1cedcb6653fc9cbfcac05fbe50f30df1eaae0
+    adapters: [fastify, prisma]
+    license: MIT
+    status: labelled
+  - owner: jatindotdev
+    name: express-drizzle-postgres-starter
+    sha: 58bfd065f15b18d11f85c8988e94b94aadf8160b
+    adapters: [express, drizzle]
+    license: MIT
+    status: labelled
+  - owner: arsalasif
+    name: flask-rest-api
+    sha: ed458830451d94c325e149a6b6956031cfa9a5b7
+    adapters: [flask, sqlalchemy]
+    license: MIT
+    status: labelled
+  - owner: watscho
+    name: express-mongodb-rest-api-boilerplate
+    sha: 0ed1f89bc3e2f1a86b1b3f57f8569fa0405aa3d7
+    adapters: [express, mongoose]
+    license: MIT
+    status: labelled

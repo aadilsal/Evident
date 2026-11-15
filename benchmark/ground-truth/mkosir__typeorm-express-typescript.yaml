@@ -1,0 +1,156 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo:
+  { owner: mkosir, name: typeorm-express-typescript, sha: 117f6647c5aabf97b5d40af060106230a103c714 }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-15',
+    minutes: 20,
+  }
+routes:
+  - { method: GET, path: /, kind: api, framework: express, evidence: 'src/routes/pages/root.ts:5' }
+  # Express 4 '*' fallback (404 handler), not an endpoint clients call on purpose.
+  - {
+      method: GET,
+      path: '/*',
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/pages/404.ts:5',
+      optional: true,
+    }
+  - {
+      method: POST,
+      path: /v1/auth/login,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/v1/auth.ts:9',
+    }
+  - {
+      method: POST,
+      path: /v1/auth/register,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/v1/auth.ts:10',
+    }
+  - {
+      method: POST,
+      path: /v1/auth/change-password,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/v1/auth.ts:11',
+    }
+  - {
+      method: GET,
+      path: /v1/users,
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/v1/users.ts:10',
+    }
+  # Inline regex constraints are dropped: '/:id([0-9]+)' -> '/:id' (labelling guide, Express).
+  - {
+      method: GET,
+      path: '/v1/users/:id',
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/v1/users.ts:12',
+    }
+  - {
+      method: PATCH,
+      path: '/v1/users/:id',
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/v1/users.ts:14',
+    }
+  - {
+      method: DELETE,
+      path: '/v1/users/:id',
+      kind: api,
+      framework: express,
+      evidence: 'src/routes/v1/users.ts:16',
+    }
+models:
+  - { name: User, table: users, orm: typeorm, evidence: 'src/orm/entities/users/User.ts:6' }
+services: []
+edges:
+  - {
+      route: POST /v1/auth/login,
+      model: User,
+      op: read,
+      orm: typeorm,
+      evidence: 'src/controllers/auth/login.ts:15',
+    }
+  - {
+      route: POST /v1/auth/register,
+      model: User,
+      op: read,
+      orm: typeorm,
+      evidence: 'src/controllers/auth/register.ts:12',
+    }
+  - {
+      route: POST /v1/auth/register,
+      model: User,
+      op: write,
+      orm: typeorm,
+      evidence: 'src/controllers/auth/register.ts:26',
+    }
+  - {
+      route: POST /v1/auth/change-password,
+      model: User,
+      op: read,
+      orm: typeorm,
+      evidence: 'src/controllers/auth/changePassword.ts:13',
+    }
+  - {
+      route: POST /v1/auth/change-password,
+      model: User,
+      op: write,
+      orm: typeorm,
+      evidence: 'src/controllers/auth/changePassword.ts:27',
+    }
+  - {
+      route: GET /v1/users,
+      model: User,
+      op: read,
+      orm: typeorm,
+      evidence: 'src/controllers/users/list.ts:10',
+    }
+  - {
+      route: 'GET /v1/users/:id',
+      model: User,
+      op: read,
+      orm: typeorm,
+      evidence: 'src/controllers/users/show.ts:12',
+    }
+  - {
+      route: 'PATCH /v1/users/:id',
+      model: User,
+      op: read,
+      orm: typeorm,
+      evidence: 'src/controllers/users/edit.ts:13',
+    }
+  - {
+      route: 'PATCH /v1/users/:id',
+      model: User,
+      op: write,
+      orm: typeorm,
+      evidence: 'src/controllers/users/edit.ts:24',
+    }
+  - {
+      route: 'DELETE /v1/users/:id',
+      model: User,
+      op: read,
+      orm: typeorm,
+      evidence: 'src/controllers/users/destroy.ts:12',
+    }
+  - {
+      route: 'DELETE /v1/users/:id',
+      model: User,
+      op: write,
+      orm: typeorm,
+      evidence: 'src/controllers/users/destroy.ts:18',
+    }
+out_of_scope:
+  - '*.test.ts files (tests)'
+notes: |
+  - Controllers are imported through tsconfig baseUrl paths ('controllers/auth').
+  - Every handler builds its repository with getRepository(User).

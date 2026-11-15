@@ -91,3 +91,15 @@ def test_history_appends_one_point_per_evident_commit(tmp_path: Path) -> None:
     runs = json.loads(path.read_text(encoding="utf-8"))["runs"]
     assert [r["evidentSha"] for r in runs] == ["a" * 40, "b" * 40]
     assert runs[0]["repos"] == 2 and "tp" not in runs[0]["categories"]["routes"]
+
+
+def test_unlabelled_categories_are_left_out_of_a_repos_score() -> None:
+    """A repo can label routes and models but not edges; its edge predictions must not count."""
+    from evident.bench import Item, drop_unlabelled
+
+    pred = {Item("routes", "GET /x"), Item("edges", "GET /x -> User read")}
+    gt = {"unlabelled": ["edges"], "routes": [{"method": "GET", "path": "/x"}]}
+    kept, skipped = drop_unlabelled(pred, gt)
+    assert {i.category for i in kept} == {"routes"}
+    assert skipped == {"edges"}
+    assert drop_unlabelled(pred, {"routes": []}) == (pred, set())

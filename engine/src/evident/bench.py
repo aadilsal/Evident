@@ -204,6 +204,12 @@ def _repos(root: Path) -> list[JSON]:
     return [r for section in data.values() if isinstance(section, list) for r in section]
 
 
+def drop_unlabelled(pred: set[Item], gt: JSON) -> tuple[set[Item], set[str]]:
+    """A repo may skip a category (`unlabelled: [edges]`); its predictions then don't count."""
+    skipped = {c for c in gt.get("unlabelled") or [] if c in CATEGORIES}
+    return {i for i in pred if i.category not in skipped}, skipped
+
+
 def run_repo(root: Path, repo: JSON) -> JSON | None:
     gt_path = root / "benchmark" / "ground-truth" / f"{repo['owner']}__{repo['name']}.yaml"
     if not gt_path.is_file():
@@ -221,12 +227,13 @@ def run_repo(root: Path, repo: JSON) -> JSON | None:
         graph = analyze(target, use_llm=False, cache_root=root / "benchmark" / ".repos").graph
     seconds = time.perf_counter() - started
     required, optional = truth_items(gt)
-    pred = predictions(graph)
-    scores = score(pred, required, optional)
+    pred, skipped = drop_unlabelled(predictions(graph), gt)
+    scores = {c: s for c, s in score(pred, required, optional).items() if c not in skipped}
     return {
         "repo": f"{repo['owner']}/{repo['name']}",
         "sha": repo["sha"],
         "seconds": round(seconds, 2),
+        **({"unlabelled": sorted(skipped)} if skipped else {}),
         "categories": {c: s.to_dict() for c, s in scores.items()},
         "misses": {c: s.misses for c, s in scores.items() if s.misses},
         "extras": {c: s.extras for c, s in scores.items() if s.extras},

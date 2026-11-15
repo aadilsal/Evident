@@ -28,8 +28,10 @@ FUNC_TYPES = frozenset(
     }
 )
 # Callbacks passed to these member calls are handlers, so they get their own scope even when nested.
+# `register`: Fastify inline plugins, `app.register(async (api) => {...}, { prefix })`.
 CALLBACK_METHODS = frozenset(
     {"get", "post", "put", "patch", "delete", "del", "all", "head", "options", "use", "route"}
+    | {"register"}
 )
 ENV_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 MAX_STRINGS = 50

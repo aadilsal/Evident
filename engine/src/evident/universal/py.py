@@ -71,6 +71,8 @@ def py_describe(node: ts.Node, depth: int = 0) -> JSON:
         }
     if t in ("list", "tuple", "set"):
         return {"k": "array", "items": [py_describe(c, depth + 1) for c in node.named_children]}
+    if t == "list_splat" and node.named_children:
+        return {"k": "spread", "of": py_describe(node.named_children[0], depth + 1)}
     if t == "dictionary":
         props: JSON = {}
         for pair in node.named_children:
@@ -240,6 +242,7 @@ class _PySummary:
             info["args"], info["kw"] = _call_args(right)
         elif right.type in ("list", "tuple"):
             info["items"] = len(right.named_children)
+            info["elems"] = py_describe(right)["items"]
         value = py_string(right)
         if value is not None:
             info["string"] = value
@@ -367,6 +370,9 @@ class _PySummary:
                     key = f"{scope}.{text(n.child_by_field_name('name'))}"
                     self._function(n, key, [], scope)
                 continue
+            if scope != MODULE and t in ("import_statement", "import_from_statement"):
+                self._top(n)  # function-local import (app factories); bound file-wide here
+                continue
             if t == "call":
                 self._call(n, scope)
             elif t == "subscript":
@@ -381,6 +387,10 @@ class _PySummary:
                 self.scopes[scope]["refs"].setdefault(text(n), line(n))
             elif t == "assignment" and scope != MODULE:
                 self._local(n, scope)
+            elif t == "for_statement" and scope != MODULE:
+                left, right = n.child_by_field_name("left"), n.child_by_field_name("right")
+                if left is not None and right is not None and left.type == "identifier":
+                    self.scopes[scope].setdefault("loops", {})[text(left)] = py_describe(right)
             elif t == "return_statement" and scope != MODULE and n.named_children:
                 ret = n.named_children[0]
                 if ret.type == "identifier":
@@ -409,7 +419,16 @@ class _PySummary:
 
     def _local(self, node: ts.Node, scope: str) -> None:
         left, right = node.child_by_field_name("left"), node.child_by_field_name("right")
-        if left is None or right is None or left.type != "identifier" or right.type != "call":
+        if left is None or right is None or left.type != "identifier":
+            return
+        if right.type in ("list", "tuple"):
+            elems = py_describe(right)["items"]
+            self.scopes[scope].setdefault("locals", {})[text(left)] = {
+                "l": line(node),
+                "elems": elems,
+            }
+            return
+        if right.type != "call":
             return
         c = py_chain(right.child_by_field_name("function"))
         if c:

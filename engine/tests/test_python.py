@@ -178,3 +178,17 @@ def test_django_urlconf_views_drf_router_and_orm(
     assert node(g, "model:Author")["attrs"]["tableName"] == "blog_author"  # type: ignore[index]
     assert set(edges(g, "relates")) == {"relates:model:Post->model:Author"}
     assert g.stack is not None and "unsupported" not in g.stack
+
+
+def test_flask_subclassed_app_blueprint_loop_and_abstract_base_reads(
+    copy_fixture: Copy, graph_validator: Draft202012Validator
+) -> None:
+    """A `Flask` subclass, blueprints registered in a loop, and reads through `__abstract__`
+    base classmethods (`User.first_by` -> `cls.query`)."""
+    g = analyse_fixture(copy_fixture("flask-patterns"), graph_validator)
+    assert node_ids(g, "route") == {"route:POST /v1/auth/login", "route:GET /v1/users/:user_id"}
+    assert node_ids(g, "model") == {"model:User"}
+    assert edges(g, "reads", "writes") == {
+        "reads:handler:app/auth.py#login->model:User": ["app/auth.py:10"],
+        "reads:handler:app/users.py#get_user->model:User": ["app/users.py:10"],
+    }

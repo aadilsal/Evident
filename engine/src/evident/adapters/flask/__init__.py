@@ -17,7 +17,8 @@ from evident.adapters._py import (
     join,
     str_list,
 )
-from evident.link import FnKey, LinkContext, Ns, Sym
+from evident.link import FnKey, LinkContext, Ns, Project, Sym
+from evident.universal.js import MODULE
 
 JSON = dict[str, Any]
 FRAMEWORK = "flask"
@@ -42,6 +43,53 @@ def _kw_str(kw: JSON, name: str) -> str:
     return str(v.get("value", "")) if v.get("k") == "str" else ""
 
 
+def _ctor(project: Project, file: str, callee: list[str] | None, depth: int = 0) -> str | None:
+    """`Flask`/`Blueprint`, also through a subclass: `class BaseFlask(Flask)`, `BaseFlask(...)`."""
+    if not callee or depth > 3:
+        return None
+    if from_package(project, file, callee, "flask") is not None:
+        return callee[-1]
+    if len(callee) != 1:
+        return None
+    target = project.resolve(file, callee[0])
+    if not isinstance(target, Sym) or target.file not in project.js:
+        return None
+    cls = project.js[target.file]["classes"].get(target.name) or {}
+    for base in cls.get("bases", []):
+        found = _ctor(project, target.file, base.split("."), depth + 1)
+        if found in ("Flask", "Blueprint"):
+            return found
+    return None
+
+
+def _expand(
+    project: Project, file: str, scope: str, desc: JSON, depth: int = 0
+) -> list[tuple[str, JSON]]:
+    """What a `register_blueprint` argument stands for (file, desc): loops and lists unrolled."""
+    if depth > 4:
+        return [(file, desc)]
+    k = desc.get("k")
+    if k == "array":
+        return [d for i in desc["items"] for d in _expand(project, file, scope, i, depth + 1)]
+    if k == "spread":
+        return _expand(project, file, scope, desc["of"], depth + 1)
+    if k != "id":
+        return [(file, desc)]
+    info = project.js[file]["scopes"].get(scope, {})
+    name = desc["name"]
+    if name in info.get("loops", {}):
+        return _expand(project, file, scope, info["loops"][name], depth + 1)
+    elems = info.get("locals", {}).get(name, {}).get("elems")
+    if elems is not None:
+        return [d for e in elems for d in _expand(project, file, scope, e, depth + 1)]
+    target = project.resolve(file, name)
+    if isinstance(target, Sym) and target.file in project.js:
+        elems = project.js[target.file]["vars"].get(target.name, {}).get("elems")
+        if elems is not None:
+            return [d for e in elems for d in _expand(project, target.file, MODULE, e, depth + 1)]
+    return [(file, desc)]
+
+
 def link(ctx: LinkContext) -> None:
     project = ctx.project
     insts: dict[Key, _Inst] = {}
@@ -53,9 +101,7 @@ def link(ctx: LinkContext) -> None:
             (n, loc) for sc in s["scopes"].values() for n, loc in sc.get("locals", {}).items()
         ]
         for name, v in bindings:
-            if from_package(project, file, v.get("callee"), "flask") is None:
-                continue
-            ctor = (v.get("callee") or [""])[-1]
+            ctor = _ctor(project, file, v.get("callee"))
             if ctor == "Flask":
                 insts[(file, name)] = _Inst("app")
             elif ctor == "Blueprint":
@@ -110,9 +156,10 @@ def link(ctx: LinkContext) -> None:
                     continue
                 args, kw = call.get("a", []), call.get("kw", {})
                 if c[1] == "register_blueprint" and args:
-                    child = inst_of(file, args[0])
-                    if child is not None:
-                        insts[parent].children.append((_kw_str(kw, "url_prefix"), child))
+                    for at, arg in _expand(project, file, scope, args[0]):
+                        child = inst_of(at, arg)
+                        if child is not None:
+                            insts[parent].children.append((_kw_str(kw, "url_prefix"), child))
                 elif c[1] == "add_url_rule" and args and args[0].get("k") == "str":
                     view = kw.get("view_func") or (args[2] if len(args) > 2 else None)
                     handler = fn_of(project, file, view) if view else None

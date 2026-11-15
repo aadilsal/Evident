@@ -67,6 +67,8 @@ def link(ctx: LinkContext) -> None:
     tables = {}
     concrete = {}
     for (f, cls), info in models.items():
+        if (info.get("fields", {}).get("__abstract__", {}).get("value") or {}).get("value"):
+            continue  # an abstract base: no table, but subclasses still inherit from it
         tname = (info.get("fields", {}).get("__tablename__", {}).get("value") or {}).get("value")
         sqlmodel_table = info.get("baseKw", {}).get("table") == "True"
         if tname or sqlmodel_table or any("Model" in b for b in info.get("bases", [])):
@@ -133,6 +135,25 @@ def link(ctx: LinkContext) -> None:
             return target.name
         return None
 
+    def queries_cls(model: tuple[str, str], method: str, depth: int = 0) -> bool:
+        """`Model.first_by(...)` where an ancestor classmethod runs `cls.query...`."""
+        f, cls = model
+        info = models.get(model)
+        if info is None or depth > 5:
+            return False
+        if method in info.get("methods", {}):
+            body = project.js[f]["scopes"].get(f"{cls}.{method}", {})
+            return any(
+                c["c"][:2] == ["this", "query"] for c in body.get("calls", [])
+            )  # cls -> this
+        for base in info.get("bases", []):
+            target = project.resolve(f, base.split(".")[0])
+            if isinstance(target, Sym) and queries_cls(
+                (target.file, target.name), method, depth + 1
+            ):
+                return True
+        return False
+
     def classify(ctx: LinkContext, file: str, scope: str, call: JSON) -> Fact | None:
         if not file.endswith(".py"):
             return None
@@ -142,6 +163,14 @@ def link(ctx: LinkContext) -> None:
             model = model_of(file, {"k": "id", "name": c[0]})
             if model:
                 return ("reads", f"model:{model}", ev, {"operation": c[2]}, "extracted", 1.0)
+        if len(c) == 2:
+            target = project.resolve(file, c[0])
+            if (
+                isinstance(target, Sym)
+                and (target.file, target.name) in concrete
+                and queries_cls((target.file, target.name), c[1])
+            ):
+                return ("reads", f"model:{c[0]}", ev, {"operation": c[1]}, "extracted", 1.0)
         if not args:
             return None
         if c[-1] == "query" and len(c) >= 2:

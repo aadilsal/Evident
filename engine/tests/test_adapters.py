@@ -125,3 +125,16 @@ def test_workspace_imports_and_compose_containers(
         "dependsOn": ["db"],
     }
     assert "never-read" not in str(g.to_dict()), "compose environment values must never be read"
+
+
+def test_fastify_inline_plugin_keeps_nested_prefixes(
+    copy_fixture: Copy, graph_validator: Draft202012Validator
+) -> None:
+    """`app.register(async (api) => { api.register(routes, { prefix }) }, { prefix })`."""
+    g = analyse_fixture(copy_fixture("fastify-inline-plugin"), graph_validator)
+    assert node_ids(g, "route") == {
+        "route:GET /health",
+        "route:GET /api/v1/items",
+        "route:GET /api/v1/items/:id",
+    }
+    assert node(g, "route:GET /api/v1/items/:id")["confidence"] == 1.0

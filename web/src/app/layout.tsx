@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Condensed } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const sans = IBM_Plex_Sans({
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* Read the saved theme before paint so there's no flash; dark is the default. */}
         <Script id="evident-theme" src="/theme.js" strategy="beforeInteractive" />
         {children}
+        <Analytics />
       </body>
     </html>
   );

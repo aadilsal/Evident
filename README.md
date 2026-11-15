@@ -14,10 +14,13 @@ Every box and every arrow links to the exact line of code that proves it.**
 
 [![CI](https://github.com/aadilsal/Evident/actions/workflows/ci.yml/badge.svg)](https://github.com/aadilsal/Evident/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Status](https://img.shields.io/badge/status-pre--alpha-orange)
+[![Live](https://img.shields.io/badge/live-evident--pk.company-F2D544)](https://www.evident-pk.company)
+![Status](https://img.shields.io/badge/status-beta-orange)
 ![Stack](https://img.shields.io/badge/stacks-Next.js%20·%20Express%20·%20Prisma%20·%20Django%20·%20FastAPI%20·%20more-black)
 
-[**Status**](#status) · [**CLI**](#use-it-from-the-terminal) · [**Use with Claude**](#use-with-claude) · [**Benchmarks**](#accuracy-measured-not-promised) · [**How it works**](#how-it-works) · [**Docs**](docs/)
+**[Try it live → www.evident-pk.company](https://www.evident-pk.company)**
+
+[**Status**](#status) · [**CLI**](#use-it-from-the-terminal) · [**Coding agents**](#use-with-coding-agents) · [**Benchmarks**](#accuracy-measured-not-promised) · [**How it works**](#how-it-works) · [**Docs**](docs/)
 
 <!-- Swap for docs/assets/demo.gif: paste URL → map renders → click a route → request path lights up → evidence panel opens. -->
 <img src="docs/assets/demo-placeholder.svg" alt="Evident demo: a request traced from route to database table, with the code for each hop" width="860">
@@ -88,7 +91,7 @@ Not a static Mermaid image. A zoomable map built with React Flow and ELK auto-la
 
 ## Status
 
-Pre-alpha. **Phases 1 (Engine), 2 (Claude skill), 3 (Service) and 4 (Interface) are complete.** Next up: Phase 5, launch (deploy, more benchmark repos, demo video). This table is updated at the end of every phase.
+**Live at [www.evident-pk.company](https://www.evident-pk.company)** (API: [api.evident-pk.company](https://api.evident-pk.company/api/docs)). Phases 1 (Engine), 2 (Claude skill), 3 (Service) and 4 (Interface) are complete; Phase 5 (launch) is in progress: the site is deployed, and the benchmark is growing to public open-source repos. This table is updated at the end of every phase.
 
 | Piece | State |
 | --- | --- |
@@ -108,7 +111,9 @@ Pre-alpha. **Phases 1 (Engine), 2 (Claude skill), 3 (Service) and 4 (Interface) 
 | Landing page with a live map, gallery, `/benchmarks` (history chart), supported stacks, live analysis progress, mobile layout, unsupported-stack screen | ✅ Done |
 | Exports: PNG/SVG of the current view, graph JSON, printable architecture report (PDF); "report a wrong edge" | ✅ Done |
 | `evident open` (UI bundled into the package, localhost only) and `evident share` (opt-in, metadata only, expiring) | ✅ Done |
-| Hosting: site on Vercel, API on one server | ⏳ Phase 5 (domain and server pending) |
+| Hosting: site on Vercel (www.evident-pk.company), API on AWS EC2 behind Caddy (api.evident-pk.company), nightly backups, uptime checks | ✅ Live |
+| Benchmark on public open-source repos for every adapter | ⏳ Phase 5, in progress |
+| PyPI release, Docker images, demo video | ⏳ Phase 5 |
 
 ## Accuracy, measured not promised
 
@@ -125,7 +130,7 @@ A hand-labelled benchmark of **15–20 repos**, each pinned to a commit and cove
 
 *Current* = precision / recall on 8 labelled repos (Next.js, Express, NestJS, FastAPI, Django with Prisma and Django ORM), hallucination rate 0.4% (2026-11-11). The labels were written from source by an AI assistant and are awaiting the owner's review, and these repos are fairly conventional. Expect the numbers to drop as the set grows to 15–20 repos with public open-source apps. Fastify, Flask, Drizzle, TypeORM, Mongoose and SQLAlchemy have fixture tests but no labelled repos yet. Run it yourself: `cd engine && uv run evident-bench --verbose`.
 
-The same repos are run through GitDiagram as a baseline, so the comparison is honest and reproducible. Method: [benchmark labelling guide](docs/labelling-guide.md). Results: the public `/benchmarks` page *(at launch)*.
+The same repos are run through GitDiagram as a baseline, so the comparison is honest and reproducible. Method: [benchmark labelling guide](docs/labelling-guide.md). Results: the public [`/benchmarks`](https://www.evident-pk.company/benchmarks/) page.
 
 ## How it is different
 
@@ -157,10 +162,10 @@ Plus `tsconfig` path aliases and npm/pnpm/yarn workspaces.
 
 ## Use it from the terminal
 
-The engine is a standalone package (`pip install evident-map`, *not yet published*; for now, install from a clone). It's static and read-only: it never runs your code and writes only inside `.evident/`.
+The engine is a standalone Python package, `evident-map`. Until the PyPI release, install it straight from GitHub. It's static and read-only: it never runs your code and writes only inside `.evident/`.
 
 ```bash
-pip install -e engine          # from a clone, until the PyPI release
+uv tool install "git+https://github.com/aadilsal/Evident#subdirectory=engine"   # or: pipx install "git+…"
 evident analyze .              # build or refresh .evident/graph.json
 evident trace "POST /api/users"
 evident impact User.email
@@ -177,16 +182,22 @@ Every command takes `--json`, `--limit`, `--depth`, `--no-llm` and `--repo PATH|
 
 `uv run evident-bench` scores the engine against the labelled benchmark repos (cloned read-only at their pinned commits).
 
-## Use with Claude
+## Use with coding agents
 
-The Claude skill in [`skills/evident/`](skills/evident/SKILL.md) drives the CLI for you:
+One command adds the Evident skill to Claude Code, Codex, Cursor and other agents that read `SKILL.md`:
+
+```bash
+npx skills add aadilsal/Evident
+```
+
+The skill in [`skills/evident/`](skills/evident/SKILL.md) drives the CLI for you:
 
 - Once per session it runs `evident analyze . --no-llm` (offline) and leads with a short summary.
 - Before you edit a model, shared module, middleware or env var, it runs `evident impact` and tells you which routes are affected.
 - It explains flows with `trace` and checks new routes with `health`.
 - It cites `file:line` for every claim and flags inferred edges. It never claims a dependency the tool didn't return and never runs `share` unless you ask.
 
-**Install** (Claude Code): copy `skills/evident/` into your project's `.claude/skills/` (or `~/.claude/skills/` for every project). If the `evident` CLI is missing, the skill asks before running `scripts/ensure_installed.sh` (or `.ps1` on Windows).
+**Manual install:** copy `skills/evident/` into `.claude/skills/` (one project) or `~/.claude/skills/` (every project). Either way, if the `evident` CLI is missing, the skill asks before running `scripts/ensure_installed.sh` (or `.ps1` on Windows), which installs it from this repo.
 
 **Does it help?** [`skill-tasks/`](skill-tasks/) runs 12 architecture questions over the fixture repos, twice each, with and without the skill, and grades the answers against expected facts and citations. On Claude Haiku: **24/24 passed with the skill, 21/24 without**, with about 5.0 vs 6.2 tool calls per task ([results](skill-tasks/results/latest.md)). Without the skill, the misses were dropped citations and missed Mongoose routes.
 
@@ -220,7 +231,9 @@ Five of the six stages are deterministic. The LLM stage can only label node IDs 
 
 ## Quick start
 
-The engine CLI runs from a clone:
+**Hosted:** open [www.evident-pk.company](https://www.evident-pk.company), paste a public GitHub URL, or open a gallery map.
+
+**From a clone:**
 
 ```bash
 git clone https://github.com/aadilsal/Evident.git
@@ -254,13 +267,13 @@ Working on the code instead? See [CONTRIBUTING.md](CONTRIBUTING.md).
 | Layer | Technology |
 | --- | --- |
 | Analysis engine + CLI | Python 3.12, tree-sitter (per-language grammars), custom import resolver, adapter registry |
-| Agent integration | Claude skill (`skills/evident/`); MCP server in v2 |
+| Agent integration | Agent skill (`skills/evident/`, `npx skills add aadilsal/Evident`) for Claude Code, Codex, Cursor and more; MCP server in v2 |
 | API | FastAPI, Server-Sent Events, auto-generated OpenAPI docs |
 | Jobs | arq on Redis; each analysis in a child process killed at the job timeout |
 | Storage | Postgres (jobs, cached graphs, findings, benchmark history) |
 | AI | Groq (free tier, `openai/gpt-oss-20b` by default): one call per uncached commit, IDs and labels only (never code), validated against node IDs, directory-group fallback |
 | Frontend | Next.js static export, TypeScript, React Flow, ELK.js (orthogonal routing, Web Worker), anime.js, Shiki, Tailwind v4 with tokens generated from DESIGN.md; the same build is bundled into the pip package for `evident open` |
-| Infra | Site on Vercel; API stack in Docker Compose on one server with Caddy (automatic HTTPS) ([ADR-0008](docs/adr/0008-static-web-on-vercel-api-on-one-server.md)) |
+| Infra | Site on Vercel (`www.evident-pk.company`); API, worker, Postgres and Redis in Docker Compose on one AWS EC2 server with Caddy for HTTPS (`api.evident-pk.company`); secrets in SSM Parameter Store; nightly backups to S3 ([ADR-0008](docs/adr/0008-static-web-on-vercel-api-on-one-server.md), [runbook](docs/runbook/deployment.md)) |
 | Quality | ruff, mypy, pytest, ESLint, Prettier, Vitest (TS queries checked against the CLI's answers), pre-commit, Conventional Commits, benchmark gate in CI (Linux + Windows) |
 
 ## Roadmap

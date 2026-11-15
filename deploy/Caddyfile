@@ -1,0 +1,18 @@
+# HTTPS in front of the API (ADR-0008). API_DOMAIN comes from ../.env, e.g. api.example.com,
+# or <ip-with-dashes>.sslip.io until the real domain exists. Caddy gets the certificate itself.
+{$API_DOMAIN} {
+	encode zstd gzip
+	request_body {
+		max_size 3MB
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+	# Stream SSE progress events without buffering.
+	reverse_proxy api:8000 {
+		flush_interval -1
+	}
+}

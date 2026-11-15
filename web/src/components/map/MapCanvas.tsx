@@ -186,10 +186,20 @@ export interface CanvasProps {
   onClear: () => void;
   onLaidOut?: (laid: Laid) => void;
   interactive?: boolean;
+  /** Zoom buttons and minimap; the landing page hides them. */
+  controls?: boolean;
 }
 
 function Canvas(props: CanvasProps) {
-  const { view, selectedNode, selectedEdge, emphasis, frame, interactive = true } = props;
+  const {
+    view,
+    selectedNode,
+    selectedEdge,
+    emphasis,
+    frame,
+    interactive = true,
+    controls = true,
+  } = props;
   const [result, setResult] = useState<{ view: ViewModel; laid: Laid } | null>(null);
   // A layout for a previous view is stale; treat it as not laid out yet.
   const laid = result?.view === view ? result.laid : null;
@@ -348,8 +358,8 @@ function Canvas(props: CanvasProps) {
         aria-label="Architecture map"
       >
         <Background gap={24} size={0} color="transparent" />
-        {interactive && <Controls showInteractive={false} position="bottom-left" />}
-        {interactive && view.nodes.length > 40 && (
+        {interactive && controls && <Controls showInteractive={false} position="bottom-left" />}
+        {interactive && controls && view.nodes.length > 40 && (
           <MiniMap
             pannable
             zoomable

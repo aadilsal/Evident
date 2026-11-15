@@ -17,8 +17,8 @@ export interface Showcase {
   sha: string;
   files: number;
   counts: { routes: number; models: number; services: number; findings: number };
-  trace: { route: string; hops: ShowHop[] };
-  blast: { model: string; routes: string[]; total: number };
+  trace: { routeId: string; route: string; hops: ShowHop[] };
+  blast: { modelId: string; model: string; routes: string[]; total: number };
   finding: { severity: string; message: string; ref: string } | null;
 }
 
@@ -58,7 +58,7 @@ export function showcase(slug: string): Showcase {
   });
 
   // The model with the widest blast radius in routes.
-  let blast = { model: "", routes: [] as string[], total: 0 };
+  let blast = { modelId: "", model: "", routes: [] as string[], total: 0 };
   for (const m of idx.ofType("model")) {
     const dependents = impact(idx, m.id).slice(1);
     const rs = dependents
@@ -66,7 +66,7 @@ export function showcase(slug: string): Showcase {
       .filter((n) => n.type === "route")
       .map((n) => n.label);
     if (rs.length > blast.routes.length)
-      blast = { model: m.label, routes: rs, total: dependents.length };
+      blast = { modelId: m.id, model: m.label, routes: rs, total: dependents.length };
   }
 
   const rank = { error: 0, warning: 1, info: 2 } as const;
@@ -86,7 +86,7 @@ export function showcase(slug: string): Showcase {
       services: idx.ofType("service").length,
       findings: graph.findings.length,
     },
-    trace: { route: idx.nodes.get(best.id)?.label ?? "", hops },
+    trace: { routeId: best.id, route: idx.nodes.get(best.id)?.label ?? "", hops },
     blast,
     finding: f ? { severity: f.severity, message: f.message, ref: ref(f.evidence[0]) } : null,
   };

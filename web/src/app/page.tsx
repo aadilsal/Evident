@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HeroMap } from "@/components/HeroMap";
+import { InstallSkill } from "@/components/InstallSkill";
 import { CompareTable, Section, TraceExhibit, TransitSteps } from "@/components/landing";
 import { RepoInput } from "@/components/RepoInput";
 import { Page } from "@/components/SiteChrome";
@@ -19,9 +20,9 @@ const USES = [
     code: 'evident analyze .\nevident trace "POST /api/orders"\nevident impact Order\nevident open',
   },
   {
-    name: "Inside Claude",
-    body: "A Claude skill checks the blast radius before an agent edits a model, and cites file:line instead of guessing.",
-    code: "skills/evident  →  evident impact User\n“3 routes write User: …”",
+    name: "In your coding agent",
+    body: "The Evident skill works in Claude Code, Codex, Cursor and other agents. It checks the blast radius before an edit and cites file:line instead of guessing. It installs the CLI on first use, after asking.",
+    code: "npx skills add aadilsal/Evident\n\n> what breaks if I change User?\n“3 routes write User: …”",
   },
 ];
 
@@ -53,6 +54,16 @@ export default function Home() {
           </p>
           <div className="mt-xl max-w-[36rem]">
             <RepoInput autoFocus />
+          </div>
+          <div className="mt-xl max-w-[36rem]">
+            <p className="text-label-lg">Or give it to your coding agent</p>
+            <p className="mt-xs text-body-sm text-on-surface-muted">
+              One command adds the Evident skill to Claude Code, Codex, Cursor and other agents. It
+              checks the blast radius before an edit and cites file:line instead of guessing.
+            </p>
+            <div className="mt-sm">
+              <InstallSkill />
+            </div>
           </div>
           <ul className="mt-lg flex flex-wrap gap-x-lg gap-y-xs text-body-sm text-on-surface-muted">
             <li>
@@ -87,7 +98,13 @@ export default function Home() {
       {/* 2. The product itself, not a screenshot. */}
       {featured[0] && (
         <section aria-label="Live sample map" className="pb-2xl">
-          <HeroMap slug={featured[0].slug} />
+          <HeroMap
+            slug={featured[0].slug}
+            traceRoot={sample?.trace.routeId ?? ""}
+            traceLabel={sample?.trace.route ?? "a route"}
+            impactRoot={sample?.blast.modelId ?? ""}
+            impactLabel={sample?.blast.model ?? "a model"}
+          />
         </section>
       )}
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "evident-map"
-version = "0.2.0"
+version = "0.3.0"
 description = "Evidence-backed architecture maps: routes, models and services, each linked to the line that proves it."
 readme = "README.md"
 requires-python = ">=3.12"

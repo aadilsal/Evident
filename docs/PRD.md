@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Owner | Aadil Salman Butt |
-| Status | Phases 1 (Engine, Gate A 2026-11-10), 2 (Skill), 3 (Service) (2026-11-11) and 4 (Interface, 2026-11-13) complete; Phase 5 (Launch) next |
+| Status | Phases 1 (Engine, Gate A 2026-11-10), 2 (Skill), 3 (Service) (2026-11-11) and 4 (Interface, 2026-11-13) complete; Phase 5 (Launch): live and released as v0.3.0 on 2026-11-16, with the GitDiagram baseline, demo video and restore drill still open |
 | Scope reference | This PRD plus the [ADRs](adr/). Scope follows the internal feature tracker; update all three when a decision changes. |
 | Last updated | 2026-11-10 |
 
@@ -140,7 +140,7 @@ All commands support `--json` (schema-valid envelope) and human output, `file:li
 | 2. Skill release | 4 | `skills/evident/`, skill-task evals | Skill usable on fixture repos; evals run ✅ *(24/24 with skill vs 21/24 without)* |
 | 3. Service | 4–5 | FastAPI, arq worker, SSE, Postgres cache, validated Groq grouping, Python adapters, limits and sandboxing | ✅ *(8 repos at 100% P/R; CI runs the service end to end)* |
 | 4. Interface | 5–7 | Dual-mode map UI, five views, tracer, blast radius, exports, mobile | ✅ *(static export; TS queries match the CLI on goldens; `open`/`share` shipped; Compose stack verified end to end)* |
-| 5. Launch | 8–10 | 15–20 benchmark repos, GitDiagram baseline, server + Vercel deploy, demo video, case study | **Gate B:** all targets met; runbook tested (deploy, rollback, restore) |
+| 5. Launch | 8–10 | 15–20 benchmark repos, GitDiagram baseline, server + Vercel deploy, demo video, case study | **Gate B:** all targets met; runbook tested (deploy, rollback, restore) — *15 repos at 100% P/R; deployed; GitDiagram baseline, demo video and restore drill open* |
 
 ## 9. Risks
 

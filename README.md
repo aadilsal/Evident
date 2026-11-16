@@ -20,7 +20,7 @@ Every box and every arrow links to the exact line of code that proves it.**
 
 **[Try it live → www.evident-pk.company](https://www.evident-pk.company)**
 
-[**Status**](#status) · [**CLI**](#use-it-from-the-terminal) · [**Coding agents**](#use-with-coding-agents) · [**Benchmarks**](#accuracy-measured-not-promised) · [**How it works**](#how-it-works) · [**Docs**](docs/)
+[**CLI**](#use-it-from-the-terminal) · [**Coding agents**](#use-with-coding-agents) · [**Benchmarks**](#accuracy-measured-not-promised) · [**How it works**](#how-it-works) · [**Docs**](docs/)
 
 <!-- Swap for docs/assets/demo.gif: paste URL → map renders → click a route → request path lights up → evidence panel opens. -->
 <img src="docs/assets/demo-placeholder.svg" alt="Evident demo: a request traced from route to database table, with the code for each hop" width="860">
@@ -89,48 +89,22 @@ Not a static Mermaid image. A zoomable map built with React Flow and ELK auto-la
 </tr>
 </table>
 
-## Status
-
-**Live at [www.evident-pk.company](https://www.evident-pk.company)** (API: [api.evident-pk.company](https://api.evident-pk.company/api/docs)). Phases 1 (Engine), 2 (Claude skill), 3 (Service) and 4 (Interface) are complete; Phase 5 (launch) is in progress: the site is deployed, and the benchmark is growing to public open-source repos. This table is updated at the end of every phase.
-
-| Piece | State |
-| --- | --- |
-| Graph schema `1.2.0` + CLI output schema `1.2.0` | ✅ Done |
-| JS/TS adapters: Next.js, Express, NestJS, Fastify, Prisma, Drizzle, TypeORM, Mongoose | ✅ Done, with fixture tests |
-| Python adapters: FastAPI, Flask, Django (+ DRF), Django ORM, SQLAlchemy | ✅ Done, with fixture tests |
-| Universal layer: module graph, SDK services, env vars, `docker-compose` containers, `tsconfig` aliases, workspaces | ✅ Done (JS/TS and Python) |
-| Stack detection + fallback map for unsupported stacks | ✅ Done |
-| CLI: `analyze` (summary-first), `trace`, `impact`, `find`, `health`, `show`, `export` (Markdown report, graph JSON), `open`, `share` with `--json` | ✅ Done |
-| Health rules: unguarded write, unvalidated body, import cycle, unused model, undocumented env | ✅ Done |
-| Benchmark: 8 repos labelled (5 JS/TS, 3 Python), `evident-bench`, CI gate (>2 pt drop fails) | ✅ Done |
-| LLM grouping: Groq, validated against node IDs, directory fallback | ✅ Done |
-| Service: FastAPI API, arq worker, Postgres cache, SSE progress, rate limits, job timeouts, Docker Compose | ✅ Done (CI runs it end to end) |
-| CI: pre-commit, mypy + pytest on Linux and Windows, benchmark gate | ✅ Done |
-| Claude skill (`skills/evident/`) + skill-task evals | ✅ Done: 24/24 tasks with the skill vs 21/24 without |
-| Web map UI: five views, request tracer, blast radius, evidence panel with snippets, layer filters, ⌘K search, permalinks, light/dark | ✅ Done ([ADR-0008](docs/adr/0008-static-web-on-vercel-api-on-one-server.md): static export) |
-| Landing page with a live map, gallery, `/benchmarks` (history chart), supported stacks, live analysis progress, mobile layout, unsupported-stack screen | ✅ Done |
-| Exports: PNG/SVG of the current view, graph JSON, printable architecture report (PDF); "report a wrong edge" | ✅ Done |
-| `evident open` (UI bundled into the package, localhost only) and `evident share` (opt-in, metadata only, expiring) | ✅ Done |
-| Hosting: site on Vercel (www.evident-pk.company), API on AWS EC2 behind Caddy (api.evident-pk.company), nightly backups, uptime checks | ✅ Live |
-| Benchmark on public open-source repos for every adapter | ⏳ Phase 5, in progress |
-| PyPI release, Docker images, demo video | ⏳ Phase 5 |
-
 ## Accuracy, measured not promised
 
 "It doesn't hallucinate" is a claim. Evident publishes a number instead.
 
-A hand-labelled benchmark of **15–20 repos**, each pinned to a commit and covering every supported adapter, scores every engine change on precision and recall per category **and per adapter**. It will run in CI on every pull request and fail the build if any metric drops by more than 2 points.
+A hand-labelled benchmark of **15 repos** (8 of the author's apps and 7 public open-source apps), each pinned to a commit and covering every supported adapter, scores every engine change on precision and recall per category **and per adapter**. It runs in CI on every pull request and fails the build if any metric drops by more than 2 points.
 
 | Category | Target precision | Target recall | Current |
 | --- | :-: | :-: | :-: |
-| Routes | ≥ 90% | ≥ 85% | **100% / 100%** (460 routes) |
-| Models | ≥ 90% | ≥ 85% | **100% / 100%** (26 models) |
-| Route → model read/write edges | ≥ 90% | ≥ 85% | **100% / 100%** (168 edges) |
-| External services | tracked | tracked | **100% / 100%** (16 services) |
+| Routes | ≥ 90% | ≥ 85% | **100% / 100%** (592 routes) |
+| Models | ≥ 90% | ≥ 85% | **100% / 100%** (50 models) |
+| Route → model read/write edges | ≥ 90% | ≥ 85% | **100% / 100%** (218 edges) |
+| External services | tracked | tracked | **100% / 100%** (19 services) |
 
-*Current* = precision / recall on 8 labelled repos (Next.js, Express, NestJS, FastAPI, Django with Prisma and Django ORM), hallucination rate 0.4% (2026-11-11). The labels were written from source by an AI assistant and are awaiting the owner's review, and these repos are fairly conventional. Expect the numbers to drop as the set grows to 15–20 repos with public open-source apps. Fastify, Flask, Drizzle, TypeORM, Mongoose and SQLAlchemy have fixture tests but no labelled repos yet. Run it yourself: `cd engine && uv run evident-bench --verbose`.
+*Current* = precision / recall on 15 labelled repos covering Next.js, Express, NestJS, Fastify, FastAPI, Flask and Django with Prisma, Drizzle, TypeORM, Mongoose, Django ORM and SQLAlchemy; hallucination rate 0.5% (2026-11-16). The labels were written from source by an AI assistant and are awaiting the owner's review. Two public repos leave route→model edges unlabelled because their data access goes through generic repository classes. Adding the public repos exposed real engine gaps (Express, Fastify, Flask, FastAPI, SQLAlchemy), each fixed with a regression test before the numbers above were recorded. Run it yourself: `cd engine && uv run evident-bench --verbose`.
 
-The same repos are run through GitDiagram as a baseline, so the comparison is honest and reproducible. Method: [benchmark labelling guide](docs/labelling-guide.md). Results: the public [`/benchmarks`](https://www.evident-pk.company/benchmarks/) page.
+A GitDiagram baseline on the same repos is planned. Method: [benchmark labelling guide](docs/labelling-guide.md). Results: the public [`/benchmarks`](https://www.evident-pk.company/benchmarks/) page.
 
 ## How it is different
 

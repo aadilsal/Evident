@@ -5,6 +5,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-16
+
+### Added
+
+- **Phase 5 (Launch):** the site is live at [www.evident-pk.company](https://www.evident-pk.company) (Vercel) with the API at `api.evident-pk.company` (AWS EC2, Docker Compose, Caddy, nightly S3 backups, uptime checks every 15 minutes)
+- Benchmark: 15 labelled repos, 7 of them public open-source apps (TypeORM, Fastify, Drizzle, Flask/SQLAlchemy, Mongoose, NestJS, FastAPI); 100% precision and recall in every category. A repo may leave a category unlabelled (`unlabelled: [edges]`)
+- Release workflow: tags publish the wheel with the map UI to PyPI (trusted publishing), multi-arch images to GHCR, and a GitHub release
+- Landing page that explains Evident in 30 seconds, the "Route e" logo, a simpler hero map, the coding-agent skill install command, a transit-line analysis progress animation, a Back button on every page after the first, and Vercel Web Analytics on the hosted site only (no cookies; not in `evident open`)
+- `docs/writing-an-adapter.md`, the deployment runbook, ADR-0008
+
+### Fixed
+
+- Express: routers built by callback factories (`createRouter((router) => ...)`) and inline param patterns (`/:id([0-9]+)` → `/:id`)
+- Fastify: nested prefixes inside inline plugins (`register(async (api) => ...)`)
+- Flask: blueprints registered in a loop over lists, `Flask` subclasses as apps, function-local imports
+- FastAPI: app factories with local routers, routers returned by a builder function, and routes on nested functions
+- SQLAlchemy: `__abstract__` bases are not models; reads through inherited classmethods (`User.first_by` → `cls.query`)
+- The benchmark no longer crashes on Windows when a labeller's clone folder is missing
+
+### Changed
+
+- The cache is keyed to engine `0.3.0`, so earlier `.evident/` caches are rebuilt on first run
+
+## [0.2.0] - unreleased snapshot of Phases 1–4
+
 ### Added
 
 - **Phase 4 (Interface) complete:** `web/`, a Next.js static export (ADR-0008) that runs on Vercel and inside the pip package:
@@ -70,4 +95,4 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Not yet added
 
-- Hosting (domain, API server, Vercel project), Caddyfile, PyPI release with the bundled UI, terminal GIF and demo video: Phase 5
+- Terminal GIF and demo video

@@ -3,8 +3,8 @@
 Library entry points: ``evident.analyze.analyze`` builds a graph; ``evident.query`` reads it.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 # Bump whenever extraction output can change; part of the cache key.
-ENGINE_VERSION = "0.2.0"
+ENGINE_VERSION = "0.3.0"
 GRAPH_SCHEMA_VERSION = "1.2.0"
 CLI_SCHEMA_VERSION = "1.2.0"

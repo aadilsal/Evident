@@ -6,8 +6,8 @@ if (Get-Command evident -ErrorAction SilentlyContinue) {
     exit 0
 }
 
-# From the official repo until evident-map is published on PyPI (avoids installing a squatted name).
-$source = 'git+https://github.com/aadilsal/Evident#subdirectory=engine'
+# `evident-map` on PyPI, published from the official repo by trusted publishing.
+$source = 'evident-map'
 
 if (Get-Command uv -ErrorAction SilentlyContinue) {
     uv tool install $source

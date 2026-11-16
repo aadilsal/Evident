@@ -136,10 +136,10 @@ Plus `tsconfig` path aliases and npm/pnpm/yarn workspaces.
 
 ## Use it from the terminal
 
-The engine is a standalone Python package, `evident-map`. Until the PyPI release, install it straight from GitHub. It's static and read-only: it never runs your code and writes only inside `.evident/`.
+The engine is a standalone Python package, [`evident-map`](https://pypi.org/project/evident-map/) on PyPI. It's static and read-only: it never runs your code and writes only inside `.evident/`.
 
 ```bash
-uv tool install "git+https://github.com/aadilsal/Evident#subdirectory=engine"   # or: pipx install "git+…"
+uv tool install evident-map    # or: pipx install evident-map / pip install evident-map
 evident analyze .              # build or refresh .evident/graph.json
 evident trace "POST /api/users"
 evident impact User.email

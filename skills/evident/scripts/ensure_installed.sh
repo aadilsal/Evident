@@ -7,8 +7,8 @@ if command -v evident >/dev/null 2>&1; then
   exit 0
 fi
 
-# From the official repo until evident-map is published on PyPI (avoids installing a squatted name).
-SOURCE="git+https://github.com/aadilsal/Evident#subdirectory=engine"
+# `evident-map` on PyPI, published from the official repo by trusted publishing.
+SOURCE="evident-map"
 
 if command -v uv >/dev/null 2>&1; then
   uv tool install "$SOURCE"

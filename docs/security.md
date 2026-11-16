@@ -56,7 +56,7 @@ Evident clones and analyses repositories **it did not write and must not trust**
 The same engine runs on a developer's machine ([ADR-0005](adr/0005-cli-first-three-front-ends.md)). The rules hold there too:
 
 - **Read-only.** The engine never executes repo code and writes only inside `<repo>/.evident/`, which ignores itself (it contains its own `.gitignore`). The single exception is `evident export --out FILE`, which writes exactly the file the user named. It never follows symlinks. Git calls use a fixed argv with hooks, fsmonitor and symlinks disabled and https-only protocols.
-- **Offline by default for the skill.** The skill runs `analyze --no-llm`, so nothing leaves the machine. It asks before running its installer, which installs Evident from the official repo only (not a PyPI name we haven't claimed yet). With an LLM, only node IDs, types, labels and paths are sent (T6), never file contents.
+- **Offline by default for the skill.** The skill runs `analyze --no-llm`, so nothing leaves the machine. It asks before running its installer, which installs `evident-map` from PyPI, published from the official repo by trusted publishing (no stored token). With an LLM, only node IDs, types, labels and paths are sent (T6), never file contents.
 - **`evident open`** binds to `127.0.0.1` only and serves the bundled static UI plus two read-only endpoints: the graph, and file text for snippets. File text is served only for files the graph cites as evidence, resolved inside the repo, never through a symlink, up to 1 MB. Requests whose `Host` isn't `127.0.0.1:<port>` or `localhost:<port>` get 403, which blocks DNS rebinding. Responses carry a CSP and `nosniff`.
 - **Telemetry** is opt-in only.
 

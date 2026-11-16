@@ -90,6 +90,18 @@ def link(ctx: LinkContext) -> None:
             return (file, desc["name"])
         return None
 
+    def returned_inst(file: str, desc: JSON) -> Key | None:
+        """`include_router(build_api_router())`: the router the builder returns."""
+        if desc.get("k") != "call" or len(desc.get("chain") or []) != 1:
+            return None
+        fn = project.scope_of(project.resolve(file, desc["chain"][0]))
+        if fn is None:
+            return None
+        for ret in project.js[fn[0]]["scopes"].get(fn[1], {}).get("returns", []):
+            if (fn[0], ret) in insts:
+                return (fn[0], ret)
+        return None
+
     for file, s in project.js.items():
         if not file.endswith(".py"):
             continue
@@ -124,7 +136,7 @@ def link(ctx: LinkContext) -> None:
                 if len(c) != 2 or c[1] != "include_router" or not call.get("a"):
                     continue
                 parent = inst_of(file, {"k": "id", "name": c[0]})
-                child = inst_of(file, call["a"][0])
+                child = inst_of(file, call["a"][0]) or returned_inst(file, call["a"][0])
                 if parent is None or child is None:
                     continue
                 kw = call.get("kw", {})

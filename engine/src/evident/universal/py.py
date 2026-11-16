@@ -365,6 +365,14 @@ class _PySummary:
                     # Decorator arguments run at import time: record their calls in the module.
                     stack.extend(reversed([c for c in n.children if c.type == "decorator"]))
                 continue
+            if not skip_defs and t == "decorated_definition":
+                inner = n.child_by_field_name("definition")
+                if inner is not None and inner.type == "function_definition":
+                    # `@app.get(...)` on a function nested in a factory keeps its decorators.
+                    stack.extend(reversed([c for c in n.children if c.type == "decorator"]))
+                    key = f"{scope}.{text(inner.child_by_field_name('name'))}"
+                    self._function(inner, key, _decorators(n), scope)
+                    continue
             if not skip_defs and t in ("function_definition", "class_definition"):
                 if t == "function_definition":
                     key = f"{scope}.{text(n.child_by_field_name('name'))}"
@@ -432,7 +440,11 @@ class _PySummary:
             return
         c = py_chain(right.child_by_field_name("function"))
         if c:
-            self.scopes[scope].setdefault("locals", {})[text(left)] = {"l": line(node), "callee": c}
+            info: JSON = {"l": line(node), "callee": c}
+            _, kw = _call_args(right)
+            if kw:
+                info["kw"] = kw  # APIRouter(prefix=...) built inside an app factory
+            self.scopes[scope].setdefault("locals", {})[text(left)] = info
 
     def to_json(self) -> JSON:
         return {

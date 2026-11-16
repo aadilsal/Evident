@@ -192,3 +192,13 @@ def test_flask_subclassed_app_blueprint_loop_and_abstract_base_reads(
         "reads:handler:app/auth.py#login->model:User": ["app/auth.py:10"],
         "reads:handler:app/users.py#get_user->model:User": ["app/users.py:10"],
     }
+
+
+def test_fastapi_app_factory_with_local_routers_and_nested_routes(
+    copy_fixture: Copy, graph_validator: Draft202012Validator
+) -> None:
+    """`FastAPI()` and `APIRouter(prefix=...)` as function locals, a router returned by a builder
+    function, and `@app.get` on a function nested in the factory."""
+    g = analyse_fixture(copy_fixture("fastapi-factory"), graph_validator)
+    assert node_ids(g, "route") == {"route:GET /health", "route:GET /api/v1/items/:item_id"}
+    assert node(g, "route:GET /api/v1/items/:item_id")["confidence"] == 1.0

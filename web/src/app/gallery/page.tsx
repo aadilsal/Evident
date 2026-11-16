@@ -31,13 +31,24 @@ export default function GalleryPage() {
                 {g.routes} routes · {g.models} models · {g.findings} findings
               </Mono>
             </Link>
+            {g.license && (
+              <p className="-mt-sm pb-lg text-body-sm text-on-surface-muted">
+                Open source by {g.repo.split("/")[0]}, {g.license} licence:{" "}
+                <a
+                  href={`https://github.com/${g.repo}`}
+                  className="underline underline-offset-2 hover:text-on-surface"
+                >
+                  github.com/{g.repo}
+                </a>
+              </p>
+            )}
           </li>
         ))}
       </ul>
       <p className="mt-lg text-body-sm text-on-surface-muted">
-        These repos are public projects by Evident&apos;s author, also used in the benchmark. Larger
-        open-source repos join the gallery as the benchmark grows; each will credit its project and
-        license here.
+        Every repo here is also in the benchmark. Repos marked open source belong to their authors
+        and are shown at a pinned commit under their own licence; the rest are public projects by
+        Evident&apos;s author. Evident only reads their code as text.
       </p>
     </Page>
   );

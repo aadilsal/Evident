@@ -12,6 +12,8 @@ export interface GalleryEntry {
   routes: number;
   models: number;
   findings: number;
+  /** Set for third-party open-source repos: the project's licence (credited on the page). */
+  license?: string;
 }
 
 export interface Metric {

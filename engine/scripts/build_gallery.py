@@ -23,7 +23,21 @@ CLONES = ROOT / "benchmark" / ".repos" / "src"
 OUT = ROOT / "web" / "public" / "data" / "gallery"
 
 # Benchmark repos shown in the gallery. Each must stay under the repo's 1 MB file limit.
-FEATURED = ("MotorAi", "Munshi", "AjaiConsultancyAssignment", "Insight-OS", "SpotterTruckLogging")
+FEATURED = (
+    "MotorAi",
+    "Munshi",
+    "AjaiConsultancyAssignment",
+    "Insight-OS",
+    "SpotterTruckLogging",
+    # Public open-source benchmark repos, credited with their licence on the gallery page.
+    "typeorm-express-typescript",
+    "fastify-prisma-swagger-rest-boilerplate",
+    "express-drizzle-postgres-starter",
+    "flask-rest-api",
+    "express-mongodb-rest-api-boilerplate",
+    "nestjs-boilerplate",
+    "gymhero",
+)
 
 
 def slug(name: str) -> str:
@@ -76,6 +90,7 @@ def main() -> int:
                 "routes": counts["route"],
                 "models": counts["model"],
                 "findings": len(data["findings"]),
+                **({"license": entry["license"]} if entry.get("license") else {}),
             }
         )
         print(f"wrote {out.name}: {counts['route']} routes, {counts['model']} models")

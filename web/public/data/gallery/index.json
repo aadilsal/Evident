@@ -66,6 +66,104 @@
       "routes": 24,
       "models": 6,
       "findings": 23
+    },
+    {
+      "slug": "typeorm-express-typescript",
+      "repo": "mkosir/typeorm-express-typescript",
+      "sha": "117f6647c5aabf97b5d40af060106230a103c714",
+      "blurb": "TypeORM + Express",
+      "stack": [
+        "TypeORM",
+        "Express"
+      ],
+      "routes": 9,
+      "models": 1,
+      "findings": 8,
+      "license": "MIT"
+    },
+    {
+      "slug": "fastify-prisma-swagger-rest-boilerplate",
+      "repo": "danielm/fastify-prisma-swagger-rest-boilerplate",
+      "sha": "f4e1cedcb6653fc9cbfcac05fbe50f30df1eaae0",
+      "blurb": "Prisma + Fastify",
+      "stack": [
+        "Prisma",
+        "Fastify"
+      ],
+      "routes": 10,
+      "models": 2,
+      "findings": 10,
+      "license": "MIT"
+    },
+    {
+      "slug": "express-drizzle-postgres-starter",
+      "repo": "jatindotdev/express-drizzle-postgres-starter",
+      "sha": "58bfd065f15b18d11f85c8988e94b94aadf8160b",
+      "blurb": "Drizzle + Express",
+      "stack": [
+        "Drizzle",
+        "Express"
+      ],
+      "routes": 12,
+      "models": 1,
+      "findings": 5,
+      "license": "MIT"
+    },
+    {
+      "slug": "flask-rest-api",
+      "repo": "arsalasif/flask-rest-api",
+      "sha": "ed458830451d94c325e149a6b6956031cfa9a5b7",
+      "blurb": "SQLAlchemy + Flask",
+      "stack": [
+        "SQLAlchemy",
+        "Flask"
+      ],
+      "routes": 15,
+      "models": 3,
+      "findings": 5,
+      "license": "MIT"
+    },
+    {
+      "slug": "express-mongodb-rest-api-boilerplate",
+      "repo": "watscho/express-mongodb-rest-api-boilerplate",
+      "sha": "0ed1f89bc3e2f1a86b1b3f57f8569fa0405aa3d7",
+      "blurb": "Mongoose + Express",
+      "stack": [
+        "Mongoose",
+        "Express"
+      ],
+      "routes": 24,
+      "models": 7,
+      "findings": 3,
+      "license": "MIT"
+    },
+    {
+      "slug": "nestjs-boilerplate",
+      "repo": "Vivify-Ideas/nestjs-boilerplate",
+      "sha": "93aa9a806edd9708457a690468a3654ad0ce1a32",
+      "blurb": "TypeORM + NestJS",
+      "stack": [
+        "TypeORM",
+        "NestJS"
+      ],
+      "routes": 4,
+      "models": 1,
+      "findings": 1,
+      "license": "MIT"
+    },
+    {
+      "slug": "gymhero",
+      "repo": "JakubPluta/gymhero",
+      "sha": "890b0db70d58a59d7589af34aff8bd58b5b876a2",
+      "blurb": "SQLAlchemy + FastAPI",
+      "stack": [
+        "SQLAlchemy",
+        "FastAPI"
+      ],
+      "routes": 61,
+      "models": 9,
+      "findings": 11,
+      "license": "MIT"
     }
   ]
 }

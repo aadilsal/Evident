@@ -14,6 +14,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Release workflow: tags publish the wheel with the map UI to PyPI (trusted publishing), multi-arch images to GHCR, and a GitHub release
 - Landing page that explains Evident in 30 seconds, the "Route e" logo, a simpler hero map, the coding-agent skill install command, a transit-line analysis progress animation, a Back button on every page after the first, and Vercel Web Analytics on the hosted site only (no cookies; not in `evident open`)
 - `docs/writing-an-adapter.md`, the deployment runbook, ADR-0008
+- Gallery: 12 pre-analysed maps, adding the 7 public open-source benchmark repos, each credited to its authors with its licence
 
 ### Fixed
 
@@ -23,6 +24,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - FastAPI: app factories with local routers, routers returned by a builder function, and routes on nested functions
 - SQLAlchemy: `__abstract__` bases are not models; reads through inherited classmethods (`User.first_by` → `cls.query`)
 - The benchmark no longer crashes on Windows when a labeller's clone folder is missing
+- The sdist carries the bundled map UI, so wheels built from it (`uv build`) include `evident open`'s UI
+- A job that finished after its deadline was accepted; the timeout is now enforced first
 
 ### Changed
 

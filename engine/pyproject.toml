@@ -57,6 +57,10 @@ packages = ["src/evident"]
 # The map UI (web/ static export) is git-ignored but ships in wheels: `npm run build:bundle`.
 artifacts = ["src/evident/webui/**"]
 
+[tool.hatch.build.targets.sdist]
+# `uv build` makes the wheel from the sdist, so the sdist must carry the UI too.
+artifacts = ["src/evident/webui/**"]
+
 
 [tool.ruff]
 line-length = 100

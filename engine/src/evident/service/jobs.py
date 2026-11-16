@@ -72,12 +72,14 @@ async def run_job(
         deadline = time.monotonic() + settings.job_timeout_s
         while True:
             error = await _relay(job_id, events, store, broker) or error
-            if not child.is_alive():
-                break
+            # Deadline first: a child that finishes while events are relayed is still late.
             if time.monotonic() > deadline:
-                child.kill()
+                if child.is_alive():
+                    child.kill()
                 child.join(5)
                 error = f"analysis timed out after {settings.job_timeout_s}s"
+                break
+            if not child.is_alive():
                 break
             await asyncio.sleep(POLL_S)
         error = await _relay(job_id, events, store, broker) or error

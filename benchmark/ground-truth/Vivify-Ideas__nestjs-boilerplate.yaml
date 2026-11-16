@@ -1,0 +1,74 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo:
+  { owner: Vivify-Ideas, name: nestjs-boilerplate, sha: 93aa9a806edd9708457a690468a3654ad0ce1a32 }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-16',
+    minutes: 20,
+  }
+routes:
+  # No global prefix (src/main.ts); controller paths carry /api.
+  - {
+      method: GET,
+      path: /,
+      kind: api,
+      framework: nestjs,
+      evidence: 'src/modules/main/app.controller.ts:11',
+    }
+  - {
+      method: POST,
+      path: /api/auth/login,
+      kind: api,
+      framework: nestjs,
+      evidence: 'src/modules/auth/auth.controller.ts:16',
+    }
+  - {
+      method: POST,
+      path: /api/auth/register,
+      kind: api,
+      framework: nestjs,
+      evidence: 'src/modules/auth/auth.controller.ts:25',
+    }
+  - {
+      method: GET,
+      path: /api/auth/me,
+      kind: api,
+      framework: nestjs,
+      evidence: 'src/modules/auth/auth.controller.ts:36',
+    }
+models:
+  - { name: User, table: users, orm: typeorm, evidence: 'src/modules/user/user.entity.ts:8' }
+services: []
+edges:
+  # login -> AuthService.validateUser -> UsersService.getByEmail (findOne).
+  - {
+      route: POST /api/auth/login,
+      model: User,
+      op: read,
+      orm: typeorm,
+      evidence: 'src/modules/user/user.service.ts:19',
+    }
+  # register -> UsersService.create: getByEmail, then save.
+  - {
+      route: POST /api/auth/register,
+      model: User,
+      op: read,
+      orm: typeorm,
+      evidence: 'src/modules/user/user.service.ts:19',
+    }
+  - {
+      route: POST /api/auth/register,
+      model: User,
+      op: write,
+      orm: typeorm,
+      evidence: 'src/modules/user/user.service.ts:31',
+    }
+out_of_scope:
+  - 'Swagger UI at /api/docs (SwaggerModule.setup, registered by the library)'
+  - 'src/migrations/ (TypeORM migrations, not models)'
+notes: |
+  - GET /api/auth/me and GET / only read the user inside the JWT strategy (a guard), which the
+    edge rule excludes; the @Unique([User]) validator on RegisterPayload runs inside class-validator,
+    not from the handler, so it isn't an edge either.
+  - mysql is the app's own database, not a catalogue service.

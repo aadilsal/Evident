@@ -92,6 +92,37 @@
           "hallucinationRate": 0.0
         }
       }
+    },
+    {
+      "date": "2026-11-16",
+      "evidentSha": "7ca2bb1b5e32473c8f683fc710665ee1f4f6d37c",
+      "repos": 15,
+      "categories": {
+        "routes": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.005
+        },
+        "models": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "services": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        },
+        "edges": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "hallucinationRate": 0.0
+        }
+      }
     }
   ]
 }

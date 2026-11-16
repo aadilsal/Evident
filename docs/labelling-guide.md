@@ -77,6 +77,7 @@ Trailing slashes are removed (`/api/users/` → `/api/users`). The root page is 
 | `@app.api_route("/x", methods=["GET", "POST"])` | 1 route per method |
 | `{file_path:path}` | `:file_path*` |
 | `app.mount("/", StaticFiles(...))` | Not a route |
+| App factory: `app = FastAPI()` and `api = APIRouter(prefix="/api/v1")` inside functions, `app.include_router(build_api_router())`, `@app.get("/health")` on a nested function | Same as module level: prefixes stack through the returned router |
 
 ### Flask
 

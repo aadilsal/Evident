@@ -95,3 +95,15 @@ public_oss: # Gate B: public open-source apps for adapters with no owned repo (l
     adapters: [express, mongoose]
     license: MIT
     status: labelled
+  - owner: Vivify-Ideas
+    name: nestjs-boilerplate
+    sha: 93aa9a806edd9708457a690468a3654ad0ce1a32
+    adapters: [nestjs, typeorm]
+    license: MIT
+    status: labelled
+  - owner: JakubPluta
+    name: gymhero
+    sha: 890b0db70d58a59d7589af34aff8bd58b5b876a2
+    adapters: [fastapi, sqlalchemy]
+    license: MIT
+    status: labelled

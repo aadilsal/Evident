@@ -1,0 +1,478 @@
+# Ground truth. Rules: docs/labelling-guide.md. Labelled from source, not Evident output.
+repo: { owner: JakubPluta, name: gymhero, sha: 890b0db70d58a59d7589af34aff8bd58b5b876a2 }
+labelled:
+  {
+    by: 'claude (assisted, from source text; owner review pending)',
+    date: '2026-11-16',
+    minutes: 35,
+  }
+# Edges are left for a later pass: every handler goes through a generic CRUDRepository that is
+# constructed with the model as an argument (gymhero/crud/base.py), plus service-layer helpers,
+# so tracing reads and writes by hand needs more time than this pass had.
+unlabelled: [edges]
+routes:
+  - { method: GET, path: /health, kind: api, framework: fastapi, evidence: 'gymhero/main.py:117' }
+  - { method: GET, path: /ready, kind: api, framework: fastapi, evidence: 'gymhero/main.py:122' }
+  # Routers included on APIRouter(prefix='/api/v1') in gymhero/main.py:50-64.
+  - {
+      method: POST,
+      path: '/api/v1/auth/login',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/auth.py:30',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/auth/me',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/auth.py:50',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/auth/refresh',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/auth.py:57',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/auth/register',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/auth.py:77',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/auth/logout',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/auth.py:96',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/body-parts/all',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/body_part.py:18',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/body-parts/:body_part_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/body_part.py:33',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/body-parts/name/:body_part_name',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/body_part.py:44',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/body-parts',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/body_part.py:57',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/body-parts/:body_part_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/body_part.py:68',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/body-parts/:body_part_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/body_part.py:84',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/exercises/all',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise.py:16',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/exercises/my',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise.py:39',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/exercises/:exercise_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise.py:63',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/exercises/name/:exercise_name',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise.py:76',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/exercises',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise.py:89',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/exercises/:exercise_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise.py:115',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/exercises/:exercise_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise.py:131',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/exercise-types/all',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise_type.py:22',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/exercise-types/:exercise_type_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise_type.py:37',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/exercise-types/name/:exercise_type_name',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise_type.py:54',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/exercise-types',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise_type.py:71',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/exercise-types/:exercise_type_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise_type.py:82',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/exercise-types/:exercise_type_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/exercise_type.py:104',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/levels/all',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/level.py:18',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/levels/:level_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/level.py:29',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/levels/name/:level_name',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/level.py:36',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/levels',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/level.py:47',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/levels/:level_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/level.py:58',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/levels/:level_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/level.py:74',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-plans/all',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:25',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-plans/all/my',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:43',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-plans/:training_plan_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:61',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-plans/name/:training_plan_name',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:76',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-plans/name/:training_plan_name/superuser',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:91',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/training-plans',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:107',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/training-plans/:training_plan_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:118',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/training-plans/:training_plan_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:129',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/training-plans/:training_plan_id/training-units/:training_unit_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:145',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/training-plans/:training_plan_id/training-units/:training_unit_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:164',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-plans/:training_plan_id/training-units',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_plan.py:183',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-units/all',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:26',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-units/all/my',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:44',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-units/:training_unit_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:62',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-units/name/:training_unit_name',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:77',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-units/name/:training_unit_name/superuser',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:92',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/training-units',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:108',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/training-units/:training_unit_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:119',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/training-units/:training_unit_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:135',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/training-units/:training_unit_id/exercises/:exercise_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:146',
+    }
+  - {
+      method: PATCH,
+      path: '/api/v1/training-units/:training_unit_id/exercises/:exercise_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:162',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/training-units/:training_unit_id/exercises',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:183',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/training-units/:training_unit_id/exercises/:exercise_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/training_unit.py:196',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/users/all',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/user.py:15',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/users/:user_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/user.py:26',
+    }
+  - {
+      method: GET,
+      path: '/api/v1/users/email/:email',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/user.py:31',
+    }
+  - {
+      method: POST,
+      path: '/api/v1/users',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/user.py:36',
+    }
+  - {
+      method: DELETE,
+      path: '/api/v1/users/:user_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/user.py:41',
+    }
+  - {
+      method: PUT,
+      path: '/api/v1/users/:user_id',
+      kind: api,
+      framework: fastapi,
+      evidence: 'gymhero/api/routes/user.py:50',
+    }
+models:
+  - {
+      name: BodyPart,
+      table: body_parts,
+      orm: sqlalchemy,
+      evidence: 'gymhero/models/body_part.py:7',
+    }
+  - { name: Exercise, table: exercises, orm: sqlalchemy, evidence: 'gymhero/models/exercise.py:7' }
+  - {
+      name: ExerciseType,
+      table: exercise_types,
+      orm: sqlalchemy,
+      evidence: 'gymhero/models/exercise.py:40',
+    }
+  - { name: Level, table: levels, orm: sqlalchemy, evidence: 'gymhero/models/level.py:7' }
+  - {
+      name: TrainingPlan,
+      table: training_plans,
+      orm: sqlalchemy,
+      evidence: 'gymhero/models/training_plan.py:22',
+    }
+  - {
+      name: PrescribedSet,
+      table: prescribed_set,
+      orm: sqlalchemy,
+      evidence: 'gymhero/models/training_unit.py:7',
+    }
+  - {
+      name: TrainingUnitExercise,
+      table: training_unit_exercise,
+      orm: sqlalchemy,
+      evidence: 'gymhero/models/training_unit.py:23',
+    }
+  - {
+      name: TrainingUnit,
+      table: training_units,
+      orm: sqlalchemy,
+      evidence: 'gymhero/models/training_unit.py:47',
+    }
+  - { name: User, table: users, orm: sqlalchemy, evidence: 'gymhero/models/user.py:7' }
+services: []
+edges: []
+out_of_scope:
+  - 'migrations/ (Alembic), scripts/, tests/'
+  - 'FastAPI docs and OpenAPI routes (framework-provided, and disabled in prod)'
+notes: |
+  - training_plan_training_unit (gymhero/models/training_plan.py:6) is an association Table, not a model.
+  - Base (DeclarativeBase) and TimestampMixin are not models.
+  - PyJWT, pwdlib and structlog are libraries, not catalogue services; Postgres is the app's own database.
